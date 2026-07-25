@@ -66,7 +66,7 @@ _DEFAULT_WRITE_FILE_ERROR_MAX_CHARS = 2000
 # comfortable headroom under the factory-default 240s stream_chunk_timeout.
 # Deployments can override via env var DEERFLOW_WRITE_FILE_MAX_BYTES; set to
 # 0 (or negative) to disable the guard entirely.
-_WRITE_FILE_CONTENT_MAX_BYTES = 80 * 1024
+_WRITE_FILE_CONTENT_MAX_BYTES = 200 * 1024
 _WRITE_FILE_MAX_BYTES_ENV = "DEERFLOW_WRITE_FILE_MAX_BYTES"
 _LOCAL_BASH_CWD_COMMANDS = {"cd", "pushd"}
 _LOCAL_BASH_COMMAND_WRAPPERS = {"command", "builtin"}
