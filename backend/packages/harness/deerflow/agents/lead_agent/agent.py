@@ -346,6 +346,14 @@ def build_middlewares(
         )
     )
 
+    # Planting Research skill enforcement: counts web_search calls, tracks
+    # locale confirmation, and injects structured nudges when phases are skipped.
+    # Only activates when the planting-research skill is slash-activated or
+    # loaded into the active skill context.
+    from deerflow.agents.middlewares.planting_research_middleware import PlantingResearchMiddleware
+
+    middlewares.append(PlantingResearchMiddleware())
+
     # Capture completed task delegations and loaded skill files before
     # summarization can compact them, then inject durable context channels
     # (summary + ledger + skills) into model calls.
