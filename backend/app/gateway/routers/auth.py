@@ -464,6 +464,11 @@ _SETUP_STATUS_INFLIGHT_GUARD = asyncio.Lock()
 @router.get("/setup-status")
 async def setup_status(request: Request):
     """Check if an admin account exists. Returns needs_setup=True when no admin exists."""
+    from app.gateway.auth_disabled import is_auth_disabled
+
+    if is_auth_disabled():
+        return {"needs_setup": False, "registration_enabled": False}
+
     client_ip = _get_client_ip(request)
     now = time.time()
 
