@@ -1,6 +1,6 @@
 ---
 name: planting-research
-description: Step-by-step research and guide for planting anything — from plant biology and soil chemistry to pot selection, seed sourcing, and local environment adaptation. Triggers on "plant", "grow", "garden", "seed", "soil", "tree planting", "reforest", "crop", "potting", "fertilize", "irrigation", plus /planting-research.
+description: Step-by-step planting guide from plant selection and biology through soil chemistry, pot setup, seasonal care, and locale-specific adaptation. Use when the user mentions "plant", "grow", "garden", "seed", "soil", "tree planting", "reforest", "crop", "potting", "fertilize", or "irrigation". Covers biological and chemical requirements, monthly calendar, and beginner tutorial.
 ---
 
 # Planting Research — Practical End-to-End Guide
