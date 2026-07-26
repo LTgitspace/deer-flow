@@ -7,6 +7,16 @@ echo  Starting DeerFlow...
 echo ========================================
 echo.
 
+:: GitHub Token Check
+if "%GITHUB_TOKEN%"=="" (
+    echo WARNING: GITHUB_TOKEN is not set. GitHub MCP tools will not authenticate.
+    echo Set it with: set GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+    echo.
+) else (
+    echo GitHub token detected.
+    echo.
+)
+
 :: Kill any existing instances
 taskkill /fi "WindowTitle eq DeerFlow - Backend*" /f >nul 2>&1
 taskkill /fi "WindowTitle eq DeerFlow - Frontend*" /f >nul 2>&1
@@ -14,7 +24,7 @@ timeout /t 1 /nobreak >nul
 
 :: Start Backend Gateway
 echo [1/2] Starting Gateway on port 8001...
-start "DeerFlow - Backend" cmd /c "cd /d "%~dp0backend" && set DEER_FLOW_AUTH_DISABLED=1 && uv run uvicorn app.gateway.app:app --host 0.0.0.0 --port 8001"
+start "DeerFlow - Backend" cmd /c "cd /d "%~dp0backend" && set DEER_FLOW_AUTH_DISABLED=1 && set GITHUB_TOKEN=%GITHUB_TOKEN% && uv run uvicorn app.gateway.app:app --host 0.0.0.0 --port 8001"
 
 :: Wait for backend to initialize
 timeout /t 5 /nobreak >nul

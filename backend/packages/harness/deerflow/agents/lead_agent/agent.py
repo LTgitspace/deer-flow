@@ -354,6 +354,12 @@ def build_middlewares(
 
     middlewares.append(PlantingResearchMiddleware())
 
+    # Code Review skill enforcement: tracks context gathering, codebase indexing,
+    # iterative intent confirmation, and report completeness.
+    from deerflow.agents.middlewares.code_review_middleware import CodeReviewMiddleware
+
+    middlewares.append(CodeReviewMiddleware())
+
     # Capture completed task delegations and loaded skill files before
     # summarization can compact them, then inject durable context channels
     # (summary + ledger + skills) into model calls.
