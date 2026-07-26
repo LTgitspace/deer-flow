@@ -1,277 +1,386 @@
 ---
 name: business-requirement
-description: Structure business objectives, stakeholder needs, and process flows with quantified ROI. Use when the user asks for "business requirements", "BRD", "business case", "stakeholder needs", "process improvement", "business analysis", or "requirements gathering". Covers current/future state analysis, feasibility, risk, and cost-benefit.
+description: Elicit and document complete business requirements through continuous dialogue, end-to-end process mapping with Mermaid diagrams, scope management, feasibility assessment, and polished BRD output. Use when the user asks for "business requirements", "BRD", "business case", "stakeholder needs", "process improvement", "business analysis", or "requirements gathering".
 ---
 
 # Business Requirement Skill
 
 ## Purpose
 
-Produce a complete Business Requirements Document (BRD) that aligns stakeholders, defines business objectives, maps current and future processes, quantifies costs and benefits, and identifies risks. This is not a technical spec — it describes what the business needs and why.
+Elaborate a complete Business Requirements Document through **continuous dialogue**, not assumption. The AI asks questions at every stage, maps end-to-end flows with Mermaid diagrams, maintains scope boundaries, assesses feasibility, and produces a polished, professional BRD that stakeholders can act on.
 
 ---
 
-## Phase 1: Business Context
+## Phase 0: Continuous Context Discovery
 
-**Gate: Must complete before any detailed analysis.**
+**Gate: NEVER complete. Keep asking through every phase.**
 
-### What to Establish
+### Rules of Engagement
 
-Ask with `ask_clarification` if not provided:
+1. **No guessing** — if something is unclear, ask. Do not assume.
+2. **One question at a time** — do not batch. Each answer informs the next question.
+3. **Ask why** — when the user states a requirement, ask: "Why is this needed? What problem does it solve?"
+4. **Ask who** — for every process step: "Who does this? Who approves? Who is blocked?"
+5. **Ask when** — "When does this happen? Daily? Monthly? On trigger?"
+6. **Ask what if** — "What happens if this step fails? What is the backup today?"
 
-| Question | Why |
-|---|---|
-| What is the business problem or opportunity? | Defines the reason for the project |
-| Who requested this? Who pays? | Identifies the sponsor |
-| What happens if we do nothing? | Establishes urgency |
-| What is the business goal? (revenue / cost / compliance / retention / growth) | Aligns measurement |
-| Who are the stakeholders? | Identifies who needs to approve |
-| What is the timeline? | Defines scope boundaries |
-| What is the budget? | Defines feasibility |
+### Initial Discovery Questions
 
-### Output
+Ask in this order, one at a time:
 
-```
-## Business Context
+1. "What is the core business problem or opportunity? One sentence."
+2. "What happens if nothing changes? Who feels the pain most?"
+3. "Who are the people involved? (roles, not names)"
+4. "What is the current budget and timeline constraint?"
+5. "What does success look like in measurable terms?"
+6. "Are there existing systems or processes this must integrate with?"
+7. "Who has final approval authority?"
 
-### Problem / Opportunity Statement
-{One paragraph describing the business problem or opportunity}
-
-### Business Objectives
-
-| Objective | KPI | Current Value | Target Value | Timeline |
-|---|---|---|---|---|
-| Increase revenue | Monthly recurring revenue | $50K | $75K | 6 months |
-| Reduce cost | Support tickets closed manually | 500/month | 200/month | 3 months |
-| Improve retention | 90-day churn rate | 8% | 4% | 12 months |
-
-### Stakeholders
-
-| Name/Role | Interest | Influence (H/M/L) | Concerns | Approval Needed? |
-|---|---|---|---|---|
-| Head of Sales | Pipeline growth | High | Team training time | Yes |
-| CFO | Budget impact | High | ROI | Yes |
-| IT Director | Technical feasibility | Medium | Integration effort | No |
-| End users | Usability | Low | Learning curve | No |
-```
-
----
-
-## Phase 2: Current State Analysis
-
-**Gate: Business context defined.**
-
-### What to Map
+### Output Template (filled as you learn)
 
 ```
-## Current State — "As-Is"
+## Discovery Notes
 
-### Process Flow
-{Describe or diagram the current process step by step}
+### Core Problem
+{single sentence}
 
-### Pain Points
+### Business Impact
+{what happens if nothing changes}
 
-| Pain Point | Impact (Frequency × Severity) | Who Feels It |
-|---|---|---|
-| Manual data entry | Daily × High | Operations team |
-| No visibility into pipeline | Weekly × Medium | Sales team |
-| Approval takes 3 days | Per request × High | All stakeholders |
-
-### Current Costs
-
-| Cost Item | Monthly Cost | Annual Cost |
-|---|---|---|
-| Manual labor (hours) | $X | $Y |
-| Tooling/licenses | $X | $Y |
-| Error correction (waste) | $X | $Y |
-| **Total** | **$X** | **$Y** |
+### Stakeholders (discovered continuously)
+| Role | Interest | Pain Level | Authority |
+|---|---|---|---|
 
 ### Constraints
 | Constraint | Source | Impact |
 |---|---|---|
-| Existing system must remain during migration | IT policy | Phased rollout required |
-| Budget capped at $50K | Finance | Must scope to MVP |
-| 3-month deadline | Executive | Start ASAP, no perfect solution |
-```
----
 
-## Phase 3: Future State — Requirements
-
-**Gate: Current state documented.**
-
-### Requirements Categories
-
-```
-## Future State — "To-Be"
-
-### Business Requirements (WHAT the business needs)
-
-| ID | Requirement | Priority (MoSCoW) | Stakeholder Source |
-|---|---|---|---|
-| BR-01 | Sales team can view real-time pipeline dashboard | Must-have | Head of Sales |
-| BR-02 | Approval workflow completes within 4 hours | Must-have | All stakeholders |
-| BR-03 | Data entry reduced by 80% | Should-have | Operations |
-| BR-04 | Mobile access for field agents | Could-have | Field team |
-
-### Functional Requirements (WHAT the system must do)
-
-| ID | Requirement | Maps To (BR) |
-|---|---|---|
-| FR-01 | Dashboard auto-refreshes every 60s | BR-01 |
-| FR-02 | Notifications sent via email + in-app | BR-02 |
-| FR-03 | CSV/API import from current system | BR-03 |
-| FR-04 | Responsive web interface down to 320px | BR-04 |
-
-### Non-Functional Requirements
-
-| ID | Requirement | Target | Maps To (BR) |
-|---|---|---|---|
-| NFR-01 | System available 99.5% uptime | Monthly | BR-01 |
-| NFR-02 | Dashboard loads in < 3s | p95 | BR-01 |
-| NFR-03 | Support 50 concurrent users | MVP | BR-03 |
-| NFR-04 | Data encrypted at rest and in transit | Compliance | All |
+### Success Criteria
+{how the user will know it worked — with numbers}
 ```
 
 ---
 
-## Phase 4: Process Design
+## Phase 1: End-to-End Process Mapping
 
-**Gate: Requirements defined.**
+**Gate: Full context gathered before mapping flows.**
 
-### Future Process Flow
+### Map the Current State (As-Is)
+
+Walk through the current process step by step with the user. Ask for EVERY step:
 
 ```
-## Proposed Process — "To-Be"
+"Walk me through what happens from start to finish.
 
-1. Sales rep enters customer data → auto-saved (no save button)
-2. System checks for duplicates → if found, suggest merge
-3. Approval request sent → manager notified via app + email
-4. Manager approves/declines from phone → < 4 hours
-5. System notifies sales rep → proceeds to next step
+Start: {trigger event}
+  → What happens next? Who does it?
+  → Then what? Who approves?
+  → How long does each step take?
+  → What tools or systems are used at each step?
+  → Where do handoffs happen? What information is passed?
+  → What breaks? What are the common failure points?
+End: {final outcome}"
+```
 
-### Changes from Current Process
+### Required Mermaid Diagram — Current State
 
-| Step | Before | After | Benefit |
-|---|---|---|---|
-| Data entry | Manual, 10 min per record | Auto-import + validation, 2 min | 80% time reduction |
-| Approval | Email chain, 3 days avg | In-app approval, 4 hours max | 96% faster |
-| Visibility | Weekly email report | Real-time dashboard | Always current |
+Every process MUST be visualized as a Mermaid flowchart:
+
+```mermaid
+flowchart TD
+    A[Trigger: {event}] --> B[Role: {action}]
+    B --> C{Decision point?}
+    C -->|Yes| D[Role: {action}\nTool: {tool}\nTime: {duration}]
+    C -->|No| E[Role: {action}]
+    D --> F[End: {outcome}]
+    E --> F
+
+    style D fill:#ffcccc
+    style E fill:#ffffcc
+```
+
+- Red nodes = pain points, bottlenecks
+- Yellow nodes = manual steps that could be automated
+- Green nodes = working well
+
+### Required Mermaid Diagram — Future State (To-Be)
+
+Propose and validate the future flow:
+
+```mermaid
+flowchart TD
+    A[Trigger] --> B[Automated: {action}\nBenefit: {improvement}]
+    B --> C[Role: {action}]
+    C --> D[End: {outcome}\nMetric: {KPI}]
+```
+
+### Real-World Alternatives
+
+For each key decision, present alternatives with tradeoffs:
+
+```
+### Decision: {what to decide}
+
+| Option | Pros | Cons | Cost | Timeline | Risk |
+|---|---|---|---|---|---|
+| A: {approach} | {benefits} | {drawbacks} | $X | X weeks | {risk} |
+| B: {approach} | {benefits} | {drawbacks} | $X | X weeks | {risk} |
+| C: Do nothing | {benefits} | {drawbacks} | $0 | N/A | {risk} |
+
+**Recommended**: Option {X} because {rationale}. Confirmed by user: Yes / No
 ```
 
 ---
 
-## Phase 5: Feasibility & Risk
+## Phase 2: Scope Management
 
-**Gate: Requirements and process design complete.**
+**Gate: Processes mapped before scoping.**
 
+### Define Boundaries Explicitly
+
+```
+### In Scope
+- {item 1} — because {reason}
+- {item 2} — because {reason}
+
+### Out of Scope (Explicitly Excluded)
+- {item 1} — because {reason}. Will revisit in {Phase 2 / Never}
+- {item 2} — because {reason}
+
+### Gray Area (Needs Decision)
+- {item} — unclear if in scope. Ask: {question for stakeholder}
+```
+
+### Scope Creep Detection
+
+Periodically (after every 3-4 requirements), check:
+
+```
+"Let me pause and check alignment.
+
+Original intention: {restate the core problem from Phase 0}
+Current discussion: {what we are talking about now}
+
+Are we still on track? Has anything changed since we started?"
+```
+
+If the user adds requirements beyond the original scope:
+- Flag it immediately: "This is new. It was not part of the original scope. Should we add it to the BRD as Phase 2, or include it now?"
+- Update the scope section.
+
+---
+
+## Phase 3: Intention Anchoring
+
+**Goal**: Prevent drift. Every requirement must trace back to the original business objective.
+
+### Intention Chain
+
+For each requirement, ask:
+
+```
+"I understand you want {requirement}. This addresses {business objective from Phase 0}.
+
+How critical is this? Must-have, should-have, or nice-to-have?
+
+If this is not delivered in the initial release, what would the impact be?"
+```
+
+### Changed Intentions Log
+
+If the user changes their mind during the process:
+
+```
+### Intention Changes Log
+
+| Original Intent | Changed To | Why | When | Approved By |
+|---|---|---|---|---|
+| Build full mobile app | Build responsive web app | Budget constraint | Phase 2 | CFO |
+```
+
+---
+
+## Phase 4: Feature Feasibility Assessment
+
+**Gate: Requirements defined and scoped.**
+
+### For Each Feature or Requirement
+
+Assess feasibility on 4 dimensions:
+
+```
 ### Feasibility Assessment
 
-| Dimension | Assessment | Evidence |
-|---|---|---|
-| Technical | Feasible | Similar integrations done before |
-| Operational | Requires 2 new hires | Training plan needed |
-| Timeline | Tight but achievable | MVP in 2 months, full in 4 |
-| Budget | $45K of $50K allocated | Contingency cushion available |
+| Requirement | Technical | Operational | Financial | Timeline | Overall | Confidence |
+|---|---|---|---|---|---|---|
+| {req} | {Feasible/Risky/Blocked} | {Feasible/Needs Hire} | {In Budget/Over} | {On Track/Tight} | {Go/Caution/Stop} | High/Med/Low |
+```
 
-### Risk Register
+### Technical Feasibility
 
-| Risk | Likelihood | Impact | Mitigation | Owner |
-|---|---|---|---|---|
-| Integration delays | Medium | High | Start integration first, buffer 2 weeks | Dev lead |
-| User adoption low | Medium | Medium | Training sessions, phased rollout | Ops lead |
-| Scope creep | High | Medium | Strict MoSCoW, change control board | PM |
-| Key person leaves | Low | High | Cross-training, documentation | HR |
+- Does the technology exist? Is it proven?
+- Does the team have the skills?
+- Are there integration risks with existing systems?
 
-### Assumptions
+### Operational Feasibility
 
-1. {assumption} — if wrong, impact is {impact}
-2. {assumption} — if wrong, impact is {impact}
+- Can the organization absorb the change?
+- Is training needed? How much?
+- Will existing processes break during transition?
+
+### Financial Feasibility
+
+- Is it within budget? If not, what is the gap?
+- What is the operational cost after launch?
+- What is the expected ROI timeline?
+
+### Timeline Feasibility
+
+- Can it be delivered by the deadline?
+- What is the critical path? What has no slack?
+- What can be descoped to meet the date?
 
 ---
 
-## Phase 6: Cost-Benefit Analysis
+## Phase 5: Glossary
 
-**Gate: Feasibility accepted.**
+**Goal**: Maintain a shared vocabulary. Update continuously.
 
-### Costs
+### Glossary Template
 
-| Cost Category | Year 1 | Year 2 | Year 3 |
+```
+## Glossary
+
+| Term | Definition | Used In | Clarified By |
 |---|---|---|---|
-| Development | $X | $0 | $0 |
-| Licensing | $X | $X | $X |
-| Operations | $X | $X | $X |
-| Training | $X | $0 | $0 |
-| **Total** | **$X** | **$X** | **$X** |
+| {term} | {precise definition — no ambiguity} | Phases {X-Y} | {user / AI} |
+| {acronym} | {expansion + definition} | Phases {X-Y} | {user / AI} |
+```
 
-### Benefits
+### Glossary Rules
 
-| Benefit Category | Year 1 | Year 2 | Year 3 |
-|---|---|---|---|
-| Labor savings | $X | $X | $X |
-| Revenue increase | $X | $X | $X |
-| Error reduction | $X | $X | $X |
-| **Total** | **$X** | **$X** | **$X** |
+1. Define every domain-specific term the first time it appears
+2. Define every acronym — spell it out
+3. If the user uses a term ambiguously, ask: "You said {term}. Does that include {interpretation A} or just {interpretation B}?"
+4. Add terms proactively when you detect potential confusion
 
-### ROI Summary
+---
 
-| Metric | Value |
+## Phase 6: Consistency Review
+
+**Gate: All content drafted before consistency check.**
+
+### Cross-Reference Checks
+
+Before finalizing, verify:
+
+| Check | How |
 |---|---|
-| Total investment (3 years) | $X |
-| Total benefit (3 years) | $X |
-| Net benefit | $X |
-| ROI | X% |
-| Payback period | X months |
+| No contradictions | Scan all requirements — does any requirement conflict with another? |
+| Consistent terminology | Every term matches the Glossary. No synonyms for the same concept. |
+| Traceability | Every requirement maps to a business objective from Phase 0 |
+| Completeness | No phase left empty. All templates filled. |
+| Forward references | Nothing references a section that does not exist |
+
+### Back-to-Forth Consistency
+
+When adding new content, re-read earlier phases:
+
+```
+"I am about to add {new content} in Phase {N}.
+This relates to {earlier content} in Phase {X}.
+Let me cross-check: are these consistent? Do they conflict?
+If they conflict, I will flag it now.
 ```
 
 ---
 
-## Phase 7: Deliver
+## Phase 7: Polish & Format
 
-### Final Document
+**Gate: All content complete and consistent.**
+
+### Output Standards
+
+| Element | Standard |
+|---|---|
+| **Executive summary** | 1 page. Busy executive can read it in 2 minutes and decide. |
+| **Tables** | All using consistent column alignment. Monetary values right-aligned. |
+| **Diagrams** | All Mermaid. Every process has both as-is and to-be. |
+| **Headings** | Consistent depth: Phase → Section → Subsection. No skipped levels. |
+| **Tone** | Professional, neutral, data-driven. No exclamation marks. No passive-aggressive notes. |
+| **Citations** | Every data point has a source or an explicit assumption marker. |
+
+### Final BRD Structure
 
 ```
-# Business Requirements Document: {Project Name}
+# Business Requirements Document: {Project}
 
-## 1. Executive Summary
-{One-page summary of the entire BRD}
+## Executive Summary
+{Problem, recommendation, cost, timeline, ROI — 1 page}
 
-## 2. Business Context
-{Phase 1}
+## 1. Discovery Notes
+{Phase 0}
 
-## 3. Current State Analysis
-{Phase 2}
+## 2. Process Maps
+### Current State
+{Mermaid diagram + narrative + pain points}
+### Future State
+{Mermaid diagram + improvements + KPIs}
+### Alternatives Considered
+{Decision tables}
+
+## 3. Scope
+{In scope, out of scope, gray area}
 
 ## 4. Requirements
-{Phase 3}
+### Business Requirements
+### Functional Requirements
+### Non-Functional Requirements
+{All traced to business objectives}
 
-## 5. Process Design
-{Phase 4}
+## 5. Feasibility Assessment
+{Per-requirement feasibility matrix}
 
-## 6. Feasibility & Risk
-{Phase 5}
+## 6. Risk Register
+{Risks with likelihood, impact, mitigation, owner}
 
 ## 7. Cost-Benefit Analysis
-{Phase 6}
+{Costs, benefits, ROI, payback period}
 
-## 8. Recommendations
-{Specific recommended action with justification}
+## 8. Glossary
+{All terms and acronyms}
+
+## 9. Intention Changes Log
+{Drift tracking}
+
+## 10. Recommendations
+{Clear, specific, actionable}
 ```
 
-### Bare Minimum
+---
 
-| Phase | Minimum deliverable |
+## Bare Minimum
+
+Under tight constraints:
+
+| Deliverable | Minimum |
 |---|---|
-| Context | Problem statement + 3 business objectives with KPIs |
-| Current state | Pain points table + current costs |
-| Requirements | 5 requirements (mix of BR/FR/NFR) |
-| Feasibility | Risk register with 3 risks |
-| Cost-benefit | Simple 1-year cost vs benefit estimate |
-| Recommendation | Clear "do this / don't do this" with one-sentence justification |
+| Core problem | 1 sentence |
+| Stakeholders | 3 roles with interests |
+| As-is flow | Mermaid diagram with 5+ nodes |
+| To-be flow | Mermaid diagram with 5+ nodes |
+| Requirements | 5 minimum, traced to objectives |
+| Scope | In-scope + out-of-scope explicitly |
+| Glossary | 5+ terms defined |
+| Recommendation | Clear yes/no with rationale |
 
-### Quality Gates
+## Quality Gates
 
-- [ ] Every requirement is traceable to a business objective
-- [ ] Costs and benefits are quantified (not "save money" but "save $X/year")
-- [ ] Stakeholders are identified with their interests
-- [ ] Risks have both mitigation AND an owner
-- [ ] The deliverable ends with an actionable recommendation
+- [ ] Every requirement traces back to a business objective from Phase 0
+- [ ] Both as-is and to-be processes have Mermaid diagrams
+- [ ] Scope is explicitly defined (what is IN and what is OUT)
+- [ ] Feasibility assessed on all 4 dimensions for each feature
+- [ ] Glossary covers all domain terms and acronyms
+- [ ] No contradictions between sections (cross-referenced)
+- [ ] Intention changes are logged if any occurred
+- [ ] Executive summary is 1 page, actionable, professional

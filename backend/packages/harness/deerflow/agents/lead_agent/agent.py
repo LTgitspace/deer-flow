@@ -360,6 +360,13 @@ def build_middlewares(
 
     middlewares.append(CodeReviewMiddleware())
 
+    # Business Requirement skill enforcement: tracks context discovery, current state
+    # analysis, requirements traceability, quantification, risk register, cost-benefit,
+    # and actionable recommendation.
+    from deerflow.agents.middlewares.business_requirement_middleware import BusinessRequirementMiddleware
+
+    middlewares.append(BusinessRequirementMiddleware())
+
     # Capture completed task delegations and loaded skill files before
     # summarization can compact them, then inject durable context channels
     # (summary + ledger + skills) into model calls.
