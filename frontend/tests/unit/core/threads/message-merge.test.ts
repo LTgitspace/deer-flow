@@ -5,6 +5,7 @@ import { InfiniteQueryObserver, QueryClient } from "@tanstack/react-query";
 import {
   buildThreadMessagesPageUrl,
   buildVisibleHistoryMessages,
+  areOptimisticMessagesConfirmed,
   computeSummarizationTransientMessages,
   flattenThreadHistoryPages,
   getSummarizationMiddlewareMessages,
@@ -438,6 +439,37 @@ test("getVisibleOptimisticMessages hides optimistic user input after later serve
   expect(getVisibleOptimisticMessages([optimisticHuman], 3, 3)).toEqual([
     optimisticHuman,
   ]);
+});
+
+test("areOptimisticMessagesConfirmed returns true when server messages contain every optimistic id", () => {
+  const optimisticHuman = {
+    id: "replacement-human-1",
+    type: "human",
+    content: "edited question",
+  } as Message;
+  const serverHuman = {
+    id: "replacement-human-1",
+    type: "human",
+    content: "edited question",
+  } as Message;
+  const serverAi = {
+    id: "replacement-ai-1",
+    type: "ai",
+    content: "new answer",
+  } as Message;
+
+  expect(
+    areOptimisticMessagesConfirmed([optimisticHuman], [serverHuman, serverAi]),
+  ).toBe(true);
+});
+
+test("areOptimisticMessagesConfirmed ignores optimistic messages without stable ids", () => {
+  const optimisticHuman = {
+    type: "human",
+    content: "edited question",
+  } as Message;
+
+  expect(areOptimisticMessagesConfirmed([optimisticHuman], [])).toBe(false);
 });
 
 test("buildThreadMessagesPageUrl encodes the thread and backward cursor", () => {
@@ -909,6 +941,29 @@ test("mergeTransientHistoryBridgeOrder retains confirmed overlap as a non-render
     "message:human-2",
     "message:ai-2",
   ]);
+});
+
+test("mergeTransientHistoryBridgeOrder returns the same array when nothing is new", () => {
+  const order = mergeTransientHistoryBridgeOrder(
+    [],
+    [summarizationHuman1, summarizationAi1],
+  );
+
+  // Identity, not just equality: this runs per render while the bridge is
+  // active and feeds the coalesced render memo (#4409 Phase 1).
+  expect(mergeTransientHistoryBridgeOrder(order, [summarizationAi1])).toBe(
+    order,
+  );
+  expect(
+    mergeTransientHistoryBridgeOrder(order, [
+      summarizationHuman1,
+      summarizationAi1,
+    ]),
+  ).toBe(order);
+  expect(mergeTransientHistoryBridgeOrder(order, [])).toBe(order);
+  expect(
+    mergeTransientHistoryBridgeOrder(order, [summarizationHuman2]),
+  ).not.toBe(order);
 });
 
 test("mergeTransientHistoryBridgeOrder keeps a recaptured protected prefix in place", () => {
