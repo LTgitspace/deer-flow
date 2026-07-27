@@ -312,6 +312,27 @@ If they conflict, I will flag it now.
 
 ### Final BRD Structure
 
+Present the final document using `present_file` as a Markdown file. Optionally generate a PDF version via a short Python script using `fpdf2`.
+
+### PDF Generation (Optional)
+
+After the BRD content is finalized, you can generate a professional PDF:
+
+```python
+from fpdf import FPDF
+
+pdf = FPDF()
+pdf.add_page()
+pdf.add_font("DejaVu", style="", fname="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True)
+pdf.add_font("DejaVu", style="B", fname="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", uni=True)
+pdf.set_font("DejaVu", size=16)
+pdf.cell(text="Business Requirements Document: {project}", new_x="LMARGIN", new_y="NEXT")
+# ... add sections, tables, glossary
+pdf.output("/mnt/user-data/outputs/brd-{project}.pdf")
+```
+
+Place the script in the workspace, run it via `bash`, then present the PDF with `present_file`.
+
 ```
 # Business Requirements Document: {Project}
 
