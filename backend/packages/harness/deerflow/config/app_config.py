@@ -43,6 +43,7 @@ from deerflow.config.suggestions_config import SuggestionsConfig
 from deerflow.config.summarization_config import SummarizationConfig, load_summarization_config_from_dict
 from deerflow.config.title_config import TitleConfig, load_title_config_from_dict
 from deerflow.config.token_budget_config import TokenBudgetConfig
+from deerflow.config.vision_bridge_config import VisionBridgeConfig
 from deerflow.config.token_usage_config import TokenUsageConfig
 from deerflow.config.tool_config import ToolConfig, ToolGroupConfig
 from deerflow.config.tool_output_config import ToolOutputConfig
@@ -260,6 +261,13 @@ class AppConfig(BaseModel):
         description=format_field_description(
             "run_events",
             field_doc="Run-event store backend (memory for dev, db for production queries, jsonl for lightweight single-node persistence).",
+        ),
+    )
+    vision_bridge: VisionBridgeConfig = Field(
+        default_factory=VisionBridgeConfig,
+        description=format_field_description(
+            "vision_bridge",
+            field_doc="Route image analysis to a vision-capable model when the main model is text-only.",
         ),
     )
     agent_storage: AgentStorageConfig = Field(

@@ -1,13 +1,13 @@
 ---
-title: Deploy Your Own DeerFlow
-description: This tutorial guides you through deploying DeerFlow to a production environment using Docker Compose for multi-user access.
+title: Deploy Your Own UniDeer
+description: This tutorial guides you through deploying UniDeer to a production environment using Docker Compose for multi-user access.
 ---
 
 import { Callout, Steps } from "nextra/components";
 
-# Deploy Your Own DeerFlow
+# Deploy Your Own UniDeer
 
-This tutorial guides you through deploying DeerFlow to a production environment using Docker Compose for multi-user access.
+This tutorial guides you through deploying UniDeer to a production environment using Docker Compose for multi-user access.
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ This tutorial guides you through deploying DeerFlow to a production environment 
 
 ```bash
 git clone https://github.com/bytedance/deer-flow.git
-cd deer-flow
+cd unideer
 ```
 
 ### Create the configuration file
@@ -70,7 +70,7 @@ Open `http://your-server:2026` in your browser.
 - Configure HTTPS/TLS for nginx
 - Set `BETTER_AUTH_SECRET` to a strong random string (minimum 32 characters)
 - Configure firewall rules to allow only necessary ports
-- Back up `backend/.deer-flow/` directory regularly
+- Back up `backend/.unideer/` directory regularly
 - Consider using a container-based sandbox (`AioSandboxProvider`) for multi-user isolation
 
 ## Next steps

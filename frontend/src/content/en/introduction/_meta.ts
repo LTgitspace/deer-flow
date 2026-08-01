@@ -4,8 +4,8 @@ const meta: MetaRecord = {
   index: {
     title: "Introduction",
   },
-  "why-deerflow": {
-    title: "Why DeerFlow",
+  "why-unideer": {
+    title: "Why UniDeer",
   },
   "core-concepts": {
     title: "Core Concepts",

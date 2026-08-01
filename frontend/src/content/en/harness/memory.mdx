@@ -1,6 +1,6 @@
 ---
 title: Memory
-description: Memory is a runtime feature of the DeerFlow Harness. It is not a simple conversation log — it is a structured store of facts and context summaries that persist across separate sessions and inform the agent's behavior in future conversations.
+description: Memory is a runtime feature of the UniDeer Harness. It is not a simple conversation log — it is a structured store of facts and context summaries that persist across separate sessions and inform the agent's behavior in future conversations.
 ---
 
 import { Callout } from "nextra/components";
@@ -8,12 +8,12 @@ import { Callout } from "nextra/components";
 # Memory
 
 <Callout type="info" emoji="💾">
-  Memory lets DeerFlow carry useful information across sessions. The agent
+  Memory lets UniDeer carry useful information across sessions. The agent
   remembers user preferences, project context, and recurring facts so it can
   give better responses without starting from zero every time.
 </Callout>
 
-Memory is a runtime feature of the DeerFlow Harness. It is not a simple conversation log — it is a structured store of facts and context summaries that persist across separate sessions and inform the agent's behavior in future conversations.
+Memory is a runtime feature of the UniDeer Harness. It is not a simple conversation log — it is a structured store of facts and context summaries that persist across separate sessions and inform the agent's behavior in future conversations.
 
 ## What memory stores
 
@@ -33,7 +33,7 @@ Memory has two operation modes:
 
 1. **Injection in both modes**: at the start of each conversation, the agent's current memory is injected into the system prompt at a controlled token budget (`max_injection_tokens`).
 2. **Middleware mode (default)**: `MemoryMiddleware` runs after each Lead Agent turn. It filters the conversation, queues a background update, and extracts new facts automatically. Updates are debounced by `debounce_seconds` to batch rapid changes.
-3. **Tool mode (experimental)**: DeerFlow registers `memory_search`, `memory_add`, `memory_update`, and `memory_delete` as agent tools and skips `MemoryMiddleware`. The model decides when to search or write memory, so effectiveness depends on model tool-use behavior. These explicit CRUD tools are not the passive staleness-review path; operators who enable tool mode are opting into model-directed updates/deletes instead of the middleware staleness guardrails.
+3. **Tool mode (experimental)**: UniDeer registers `memory_search`, `memory_add`, `memory_update`, and `memory_delete` as agent tools and skips `MemoryMiddleware`. The model decides when to search or write memory, so effectiveness depends on model tool-use behavior. These explicit CRUD tools are not the passive staleness-review path; operators who enable tool mode are opting into model-directed updates/deletes instead of the middleware staleness guardrails.
 4. **Per-agent memory**: when a custom agent is active, its memory is stored separately from the global memory. This keeps different agents' knowledge isolated.
 
 In tool mode, the four `memory_*` tool names are reserved. If an MCP server or custom tool already uses `memory_search`, `memory_add`, `memory_update`, or `memory_delete`, the existing tool keeps that name and the colliding memory tool is skipped with a warning.
@@ -59,7 +59,7 @@ memory:
   # level) because they are DeerMem-specific -- a different backend
   # self-interprets its own backend_config. Unknown keys are ignored.
   backend_config:
-    # Data root. Empty = deer-flow base_dir; per-user memory at
+    # Data root. Empty = unideer base_dir; per-user memory at
     # {root}/users/{user_id}/memory.json. Absolute path = that root.
     storage_path: ""
 
@@ -104,7 +104,7 @@ memory:
   backend_config:
     base_url: http://openviking:1933
     auth_mode: trusted
-    account: deerflow
+    account: unideer
     api_key_env: OPENVIKING_API_KEY
     failure_policy:
       read: fail_open
@@ -115,13 +115,13 @@ memory:
       max_injection_chars: 12000
 ```
 
-The backend hashes each DeerFlow user/agent scope into a distinct OpenViking
+The backend hashes each UniDeer user/agent scope into a distinct OpenViking
 trusted identity. Keep trusted-mode OpenViking on an internal network and put
 the API key in the server environment, not directly in `config.yaml`.
 
 ## Global vs per-agent memory
 
-DeerFlow supports two levels of memory:
+UniDeer supports two levels of memory:
 
 - **Global memory**: stored at `{base_dir}/memory.json`. Used when no specific agent is active or when the agent has no per-agent memory file.
 - **Per-agent memory**: stored at `{base_dir}/agents/{agent_name}/memory.json`. Used when a custom agent is active, keeping that agent's learned knowledge separate.
@@ -134,9 +134,9 @@ Agent names used for memory storage are validated against `AGENT_NAME_PATTERN` t
 
 By default, memory files are stored under the backend base directory:
 
-- Base directory: `backend/.deer-flow/`
-- Global memory: `backend/.deer-flow/memory.json`
-- Per-agent memory: `backend/.deer-flow/agents/{agent_name}/memory.json`
+- Base directory: `backend/.unideer/`
+- Global memory: `backend/.unideer/memory.json`
+- Per-agent memory: `backend/.unideer/agents/{agent_name}/memory.json`
 
 You can change the storage path with the `storage_path` field. Relative paths are resolved against the base directory. Use an absolute path to store memory in a custom location.
 

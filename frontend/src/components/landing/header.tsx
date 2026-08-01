@@ -34,7 +34,7 @@ export async function Header({ className, homeURL, locale }: HeaderProps) {
           rel={isExternalHome ? "noopener noreferrer" : undefined}
           className="font-serif text-xl whitespace-nowrap"
         >
-          DeerFlow
+          UniDeer
         </a>
       </div>
       <nav className="ml-auto hidden items-center gap-5 text-sm font-medium sm:flex md:mr-8 md:gap-8">
@@ -93,7 +93,7 @@ async function StarCounter() {
 
   try {
     const response = await fetch(
-      "https://api.github.com/repos/bytedance/deer-flow",
+      "https://api.github.com/repos/bytedance/unideer",
       {
         headers: env.GITHUB_OAUTH_TOKEN
           ? {

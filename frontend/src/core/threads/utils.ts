@@ -2,11 +2,11 @@ import type { Message } from "@langchain/langgraph-sdk";
 
 import type { AgentThread, AgentThreadContext } from "./types";
 
-// Namespaced to match other internal metadata keys (``deerflow_sidecar``,
-// ``deerflow_branch``) so it cannot collide with a future feature or a
+// Namespaced to match other internal metadata keys (``unideer_sidecar``,
+// ``unideer_branch``) so it cannot collide with a future feature or a
 // client-supplied key. Keep in sync with the backend thread_meta constant and
 // the E2E mock-api constant.
-export const THREAD_PINNED_METADATA_KEY = "deerflow_pinned";
+export const THREAD_PINNED_METADATA_KEY = "unideer_pinned";
 
 export type ChannelThreadSource = {
   type: "im_channel";

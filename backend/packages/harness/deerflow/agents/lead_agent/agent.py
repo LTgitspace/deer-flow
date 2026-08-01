@@ -416,8 +416,24 @@ def build_middlewares(
     # Add ViewImageMiddleware only if the current model supports vision.
     # Use the resolved runtime model_name from make_lead_agent to avoid stale config values.
     model_config = resolved_app_config.get_model_config(model_name) if model_name else None
-    if model_config is not None and model_config.supports_vision:
+    supports_vision = model_config is not None and model_config.supports_vision
+    if supports_vision:
         middlewares.append(ViewImageMiddleware())
+    elif resolved_app_config.vision_bridge.enabled:
+        # Text-only model: route images to a vision-capable model via VisionBridgeMiddleware.
+        from deerflow.agents.middlewares.vision_bridge_middleware import VisionBridgeMiddleware
+
+        middlewares.append(
+            VisionBridgeMiddleware(
+                vision_model=resolved_app_config.vision_bridge.vision_model,
+                prompt=resolved_app_config.vision_bridge.prompt,
+            )
+        )
+        logger.info(
+            "VisionBridge enabled: main model %s is text-only; images route to %s",
+            model_name,
+            resolved_app_config.vision_bridge.vision_model,
+        )
 
     # Auto-promote deferred MCP schemas from PR1 routing metadata before the
     # deferred filter decides which schemas to hide for this model call.

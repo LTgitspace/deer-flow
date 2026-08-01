@@ -111,11 +111,14 @@ def get_available_tools(
     if model_name is None and config.models:
         model_name = config.models[0].name
 
-    # Add view_image_tool only if the model supports vision
+    # Add view_image_tool for ALL models when the vision bridge is enabled
+    # (text-only models route the image to a vision model via VisionBridgeMiddleware).
+    # When the bridge is disabled, keep the original behavior: only vision models get it.
     model_config = config.get_model_config(model_name) if model_name else None
-    if model_config is not None and model_config.supports_vision:
+    vision_bridge_enabled = getattr(config, "vision_bridge", None) is not None and config.vision_bridge.enabled
+    if model_config is not None and (model_config.supports_vision or vision_bridge_enabled):
         builtin_tools.append(view_image_tool)
-        logger.info(f"Including view_image_tool for model '{model_name}' (supports_vision=True)")
+        logger.info(f"Including view_image_tool for model '{model_name}' (supports_vision={model_config.supports_vision}, vision_bridge={vision_bridge_enabled})")
 
     # Get cached MCP tools if enabled
     # NOTE: We use ExtensionsConfig.from_file() instead of config.extensions

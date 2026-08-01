@@ -1,5 +1,5 @@
 const COMPOSER_DRAFT_VERSION = 1;
-const COMPOSER_DRAFT_PREFIX = "deerflow:composer-draft:v1";
+const COMPOSER_DRAFT_PREFIX = "unideer:composer-draft:v1";
 
 export type ComposerDraft = {
   text: string;

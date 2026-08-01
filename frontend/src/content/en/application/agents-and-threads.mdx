@@ -1,13 +1,13 @@
 ---
 title: Agents and Threads
-description: DeerFlow App supports multiple named agents and maintains conversation state across sessions through threads and checkpointing.
+description: UniDeer App supports multiple named agents and maintains conversation state across sessions through threads and checkpointing.
 ---
 
 import { Callout, Steps } from "nextra/components";
 
 # Agents and Threads
 
-DeerFlow App supports multiple named agents and maintains conversation state across sessions through threads and checkpointing.
+UniDeer App supports multiple named agents and maintains conversation state across sessions through threads and checkpointing.
 
 ## Agents
 
@@ -98,7 +98,7 @@ The `database` section controls the default persistence backend for thread state
 # SQLite (local development and single-user deployments)
 database:
   backend: sqlite
-  sqlite_dir: .deer-flow/data
+  sqlite_dir: .unideer/data
 
 # Postgres (production and multi-user deployments)
 # database:
@@ -120,12 +120,12 @@ database:
 Working files produced during a thread (uploads, intermediate files, output artifacts) are stored under:
 
 ```
-backend/.deer-flow/threads/{thread_id}/user-data/
+backend/.unideer/threads/{thread_id}/user-data/
 ```
 
 This directory is mounted into the sandbox as `/mnt/user-data/` for the agent to read and write.
 
-In Docker deployments, this path is bind-mounted from the host so that thread data persists across container restarts. Set `DEER_FLOW_ROOT` to the absolute path of your deer-flow repository root to ensure the correct host path is used.
+In Docker deployments, this path is bind-mounted from the host so that thread data persists across container restarts. Set `DEER_FLOW_ROOT` to the absolute path of your unideer repository root to ensure the correct host path is used.
 
 <Cards num={2}>
   <Cards.Card

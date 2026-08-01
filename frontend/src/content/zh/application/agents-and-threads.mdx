@@ -1,6 +1,6 @@
 ---
 title: Agent 与线程
-description: 了解 DeerFlow 中 Agent 与线程的关系，以及如何管理自定义 Agent 和对话线程。
+description: 了解 UniDeer 中 Agent 与线程的关系，以及如何管理自定义 Agent 和对话线程。
 ---
 
 import { Callout, Steps } from "nextra/components";
@@ -14,7 +14,7 @@ import { Callout, Steps } from "nextra/components";
 
 ## 自定义 Agent
 
-DeerFlow 允许你创建多个具有不同专业领域的自定义 Agent。每个 Agent 使用 DeerFlow Harness 相同的 Lead Agent 运行时，但具有不同的：
+UniDeer 允许你创建多个具有不同专业领域的自定义 Agent。每个 Agent 使用 UniDeer Harness 相同的 Lead Agent 运行时，但具有不同的：
 
 - 模型（例如为一个 Agent 使用 GPT-4o，为另一个使用 Claude）
 - 系统提示和指令
@@ -27,7 +27,7 @@ DeerFlow 允许你创建多个具有不同专业领域的自定义 Agent。每�
 
 #### 通过界面
 
-1. 打开 DeerFlow 应用。
+1. 打开 UniDeer 应用。
 2. 点击侧边栏中的 **Agents**（Agent 管理）。
 3. 点击 **New Agent**（新建 Agent）。
 4. 填写名称、描述和配置。
@@ -74,7 +74,7 @@ curl -X POST http://localhost:8001/api/agents \
 
 ### 线程持久化配置
 
-DeerFlow 在每次 Agent 轮次后自动保存线程状态。使用持久化后端时，这允许：
+UniDeer 在每次 Agent 轮次后自动保存线程状态。使用持久化后端时，这允许：
 
 - 在服务器重启后恢复线程。
 - 在长时间间隔后继续对话。
@@ -86,7 +86,7 @@ DeerFlow 在每次 Agent 轮次后自动保存线程状态。使用持久化后�
 # SQLite（本地开发和单用户部署）
 database:
   backend: sqlite
-  sqlite_dir: .deer-flow/data
+  sqlite_dir: .unideer/data
 
 # Postgres（生产环境和多用户部署）
 # database:
@@ -101,10 +101,10 @@ database:
 
 ### 线程数据目录
 
-每个线程在 `.deer-flow/threads/{thread_id}/` 下有一个专用目录：
+每个线程在 `.unideer/threads/{thread_id}/` 下有一个专用目录：
 
 ```
-.deer-flow/threads/{thread_id}/
+.unideer/threads/{thread_id}/
   user-data/
     uploads/     ← 用户上传的文件
     outputs/     ← Agent 生成的产出物

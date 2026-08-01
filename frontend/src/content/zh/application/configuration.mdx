@@ -1,17 +1,17 @@
 ---
 title: 配置
-description: 本页面涵盖 DeerFlow 应用的所有配置层——`config.yaml`、前端环境变量、`extensions_config.json` 和运行时环境变量。
+description: 本页面涵盖 UniDeer 应用的所有配置层——`config.yaml`、前端环境变量、`extensions_config.json` 和运行时环境变量。
 ---
 
 import { Callout, Tabs } from "nextra/components";
 
 # 配置
 
-本页面涵盖 DeerFlow 应用的所有配置层——`config.yaml`、前端环境变量、`extensions_config.json` 和运行时环境变量。
+本页面涵盖 UniDeer 应用的所有配置层——`config.yaml`、前端环境变量、`extensions_config.json` 和运行时环境变量。
 
 ## config.yaml
 
-`config.yaml` 是 DeerFlow 的主要配置文件。所有 Agent 行为、模型选择、工具加载和运行时功能都由它控制。
+`config.yaml` 是 UniDeer 的主要配置文件。所有 Agent 行为、模型选择、工具加载和运行时功能都由它控制。
 
 参见[配置](/docs/harness/configuration)参考页面了解文件格式和每个章节的详细说明。
 
@@ -113,12 +113,12 @@ ollama pull llama3.3
 ```yaml
 # 本地开发（默认）
 sandbox:
-  use: deerflow.sandbox.local:LocalSandboxProvider
+  use: unideer.sandbox.local:LocalSandboxProvider
   allow_host_bash: false
 
 # 基于容器（推荐用于多用户）
 sandbox:
-  use: deerflow.community.aio_sandbox:AioSandboxProvider
+  use: unideer.community.aio_sandbox:AioSandboxProvider
   replicas: 3
   idle_timeout: 600
 ```
@@ -129,12 +129,12 @@ sandbox:
 
 ```yaml
 tools:
-  - use: deerflow.community.ddg_search.tools:web_search_tool
-  - use: deerflow.community.jina_ai.tools:web_fetch_tool
-  - use: deerflow.sandbox.tools:ls_tool
-  - use: deerflow.sandbox.tools:read_file_tool
-  - use: deerflow.sandbox.tools:write_file_tool
-  - use: deerflow.sandbox.tools:bash_tool
+  - use: unideer.community.ddg_search.tools:web_search_tool
+  - use: unideer.community.jina_ai.tools:web_fetch_tool
+  - use: unideer.sandbox.tools:ls_tool
+  - use: unideer.sandbox.tools:read_file_tool
+  - use: unideer.sandbox.tools:write_file_tool
+  - use: unideer.sandbox.tools:bash_tool
 ```
 
 ### 技能
@@ -149,17 +149,17 @@ skills:
 
 ### 数据库后端
 
-DeerFlow 使用 `database` 配置同时管理 LangGraph 检查点数据和应用数据，例如运行记录、反馈和线程元数据。
+UniDeer 使用 `database` 配置同时管理 LangGraph 检查点数据和应用数据，例如运行记录、反馈和线程元数据。
 
 默认使用 SQLite，适合本地开发和单节点单用户持久化：
 
 ```yaml
 database:
   backend: sqlite
-  sqlite_dir: .deer-flow/data
+  sqlite_dir: .unideer/data
 ```
 
-SQLite 模式会把数据写入同一个 `deerflow.db` 文件。它适合开发或单用户部署，但生产并发流量可能触发 SQLite 的单写者限制，出现 `sqlite3.OperationalError: database is locked`。
+SQLite 模式会把数据写入同一个 `unideer.db` 文件。它适合开发或单用户部署，但生产并发流量可能触发 SQLite 的单写者限制，出现 `sqlite3.OperationalError: database is locked`。
 
 生产环境或多用户部署请使用 Postgres：
 
@@ -172,7 +172,7 @@ run_events:
   backend: db
 ```
 
-在环境变量中设置 `DATABASE_URL`，例如 `postgresql://user:password@localhost:5432/deerflow`。
+在环境变量中设置 `DATABASE_URL`，例如 `postgresql://user:password@localhost:5432/unideer`。
 
 本地运行时安装 PostgreSQL 支持：
 
@@ -225,8 +225,8 @@ BETTER_AUTH_SECRET=local-dev-secret-at-least-32-chars
 ```
 
 <Callout type="warning">
-  不要为 DeerFlow 工作区文件引入 MCP filesystem server。它会与 DeerFlow
-  内置文件工具形成路径语义不同的重复能力，让 LLM 行为不稳定。DeerFlow
+  不要为 UniDeer 工作区文件引入 MCP filesystem server。它会与 UniDeer
+  内置文件工具形成路径语义不同的重复能力，让 LLM 行为不稳定。UniDeer
   当前没有为 filesystem server 适配 MCP Roots 模式，也不会把{" "}
   <code>/mnt/user-data/...</code> 这类沙箱路径映射成{" "}
   <code>@modelcontextprotocol/server-filesystem</code> 可接受的路径。
@@ -234,11 +234,11 @@ BETTER_AUTH_SECRET=local-dev-secret-at-least-32-chars
 
 ### 技能启用状态
 
-技能启用状态会反映在 `extensions_config.json` 中。你可以直接编辑它，或通过 DeerFlow 应用界面进行管理。
+技能启用状态会反映在 `extensions_config.json` 中。你可以直接编辑它，或通过 UniDeer 应用界面进行管理。
 
 ## 运行时环境变量
 
-这些变量在 DeerFlow 进程中设置（通过 `.env`、Docker 环境或 shell）：
+这些变量在 UniDeer 进程中设置（通过 `.env`、Docker 环境或 shell）：
 
 | 变量                    | 默认值           | 描述                                             |
 | ----------------------- | ---------------- | ------------------------------------------------ |
