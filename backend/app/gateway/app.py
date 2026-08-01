@@ -210,6 +210,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     config = get_gateway_config()
     logger.info(f"Starting API Gateway on {config.host}:{config.port}")
 
+    from deerflow.skills.projection import ensure_public_skill_projection
+
+    public_projection_ready = await asyncio.to_thread(ensure_public_skill_projection, app_config=startup_config)
+    if public_projection_ready:
+        logger.info("Ensured the public skill projection; user projections repair lazily on sandbox acquire")
+
     # Agent observability (Monocle). Off by default; enabled with
     # MONOCLE_TRACING. Initialized here at startup — not at import time — so a
     # plain `import deerflow.agents` never installs a process-global tracer.
@@ -228,7 +234,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         from deerflow.agents.memory import get_memory_manager
 
         if startup_config.memory.enabled:
-            manager = get_memory_manager()
+            manager = await asyncio.to_thread(get_memory_manager)
             warm_retrieval = getattr(manager, "warm_retrieval", None)
             if callable(warm_retrieval):
                 retrieval_warm_task = asyncio.create_task(
@@ -252,7 +258,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         from deerflow.agents.memory import get_memory_manager
 
-        manager = get_memory_manager()
+        manager = await asyncio.to_thread(get_memory_manager)
         warmed = await asyncio.wait_for(
             asyncio.to_thread(manager.warm),
             timeout=5,
@@ -411,7 +417,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             if app_cfg.memory.enabled:
                 from deerflow.agents.memory import get_memory_manager
 
-                manager = get_memory_manager()
+                manager = await asyncio.to_thread(get_memory_manager)
                 flush_timeout = app_cfg.memory.shutdown_flush_timeout_seconds
                 completed = await asyncio.to_thread(manager.shutdown_flush, flush_timeout)
                 if completed:

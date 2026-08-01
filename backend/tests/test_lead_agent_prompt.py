@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from typing import cast
 
 import anyio
+import pytest
 
 from deerflow.agents.lead_agent import prompt as prompt_module
 from deerflow.config.app_config import AppConfig
@@ -110,7 +111,7 @@ def test_apply_prompt_template_includes_memory_tool_guidance_only_in_tool_mode(m
         skills=SimpleNamespace(container_path="/mnt/skills", use="deerflow.skills.storage.local_skill_storage:LocalSkillStorage", get_skills_path=lambda: Path("/tmp/skills")),
         skill_evolution=SimpleNamespace(enabled=False),
         tool_search=SimpleNamespace(enabled=False),
-        memory=SimpleNamespace(enabled=True, mode="tool"),
+        memory=SimpleNamespace(enabled=True, mode="tool", injection_enabled=False),
         acp_agents={},
     )
     middleware_config = SimpleNamespace(
@@ -133,6 +134,8 @@ def test_apply_prompt_template_includes_memory_tool_guidance_only_in_tool_mode(m
     assert "<memory_tool_system>" in tool_prompt
     assert "memory_search" in tool_prompt
     assert "memory_add" in tool_prompt
+    assert "agent facts are not injected automatically" in tool_prompt
+    assert "When present, the injected <memory> block contains only global user and history summaries" in tool_prompt
     assert "<memory_tool_system>" not in middleware_prompt
 
 
@@ -231,6 +234,10 @@ def test_apply_prompt_template_includes_subagent_total_limit(monkeypatch):
 
     assert "MAXIMUM 3 `task` CALLS PER RESPONSE" in prompt
     assert "MAXIMUM 5 `task` CALLS PER RUN" in prompt
+    assert "Default to direct execution" in prompt
+    assert "DELEGATION CHECK" in prompt
+    assert "expected benefit from real parallel latency" in prompt
+    assert "HARD LIMITS ARE NON-NEGOTIABLE" in prompt
 
 
 def test_apply_prompt_template_clamps_subagent_limits_to_enforced_bounds(monkeypatch):
@@ -301,7 +308,12 @@ def test_apply_prompt_template_single_subagent_limit_matches_middleware(monkeypa
     )
 
     assert f"MAXIMUM {enforced} `task` CALLS PER RESPONSE" in prompt
-    assert f"HARD LIMITS: max {enforced} `task` calls per response" in prompt
+    assert f"HARD LIMITS ARE NON-NEGOTIABLE: max {enforced} `task` calls per response" in prompt
+    assert "Expected benefit = specialist capability + context isolation" in prompt
+    assert "delegate only for material specialist or context-isolation benefit" in prompt
+    assert "expected benefit from real parallel latency" not in prompt
+    assert "material within-batch parallel savings" not in prompt
+    assert "Multi-batch example" not in prompt
 
 
 def test_build_acp_section_uses_explicit_app_config_without_global_config(monkeypatch):
@@ -345,6 +357,37 @@ def test_get_memory_context_uses_explicit_app_config_without_global_config(monke
         "agent_name": "agent-a",
         "user_id": "user-1",
     }
+
+
+def test_get_memory_context_propagates_fail_closed_manager_error(monkeypatch):
+    from deerflow.agents.memory import MemoryManagerError
+
+    explicit_config = SimpleNamespace(
+        memory=SimpleNamespace(
+            enabled=True,
+            injection_enabled=True,
+            backend_config={"failure_policy": {"read": "fail_closed"}},
+        ),
+    )
+    manager = SimpleNamespace(get_context=lambda *args, **kwargs: (_ for _ in ()).throw(MemoryManagerError("down")))
+    monkeypatch.setattr("deerflow.agents.memory.get_memory_manager", lambda: manager)
+    monkeypatch.setattr("deerflow.runtime.user_context.get_effective_user_id", lambda: "user-1")
+
+    with pytest.raises(MemoryManagerError, match="down"):
+        prompt_module._get_memory_context("agent-a", app_config=explicit_config)
+
+
+def test_get_memory_context_swallows_manager_error_without_fail_closed(monkeypatch):
+    from deerflow.agents.memory import MemoryManagerError
+
+    explicit_config = SimpleNamespace(
+        memory=SimpleNamespace(enabled=True, injection_enabled=True, backend_config={}),
+    )
+    manager = SimpleNamespace(get_context=lambda *args, **kwargs: (_ for _ in ()).throw(MemoryManagerError("down")))
+    monkeypatch.setattr("deerflow.agents.memory.get_memory_manager", lambda: manager)
+    monkeypatch.setattr("deerflow.runtime.user_context.get_effective_user_id", lambda: "user-1")
+
+    assert prompt_module._get_memory_context("agent-a", app_config=explicit_config) == ""
 
 
 def test_get_memory_context_prefers_explicit_user_id(monkeypatch):
