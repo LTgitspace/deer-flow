@@ -72,9 +72,8 @@ function MessageGroupComponent({
   const [showAbove, setShowAbove] = useState(
     env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY === "true",
   );
-  const [showLastThinking, setShowLastThinking] = useState(
-    env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY === "true",
-  );
+  // Always visible by default (Zed-style): thinking content shows inline.
+  const [showLastThinking, setShowLastThinking] = useState(true);
   const steps = useMemo(() => convertToSteps(messages), [messages]);
   const stepIndexByStep = useMemo(
     () => new Map(steps.map((step, index) => [step, index] as const)),
