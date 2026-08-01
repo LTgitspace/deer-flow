@@ -268,6 +268,17 @@ def create_chat_model(name: str | None = None, thinking_enabled: bool = False, *
     if not model_config.supports_reasoning_effort:
         kwargs.pop("reasoning_effort", None)
         model_settings_from_config.pop("reasoning_effort", None)
+    else:
+        # Explicit per-run reasoning_effort (from frontend/run context) wins
+        # over the config-level default. Without this, both end up in
+        # model_class(**kwargs, **model_settings_from_config) and Python
+        # raises "got multiple values for keyword argument".
+        explicit_effort = kwargs.pop("reasoning_effort", None)
+        if explicit_effort is not None:
+            if thinking_enabled and explicit_effort in ("low", "medium", "high", "xhigh"):
+                model_settings_from_config["reasoning_effort"] = explicit_effort
+            elif not thinking_enabled:
+                model_settings_from_config["reasoning_effort"] = "minimal"
 
     # Normalize the api_base -> base_url alias FIRST, so the downstream OpenAI-compatible
     # heuristics (stream_usage default below / stream_chunk_timeout) see the canonical endpoint key.
