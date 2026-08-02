@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import sys
 from datetime import UTC, datetime
 from typing import Any
 
@@ -54,10 +56,55 @@ class TraceTextFormatter(logging.Formatter):
     _deerflow_trace_formatter = True
 
 
+# ── Colored console output ──
+# INFO renders green; other levels use the standard scheme. ANSI escapes are
+# only emitted when stderr is a TTY (or NO_COLOR is unset), so logs piped to a
+# file stay plain.
+
+_LEVEL_COLORS = {
+    "DEBUG": "\033[36m",  # cyan
+    "INFO": "\033[32m",  # green
+    "WARNING": "\033[33m",  # yellow
+    "ERROR": "\033[31m",  # red
+    "CRITICAL": "\033[1;31m",  # bold red
+}
+_RESET = "\033[0m"
+
+
+class ColoredLevelFormatter(logging.Formatter):
+    """Formatter that colors the level name; auto-disabled when not a TTY."""
+
+    def __init__(self, fmt: str | None = None, datefmt: str | None = None, *, use_colors: bool | None = None):
+        super().__init__(fmt, datefmt)
+        if sys.platform == "win32":
+            try:
+                import colorama  # noqa: F401
+
+                colorama.init()
+            except ImportError:
+                pass
+        if use_colors is None:
+            use_colors = "NO_COLOR" not in os.environ and bool(getattr(sys.stderr, "isatty", lambda: False)())
+        self.use_colors = use_colors
+
+    def format(self, record: logging.LogRecord) -> str:
+        color = _LEVEL_COLORS.get(record.levelname) if self.use_colors else None
+        if color is None:
+            return super().format(record)
+        levelname = record.levelname
+        record.levelname = f"{color}{levelname}{_RESET}"
+        try:
+            return super().format(record)
+        finally:
+            record.levelname = levelname
+
+
 def _ensure_root_handler() -> None:
     if logging.root.handlers:
         return
-    logging.basicConfig(level=logging.INFO, format=DEFAULT_LOG_FORMAT, datefmt=DEFAULT_LOG_DATE_FORMAT)
+    handler = logging.StreamHandler()
+    handler.setFormatter(ColoredLevelFormatter(DEFAULT_LOG_FORMAT, datefmt=DEFAULT_LOG_DATE_FORMAT))
+    logging.basicConfig(level=logging.INFO, handlers=[handler])
 
 
 def _has_trace_filter(handler: logging.Handler) -> bool:
@@ -74,7 +121,7 @@ def _remove_trace_filter(handler: logging.Handler) -> None:
 
 
 def _default_formatter() -> logging.Formatter:
-    return logging.Formatter(DEFAULT_LOG_FORMAT, datefmt=DEFAULT_LOG_DATE_FORMAT)
+    return ColoredLevelFormatter(DEFAULT_LOG_FORMAT, datefmt=DEFAULT_LOG_DATE_FORMAT)
 
 
 def _trace_formatter(format_name: str | None) -> logging.Formatter:
