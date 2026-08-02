@@ -16,12 +16,12 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Awaitable, Callable
-from typing import Any, override
+from typing import override
 
 from langchain.agents import AgentState
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ModelCallResult, ModelRequest, ModelResponse
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 logger = logging.getLogger(__name__)
 
@@ -247,6 +247,12 @@ class CodeReviewMiddleware(AgentMiddleware[AgentState]):
 
     # ── Lifecycle hooks ──
 
+    @staticmethod
+    def _log_nudges(nudges: list[HumanMessage]) -> None:
+        """Log every injected nudge for observability."""
+        for nudge in nudges:
+            logger.info("CodeReviewMiddleware trigger: %s", str(nudge.content)[:120].replace("\n", " "))
+
     @override
     def wrap_model_call(
         self,
@@ -311,6 +317,7 @@ class CodeReviewMiddleware(AgentMiddleware[AgentState]):
                     break
             for nudge in reversed(nudges):
                 patched.insert(insert_at, nudge)
+            self._log_nudges(nudges)
             request = request.override(messages=patched)
 
         return handler(request)
@@ -371,6 +378,7 @@ class CodeReviewMiddleware(AgentMiddleware[AgentState]):
                     break
             for nudge in reversed(nudges):
                 patched.insert(insert_at, nudge)
+            self._log_nudges(nudges)
             request = request.override(messages=patched)
 
         return await handler(request)

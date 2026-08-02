@@ -92,6 +92,21 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
     def _locale_confirmed(state: dict[str, Any]) -> bool:
         return (state.get("custom_data") or {}).get(_LOCALE_CONFIRMED_KEY, False)
 
+    @staticmethod
+    def _has_mermaid(messages: list) -> bool:
+        """True if the latest AI content already contains a mermaid diagram."""
+        for msg in reversed(messages):
+            if not isinstance(msg, AIMessage):
+                continue
+            if getattr(msg, "tool_calls", None):
+                continue
+            content = str(getattr(msg, "content", "") or "").lower()
+            return any(
+                marker in content
+                for marker in ("mermaid", "graph td", "graph lr", "sequencediagram", "flowchart")
+            )
+        return False
+
     # ── Per-step utilities ──
 
     def _extract_search_queries(self, messages: list) -> tuple[int, set[str]]:
@@ -186,9 +201,20 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
                 "Search from different angles — you need varied perspectives, not variants "
                 "of the same query."
             ),
+            "mermaid": (
+                "[SYSTEM REMINDER] Your final answer must include at least one mermaid diagram "
+                "(```mermaid ... ``` code block) visualizing the key structure, process, or flow "
+                "of your research. If your answer already contains one, ignore this."
+            ),
         }
         content = nudges.get(phase, nudges.get(missing, f"[SYSTEM REMINDER] Complete phase: {phase}"))
         return HumanMessage(content=content, additional_kwargs={"hide_from_ui": True})
+
+    @staticmethod
+    def _log_nudges(nudges: list[HumanMessage]) -> None:
+        """Log every injected nudge for observability."""
+        for nudge in nudges:
+            logger.info("PlantingResearchMiddleware trigger: %s", str(nudge.content)[:120].replace("\n", " "))
 
     # ── Lifecycle hooks ──
 
@@ -227,6 +253,10 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
             if calendar_months_found < MIN_MONTHS_IN_CALENDAR:
                 nudges.append(self._build_nudge(PHASE_CALENDAR, "", search_count))
 
+        # Gate 4: Synthesis must include a mermaid diagram
+        if search_count >= MIN_SEARCHES_BEFORE_SYNTHESIS and not self._has_mermaid(messages):
+            nudges.append(self._build_nudge("", "mermaid", search_count))
+
         # Inject nudges as hidden messages before the model call
         if nudges:
             # Find insertion point: after the last system message, before user messages
@@ -238,6 +268,7 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
                     break
             for nudge in reversed(nudges):
                 patched.insert(insert_at, nudge)
+            self._log_nudges(nudges)
             request = request.override(messages=patched)
 
         return handler(request)
@@ -275,6 +306,9 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
             if calendar_months_found < MIN_MONTHS_IN_CALENDAR:
                 nudges.append(self._build_nudge(PHASE_CALENDAR, "", search_count))
 
+        if search_count >= MIN_SEARCHES_BEFORE_SYNTHESIS and not self._has_mermaid(messages):
+            nudges.append(self._build_nudge("", "mermaid", search_count))
+
         if nudges:
             patched = list(messages)
             insert_at = 0
@@ -284,6 +318,7 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
                     break
             for nudge in reversed(nudges):
                 patched.insert(insert_at, nudge)
+            self._log_nudges(nudges)
             request = request.override(messages=patched)
 
         return await handler(request)

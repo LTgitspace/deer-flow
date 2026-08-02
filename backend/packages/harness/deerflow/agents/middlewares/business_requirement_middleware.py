@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Awaitable, Callable
-from typing import Any, override
+from typing import override
 
 from langchain.agents import AgentState
 from langchain.agents.middleware import AgentMiddleware
@@ -327,6 +327,12 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
         }
         return HumanMessage(content=nudges.get(reason, ""), additional_kwargs={"hide_from_ui": True})
 
+    @staticmethod
+    def _log_nudges(nudges: list[HumanMessage]) -> None:
+        """Log every injected nudge for observability."""
+        for nudge in nudges:
+            logger.info("BusinessRequirementMiddleware trigger: %s", str(nudge.content)[:120].replace("\n", " "))
+
     # ── Lifecycle hooks ──
 
     @override
@@ -341,7 +347,6 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
         clarifications = self._count_clarification_asks(messages)
         context_ok = self._context_answered(messages)
         has_obj = self._has_objectives(messages)
-        has_stake = self._has_stakeholders(messages)
         has_mermaid = self._has_mermaid(messages)
         has_scope = self._has_scope(messages)
         has_current = self._has_current_state(messages)
@@ -421,6 +426,7 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
                     break
             for nudge in reversed(nudges):
                 patched.insert(insert_at, nudge)
+            self._log_nudges(nudges)
             request = request.override(messages=patched)
 
         return handler(request)
@@ -437,7 +443,6 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
         clarifications = self._count_clarification_asks(messages)
         context_ok = self._context_answered(messages)
         has_obj = self._has_objectives(messages)
-        has_stake = self._has_stakeholders(messages)
         has_mermaid = self._has_mermaid(messages)
         has_scope = self._has_scope(messages)
         has_current = self._has_current_state(messages)
@@ -493,6 +498,7 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
                     break
             for nudge in reversed(nudges):
                 patched.insert(insert_at, nudge)
+            self._log_nudges(nudges)
             request = request.override(messages=patched)
 
         return await handler(request)

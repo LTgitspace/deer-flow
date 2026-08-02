@@ -474,6 +474,13 @@ def build_middlewares(
 
     middlewares.append(BusinessRequirementMiddleware())
 
+    # Deep Research skill enforcement: clarification-first research (3 questions
+    # before searching, follow-ups for thin answers), no guessing, mandatory
+    # search/fetch depth, mid-process direction checks, and citations.
+    from deerflow.agents.middlewares.deep_research_middleware import DeepResearchMiddleware
+
+    middlewares.append(DeepResearchMiddleware())
+
     # Capture completed task delegations and loaded skill files before
     # summarization can compact them, then inject durable context channels
     # (summary + ledger + skills) into model calls.
