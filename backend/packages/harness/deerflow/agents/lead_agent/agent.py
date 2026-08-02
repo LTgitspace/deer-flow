@@ -481,6 +481,13 @@ def build_middlewares(
 
     middlewares.append(DeepResearchMiddleware())
 
+    # System Design skill enforcement: sizing checkpoint first (Lane A/B/C), no
+    # guessing on requirements, mermaid-first diagrams, lane-consistent depth,
+    # approval gate, and a mandatory build order.
+    from deerflow.agents.middlewares.system_design_middleware import SystemDesignMiddleware
+
+    middlewares.append(SystemDesignMiddleware())
+
     # Capture completed task delegations and loaded skill files before
     # summarization can compact them, then inject durable context channels
     # (summary + ledger + skills) into model calls.
