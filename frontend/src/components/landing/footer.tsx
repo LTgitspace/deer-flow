@@ -1,13 +1,18 @@
-import { useMemo } from "react";
+import Link from "next/link";
 
+import { DEFAULT_LOCALE, type Locale } from "@/core/i18n/locale";
+import { getI18n } from "@/core/i18n/server";
 import { cn } from "@/lib/utils";
 
 export type FooterProps = {
   className?: string;
+  locale?: Locale;
 };
 
-export function Footer({ className }: FooterProps) {
-  const year = useMemo(() => new Date().getFullYear(), []);
+export async function Footer({ className, locale }: FooterProps) {
+  const year = new Date().getFullYear();
+  const { locale: resolvedLocale } = await getI18n(locale ?? DEFAULT_LOCALE);
+  const lang = resolvedLocale.substring(0, 2);
   return (
     <footer
       className={cn(
@@ -22,7 +27,10 @@ export function Footer({ className }: FooterProps) {
         </p>
       </div>
       <div className="text-muted-foreground container mb-8 flex flex-col items-center justify-center text-xs">
-        <p>Licensed under MIT License</p>
+        <p>UniDeer, a fork of DeerFlow</p>
+        <Link href={`/${lang}/license`} className="hover:text-foreground transition-colors">
+          Licensed under MIT License
+        </Link>
         <p>&copy; {year} UniDeer</p>
       </div>
     </footer>

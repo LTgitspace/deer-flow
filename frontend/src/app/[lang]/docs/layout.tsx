@@ -31,7 +31,7 @@ export default async function DocLayout({ children, params }) {
       }
       pageMap={pageMap}
       docsRepositoryBase="https://github.com/bytedance/deer-flow/tree/main/frontend"
-      footer={<Footer className="mt-0" />}
+      footer={<Footer className="mt-0" locale={locale} />}
       i18n={i18n}
       // ... Your additional layout options
     >

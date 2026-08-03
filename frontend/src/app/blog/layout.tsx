@@ -26,7 +26,7 @@ export default async function BlogLayout({ children }) {
       pageMap={pageMap}
       sidebar={{ defaultOpen: true }}
       docsRepositoryBase="https://github.com/bytedance/deer-flow/tree/main/frontend"
-      footer={<Footer />}
+      footer={<Footer locale={locale} />}
     >
       {children}
     </Layout>

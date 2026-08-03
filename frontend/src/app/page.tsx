@@ -20,7 +20,7 @@ export default function LandingPage() {
         <WhatsNewSection />
         <CommunitySection />
       </main>
-      <Footer />
+      <Footer locale={DEFAULT_LOCALE} />
     </div>
   );
 }
