@@ -152,9 +152,14 @@ class DeepResearchMiddleware(AgentMiddleware[AgentState]):
                 queries.add(query)
         return search_count, fetch_count, queries
 
-    def _ai_asked_clarification(self, messages: list) -> bool:
-        """True if the model asked a clarification question set."""
-        for msg in reversed(messages):
+    def _ai_asked_clarification(self, messages: list, lookback: int = 12) -> bool:
+        """True if the model asked a clarification question set in the recent exchange.
+
+        Scoped to the last ``lookback`` messages so old questions from a previous
+        topic in a long thread do not permanently satisfy the gate — a new
+        research question must get fresh clarification.
+        """
+        for msg in reversed(messages[-lookback:]):
             if not isinstance(msg, AIMessage):
                 continue
             if getattr(msg, "tool_calls", None):
@@ -252,14 +257,34 @@ class DeepResearchMiddleware(AgentMiddleware[AgentState]):
     ) -> list[HumanMessage]:
         nudges: list[HumanMessage] = []
 
-        # Rule 1+2: clarification first — never research without user context.
-        if search_count == 0 and not self._ai_asked_clarification(messages):
-            nudges.append(
-                self._nudge(
+        # Rule 1: clarification first — RE-ARMING gate. Fires until the user has
+        # actually answered, even if the model already started searching. One
+        # defiant search no longer disarms it.
+        if not self._ai_asked_clarification(messages):
+            if search_count > 0:
+                text = (
+                    "[SYSTEM REMINDER] You started searching before clarifying the user's needs. "
+                    f"STOP researching and ask the user {MIN_CLARIFY_QUESTIONS} clarification questions via "
+                    "ask_clarification: (1) exact goal and scope, (2) key constraints or preferences, "
+                    "(3) desired depth and output format. Do not continue until they respond."
+                )
+            else:
+                text = (
                     "[SYSTEM REMINDER] You are about to conduct deep research. "
                     f"Before ANY research, ask the user {MIN_CLARIFY_QUESTIONS} clarification questions via "
                     "ask_clarification: (1) exact goal and scope, (2) key constraints or preferences, "
                     "(3) desired depth and output format. Do not search or answer until they respond."
+                )
+            nudges.append(self._nudge(text))
+            return nudges
+
+        # Wait-gate: the model asked, but the user has not answered yet.
+        if not self._clarification_answered(messages):
+            nudges.append(
+                self._nudge(
+                    "[SYSTEM REMINDER] You asked clarification questions but the user has not answered "
+                    "yet. Do NOT guess their answers or continue researching on assumptions — wait "
+                    "for their reply."
                 )
             )
             return nudges

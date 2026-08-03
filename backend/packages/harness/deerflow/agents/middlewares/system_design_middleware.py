@@ -145,19 +145,23 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
         content = str(getattr(latest, "content", "") or "").lower()
         return any(t in content for t in _DESIGN_TRIGGERS)
 
-    @staticmethod
-    def _count_clarification_asks(messages: list) -> int:
-        """Count ask_clarification tool calls made by the model."""
+    def _count_clarification_asks(self, messages: list) -> int:
+        """Count ask_clarification tool calls in the recent exchange (drives the
+        one-question-at-a-time sequence)."""
         count = 0
-        for msg in messages:
+        for msg in messages[-12:]:
             if isinstance(msg, AIMessage) and getattr(msg, "tool_calls", None):
                 if any("clarif" in (tc.get("name", "") or "") for tc in msg.tool_calls):
                     count += 1
         return count
 
     def _context_answered(self, messages: list) -> bool:
-        """True when a user message contains >= 3 design-context signals."""
-        for msg in reversed(messages):
+        """True when a recent user message contains >= 3 design-context signals.
+
+        Scoped to the last 12 messages so context from a previous topic does
+        not permanently satisfy the gate (re-arming behavior).
+        """
+        for msg in reversed(messages[-12:]):
             if not isinstance(msg, HumanMessage):
                 continue
             if (getattr(msg, "additional_kwargs", None) or {}).get("hide_from_ui"):
@@ -166,6 +170,31 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
             if sum(1 for s in _DESIGN_CONTEXT_SIGNALS if s in content) >= 3:
                 return True
         return False
+
+    @staticmethod
+    def _user_replied_after_last_ask(messages: list, lookback: int = 12) -> bool:
+        """True if a visible user message arrived after the model's most recent question.
+
+        Returns True when there is no recent ask (nothing to wait on). Shared
+        wait-gate semantics across all skill middlewares.
+        """
+        recent = messages[-lookback:]
+        for i in range(len(recent) - 1, -1, -1):
+            msg = recent[i]
+            if not isinstance(msg, AIMessage):
+                continue
+            content = str(getattr(msg, "content", "") or "").strip()
+            has_tool_ask = any(
+                "clarif" in (tc.get("name", "") or "") for tc in getattr(msg, "tool_calls", None) or []
+            )
+            if has_tool_ask or (content and content.endswith("?") and len(content) < 600):
+                for later in recent[i + 1 :]:
+                    if isinstance(later, HumanMessage) and not (
+                        (getattr(later, "additional_kwargs", None) or {}).get("hide_from_ui")
+                    ):
+                        return True
+                return False
+        return True
 
     def _lane_a_confirmed(self, messages: list) -> bool:
         """True when the user clearly described a personal/local system."""
@@ -288,6 +317,16 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
 
         # Phase 0 — sizing checkpoint, BRD-style: one question at a time.
         if not self._context_answered(messages):
+            # Wait-gate: do not advance the question sequence while the user
+            # has not answered the current question.
+            if not self._user_replied_after_last_ask(messages):
+                return [
+                    self._nudge(
+                        "[SYSTEM REMINDER] The user has not answered your last sizing question yet. "
+                        "Do NOT guess their answers or proceed with the design — wait for their "
+                        "reply, then ask the next question."
+                    )
+                ]
             asks = self._count_clarification_asks(messages)
             question = _QUESTION_SEQUENCE[min(asks, len(_QUESTION_SEQUENCE) - 1)]
             return [

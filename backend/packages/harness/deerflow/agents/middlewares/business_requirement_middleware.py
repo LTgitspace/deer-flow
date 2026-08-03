@@ -53,7 +53,9 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
             "objective", "kpi", "budget", "timeline", "constraint",
             "approval", "integration", "existing system",
         ]
-        for msg in reversed(messages):
+        # Scoped to the recent exchange: old context from a previous topic must
+        # not permanently satisfy the gate (re-arming behavior).
+        for msg in reversed(messages[-12:]):
             if not isinstance(msg, HumanMessage):
                 continue
             if (getattr(msg, "additional_kwargs", None) or {}).get("hide_from_ui"):
@@ -63,6 +65,31 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
             if matched >= 3:
                 return True
         return False
+
+    @staticmethod
+    def _user_replied_after_last_ask(messages: list, lookback: int = 12) -> bool:
+        """True if a visible user message arrived after the model's most recent question.
+
+        Returns True when there is no recent ask (nothing to wait on). Shared
+        wait-gate semantics across all skill middlewares.
+        """
+        recent = messages[-lookback:]
+        for i in range(len(recent) - 1, -1, -1):
+            msg = recent[i]
+            if not isinstance(msg, AIMessage):
+                continue
+            content = str(getattr(msg, "content", "") or "").strip()
+            has_tool_ask = any(
+                "clarif" in (tc.get("name", "") or "") for tc in getattr(msg, "tool_calls", None) or []
+            )
+            if has_tool_ask or (content and content.endswith("?") and len(content) < 600):
+                for later in recent[i + 1 :]:
+                    if isinstance(later, HumanMessage) and not (
+                        (getattr(later, "additional_kwargs", None) or {}).get("hide_from_ui")
+                    ):
+                        return True
+                return False
+        return True
 
     @staticmethod
     def _has_objectives(messages: list) -> bool:
@@ -234,6 +261,11 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
                 "Then: stakeholders, budget, timeline, existing systems, approval authority. "
                 "Use ask_clarification for each question. Do not batch."
             ),
+            "wait": (
+                "[BRD REMINDER] The user has not answered your last question yet. "
+                "Do NOT guess or continue on assumptions — wait for their answer, "
+                "then ask the next context question."
+            ),
             "objectives": (
                 "[BRD REMINDER] Define business objectives with measurable KPIs. "
                 "Not 'increase revenue' but 'increase MRR from $50K to $75K in 6 months'. "
@@ -361,8 +393,11 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
 
         # Phase 0 — Continuous context
         if not context_ok:
-            nudges.append(self._build_nudge("context"))
-            nudges.append(self._build_nudge("stakeholders"))
+            if self._user_replied_after_last_ask(messages):
+                nudges.append(self._build_nudge("context"))
+                nudges.append(self._build_nudge("stakeholders"))
+            else:
+                nudges.append(self._build_nudge("wait"))
         else:
             if not has_obj:
                 nudges.append(self._build_nudge("objectives"))
@@ -456,8 +491,11 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
         has_nums = self._has_numbers(messages)
 
         if not context_ok:
-            nudges.append(self._build_nudge("context"))
-            nudges.append(self._build_nudge("stakeholders"))
+            if self._user_replied_after_last_ask(messages):
+                nudges.append(self._build_nudge("context"))
+                nudges.append(self._build_nudge("stakeholders"))
+            else:
+                nudges.append(self._build_nudge("wait"))
         else:
             if not has_obj:
                 nudges.append(self._build_nudge("objectives"))

@@ -150,6 +150,31 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
                     return True
         return False
 
+    @staticmethod
+    def _user_replied_after_last_ask(messages: list, lookback: int = 12) -> bool:
+        """True if a visible user message arrived after the model's most recent question.
+
+        Returns True when there is no recent ask (nothing to wait on). Shared
+        wait-gate semantics across all skill middlewares.
+        """
+        recent = messages[-lookback:]
+        for i in range(len(recent) - 1, -1, -1):
+            msg = recent[i]
+            if not isinstance(msg, AIMessage):
+                continue
+            content = str(getattr(msg, "content", "") or "").strip()
+            has_tool_ask = any(
+                "clarif" in (tc.get("name", "") or "") for tc in getattr(msg, "tool_calls", None) or []
+            )
+            if has_tool_ask or (content and content.endswith("?") and len(content) < 600):
+                for later in recent[i + 1 :]:
+                    if isinstance(later, HumanMessage) and not (
+                        (getattr(later, "additional_kwargs", None) or {}).get("hide_from_ui")
+                    ):
+                        return True
+                return False
+        return True
+
     def _build_nudge(self, phase: str, missing: str, search_count: int = 0) -> HumanMessage:
         """Create a hidden context message that nudges the model."""
         nudges = {
@@ -201,6 +226,11 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
                 "Search from different angles — you need varied perspectives, not variants "
                 "of the same query."
             ),
+            "wait": (
+                "[SYSTEM REMINDER] The user has not answered your last question yet. "
+                "Do NOT guess or proceed on assumptions — wait for their answer, "
+                "then continue the research."
+            ),
             "mermaid": (
                 "[SYSTEM REMINDER] Your final answer must include at least one mermaid diagram "
                 "(```mermaid ... ``` code block) visualizing the key structure, process, or flow "
@@ -235,7 +265,10 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
 
         # Gate 1: Locale MUST be confirmed before anything beyond scope
         if current_phase in (PHASE_SCOPE, PHASE_LOCALE) and not locale_confirmed:
-            nudges.append(self._build_nudge(PHASE_LOCALE, "", search_count))
+            if self._user_replied_after_last_ask(messages):
+                nudges.append(self._build_nudge(PHASE_LOCALE, "", search_count))
+            else:
+                nudges.append(self._build_nudge("", "wait", search_count))
 
         # Gate 2: Search depth check
         if current_phase in (PHASE_BIOLOGY, PHASE_CHEMISTRY, PHASE_PROCESS, PHASE_TIPS):
@@ -290,7 +323,10 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
         nudges: list[HumanMessage] = []
 
         if current_phase in (PHASE_SCOPE, PHASE_LOCALE) and not locale_confirmed:
-            nudges.append(self._build_nudge(PHASE_LOCALE, "", search_count))
+            if self._user_replied_after_last_ask(messages):
+                nudges.append(self._build_nudge(PHASE_LOCALE, "", search_count))
+            else:
+                nudges.append(self._build_nudge("", "wait", search_count))
 
         if current_phase in (PHASE_BIOLOGY, PHASE_CHEMISTRY, PHASE_PROCESS, PHASE_TIPS):
             if search_count < MIN_SEARCHES_BEFORE_SYNTHESIS:

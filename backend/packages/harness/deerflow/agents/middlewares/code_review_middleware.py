@@ -61,7 +61,9 @@ class CodeReviewMiddleware(AgentMiddleware[AgentState]):
             "team", "maintain", "scale",
             "script", "service", "mission",
         ]
-        for msg in reversed(messages):
+        # Scoped to the recent exchange: old context from a previous topic must
+        # not permanently satisfy the gate (re-arming behavior).
+        for msg in reversed(messages[-12:]):
             if not isinstance(msg, HumanMessage):
                 continue
             if (getattr(msg, "additional_kwargs", None) or {}).get("hide_from_ui"):
@@ -166,6 +168,31 @@ class CodeReviewMiddleware(AgentMiddleware[AgentState]):
         return False
 
     @staticmethod
+    def _user_replied_after_last_ask(messages: list, lookback: int = 12) -> bool:
+        """True if a visible user message arrived after the model's most recent question.
+
+        Returns True when there is no recent ask (nothing to wait on). Shared
+        wait-gate semantics across all skill middlewares.
+        """
+        recent = messages[-lookback:]
+        for i in range(len(recent) - 1, -1, -1):
+            msg = recent[i]
+            if not isinstance(msg, AIMessage):
+                continue
+            content = str(getattr(msg, "content", "") or "").strip()
+            has_tool_ask = any(
+                "clarif" in (tc.get("name", "") or "") for tc in getattr(msg, "tool_calls", None) or []
+            )
+            if has_tool_ask or (content and content.endswith("?") and len(content) < 600):
+                for later in recent[i + 1 :]:
+                    if isinstance(later, HumanMessage) and not (
+                        (getattr(later, "additional_kwargs", None) or {}).get("hide_from_ui")
+                    ):
+                        return True
+                return False
+        return True
+
+    @staticmethod
     def _uses_sonarqube_tool(messages: list) -> bool:
         """Check if SonarQube is being used."""
         for msg in messages[-8:]:
@@ -207,6 +234,11 @@ class CodeReviewMiddleware(AgentMiddleware[AgentState]):
                 "yourself. Read the project's package manager file. Check file extensions. "
                 "Search for imports. Look for test files. Look for CI/CD configs. "
                 "Use bash ls, read_file, and grep to discover what you need."
+            ),
+            "wait": (
+                "[CODE REVIEW] The user has not answered your last question yet. "
+                "Do NOT guess the code context or continue on assumptions — wait "
+                "for their answer, then ask the next question."
             ),
             "sonarqube": (
                 "[CODE REVIEW] SonarQube findings are syntax/style ONLY — not logic bugs. "
@@ -272,34 +304,33 @@ class CodeReviewMiddleware(AgentMiddleware[AgentState]):
         uses_sonar = self._uses_sonarqube_tool(messages)
 
         # Phase 0 — Continuous context: keep asking until we have enough signals
+        # Continuous context
         if not context_ok:
-            await_nudge = "[CODE REVIEW] Build context first. Inspect the codebase structure, "
-            "file types, and package manager to determine language, framework, and dependencies. "
-            "Then use ask_clarification to confirm with user."
+            if self._user_replied_after_last_ask(messages):
+                await_nudge = "[CODE REVIEW] Build context first. Inspect the codebase structure, "
+                "file types, and package manager to determine language, framework, and dependencies. "
+                "Then use ask_clarification to confirm with user."
 
-            nudges.append(HumanMessage(content=await_nudge, additional_kwargs={"hide_from_ui": True}))
+                nudges.append(HumanMessage(content=await_nudge, additional_kwargs={"hide_from_ui": True}))
 
-            # Context incomplete
-            nudges.append(self._build_nudge("context"))
-            nudges.append(self._build_nudge("inspect"))
+                # Context incomplete
+                nudges.append(self._build_nudge("context"))
+                nudges.append(self._build_nudge("inspect"))
+            else:
+                nudges.append(self._build_nudge("wait"))
         else:
-            # Phase 0 — Continuous: keep asking even after initial answers
             if user_replied and clarifications < 5:
                 nudges.append(self._build_nudge("context_continue"))
 
-        # Phase 1 — Codebase must be indexed before any findings
         if context_ok and not has_index:
             nudges.append(self._build_nudge("index"))
 
-        # Phase 2 — SonarQube separation (if SonarQube is being used)
         if has_index and uses_sonar and not has_sonarqube:
             nudges.append(self._build_nudge("sonarqube"))
 
-        # Phase 3 — Every finding confirmed with user
         if has_index and not has_findings:
             nudges.append(self._build_nudge("confirm"))
 
-        # Severity enforcement
         if has_findings and not has_verdict:
             nudges.append(self._build_nudge("severity"))
 
@@ -342,14 +373,18 @@ class CodeReviewMiddleware(AgentMiddleware[AgentState]):
 
         # Continuous context
         if not context_ok:
-            await_nudge = "[CODE REVIEW] Build context first. Inspect the codebase structure, "
-            "file types, and package manager to determine language, framework, and dependencies. "
-            "Then use ask_clarification to confirm with user."
+            if self._user_replied_after_last_ask(messages):
+                await_nudge = "[CODE REVIEW] Build context first. Inspect the codebase structure, "
+                "file types, and package manager to determine language, framework, and dependencies. "
+                "Then use ask_clarification to confirm with user."
 
-            nudges.append(HumanMessage(content=await_nudge, additional_kwargs={"hide_from_ui": True}))
+                nudges.append(HumanMessage(content=await_nudge, additional_kwargs={"hide_from_ui": True}))
 
-            nudges.append(self._build_nudge("context"))
-            nudges.append(self._build_nudge("inspect"))
+                # Context incomplete
+                nudges.append(self._build_nudge("context"))
+                nudges.append(self._build_nudge("inspect"))
+            else:
+                nudges.append(self._build_nudge("wait"))
         else:
             if user_replied and clarifications < 5:
                 nudges.append(self._build_nudge("context_continue"))

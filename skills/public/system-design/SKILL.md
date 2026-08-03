@@ -1,6 +1,6 @@
 ---
 name: system-design
-description: Produce high-level system architecture designs — system boundaries, components, their interactions, data flow, and key architecture decisions. NOT an implementation spec: no entity schemas, no endpoint-level API definitions, no concurrency internals. Use when the user asks for "design this", "architecture", "system design", "how to build", "technical design", or "architecture review". Always starts with a sizing checkpoint (Local / Team / Scale-out), then evidence-backed architecture, mermaid diagrams, and a build order.
+description: "Produce high-level system architecture designs — system boundaries, components, their interactions, data flow, and key architecture decisions. NOT an implementation spec: no entity schemas, no endpoint-level API definitions, no concurrency internals. Use when the user asks for \"design this\", \"architecture\", \"system design\", \"how to build\", \"technical design\", or \"architecture review\". Always starts with a sizing checkpoint (Local / Team / Scale-out), then evidence-backed architecture, mermaid diagrams, and a build order."
 ---
 
 # System Design Skill (High-Level Architecture)
