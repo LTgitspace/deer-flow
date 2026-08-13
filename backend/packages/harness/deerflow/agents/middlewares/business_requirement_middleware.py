@@ -14,6 +14,10 @@ Phases enforced:
   Phase 5: Glossary maintenance
   Phase 6: Consistency review (cross-reference checks)
   Phase 7: Polish & format (professional output)
+
+Forced context gate: the middleware only activates when the
+business-requirement skill is active in the thread (slash-activated or loaded
+into skill_context). All other conversations pass through untouched.
 """
 
 from __future__ import annotations
@@ -27,6 +31,8 @@ from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ModelCallResult, ModelRequest, ModelResponse
 from langchain_core.messages import AIMessage, HumanMessage
 
+from deerflow.agents.middlewares.skill_context import skill_is_active
+
 logger = logging.getLogger(__name__)
 
 # ── Minimum thresholds ──
@@ -39,6 +45,10 @@ MIN_RISKS = 3
 MIN_GLOSSARY_TERMS = 3
 MIN_COST_ITEMS = 2
 MIN_BENEFIT_ITEMS = 2
+
+# Skill directory name this middleware enforces. The gate only fires when this
+# skill is active in the thread (slash-activated or loaded into skill_context).
+_SKILL_NAME = "business-requirement"
 
 
 class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
@@ -374,6 +384,11 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
         handler: Callable[[ModelRequest], ModelResponse],
     ) -> ModelCallResult:
         messages = list(request.messages)
+
+        state = getattr(request, "state", None) or {}
+        if not skill_is_active(messages, state, _SKILL_NAME):
+            return handler(request)
+
         nudges: list[HumanMessage] = []
 
         clarifications = self._count_clarification_asks(messages)
@@ -473,6 +488,11 @@ class BusinessRequirementMiddleware(AgentMiddleware[AgentState]):
         handler: Callable[[ModelRequest], Awaitable[ModelResponse]],
     ) -> ModelCallResult:
         messages = list(request.messages)
+
+        state = getattr(request, "state", None) or {}
+        if not skill_is_active(messages, state, _SKILL_NAME):
+            return await handler(request)
+
         nudges: list[HumanMessage] = []
 
         clarifications = self._count_clarification_asks(messages)

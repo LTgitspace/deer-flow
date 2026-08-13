@@ -26,6 +26,10 @@ Design notes:
   - Enforcement is scoped: it only activates when the conversation is
     research-shaped (research trigger in the latest user message, or
     search/fetch tools already used). Non-research threads are untouched.
+  - Forced context gate: even when research-shaped, the contract only fires
+    once the deep-research skill is active in the thread (slash-activated or
+    loaded into skill_context). Shaped-but-inactive conversations get a
+    single activation nudge instead.
 """
 
 from __future__ import annotations
@@ -40,6 +44,8 @@ from langchain.agents import AgentState
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ModelCallResult, ModelRequest, ModelResponse
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+from deerflow.agents.middlewares.skill_context import skill_is_active
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +90,10 @@ _RESEARCH_TRIGGERS = (
     "study",
     "data on",
 )
+
+# Skill directory name this middleware enforces. The gate only fires when this
+# skill is active in the thread (slash-activated or loaded into skill_context).
+_SKILL_NAME = "deep-research"
 
 
 class DeepResearchMiddleware(AgentMiddleware[AgentState]):
@@ -393,6 +403,27 @@ class DeepResearchMiddleware(AgentMiddleware[AgentState]):
 
         return nudges[:MAX_NUDGES_PER_CALL]
 
+    def _build_inactive_skill_nudge(self, search_count: int) -> HumanMessage:
+        """Force skill activation before any research continues.
+
+        Escalates when the model already searched without the skill active.
+        """
+        if search_count > 0:
+            text = (
+                "[SYSTEM REMINDER] The deep-research skill is not active in this thread, but you "
+                "have already started searching. STOP researching. Activate the skill first: load it "
+                "via read_file (skills/public/deep-research/SKILL.md) or ask the user to run "
+                "/deep-research. Research contract gates are suspended until the skill is active."
+            )
+        else:
+            text = (
+                "[SYSTEM REMINDER] This thread is research-shaped, but the deep-research skill is "
+                "not active. Before any research, activate the skill: load it via read_file "
+                "(skills/public/deep-research/SKILL.md) or ask the user to run /deep-research. "
+                "Research contract gates are suspended until the skill is active."
+            )
+        return self._nudge(text)
+
     def _patch_messages(self, messages: list, nudges: list[HumanMessage]) -> list:
         patched = list(messages)
         insert_at = 0
@@ -422,6 +453,14 @@ class DeepResearchMiddleware(AgentMiddleware[AgentState]):
         if not self._is_research_shaped(messages):
             return handler(request)
 
+        state = getattr(request, "state", None) or {}
+        if not skill_is_active(messages, state, _SKILL_NAME):
+            search_count, _, _ = self._tool_counts(messages)
+            nudge = self._build_inactive_skill_nudge(search_count)
+            self._log_nudges([nudge])
+            request = request.override(messages=self._patch_messages(messages, [nudge]))
+            return handler(request)
+
         search_count, fetch_count, unique_queries = self._tool_counts(messages)
         nudges = self._build_nudges(
             search_count=search_count,
@@ -442,6 +481,14 @@ class DeepResearchMiddleware(AgentMiddleware[AgentState]):
     ) -> ModelCallResult:
         messages = list(request.messages)
         if not self._is_research_shaped(messages):
+            return await handler(request)
+
+        state = getattr(request, "state", None) or {}
+        if not skill_is_active(messages, state, _SKILL_NAME):
+            search_count, _, _ = self._tool_counts(messages)
+            nudge = self._build_inactive_skill_nudge(search_count)
+            self._log_nudges([nudge])
+            request = request.override(messages=self._patch_messages(messages, [nudge]))
             return await handler(request)
 
         search_count, fetch_count, unique_queries = self._tool_counts(messages)

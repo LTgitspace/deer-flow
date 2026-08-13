@@ -10,7 +10,7 @@ from html import escape
 from typing import Any, TypedDict
 
 import yaml
-from langchain_core.messages import AIMessage, AnyMessage, ToolMessage
+from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, ToolMessage
 
 from deerflow.agents.thread_state import _SKILL_DESCRIPTION_MAX_CHARS, SkillEntry
 
@@ -198,3 +198,42 @@ def render_skill_context(entries: list[SkillEntry]) -> str:
         suffix = f": {description}" if description else ""
         lines.append(f"- {name}{suffix} -> {path}")
     return "\n".join(lines)
+
+
+def skill_is_active(
+    messages: list[AnyMessage] | None,
+    state: Mapping[str, Any] | None,
+    skill_name: str,
+) -> bool:
+    """Return whether ``skill_name`` is active in the current thread context.
+
+    Two activation signals count as active:
+
+    1. Slash activation - a hidden HumanMessage injected by
+       ``SkillActivationMiddleware`` (slash marker in ``additional_kwargs``)
+       whose content references the skill name.
+    2. Loaded skill context - a ``skill_context`` state entry whose ``name``
+       equals ``skill_name`` (exact match on the skill directory name).
+
+    Read-only and history/state-derived: no writes, deterministic across runs.
+    """
+    if not isinstance(skill_name, str) or not skill_name:
+        return False
+
+    # Lazy import: skill_context is imported by core middlewares at module load
+    # time; importing skill_activation_middleware eagerly would couple the graph.
+    from deerflow.agents.middlewares.skill_activation_middleware import is_slash_skill_activation_reminder
+
+    for message in messages or []:
+        if not isinstance(message, HumanMessage) or not is_slash_skill_activation_reminder(message):
+            continue
+        content = str(getattr(message, "content", "") or "")
+        if f'name="{skill_name}"' in content or f"`{skill_name}`" in content:
+            return True
+
+    entries = (state or {}).get("skill_context") or []
+    for entry in entries:
+        if isinstance(entry, Mapping) and entry.get("name") == skill_name:
+            return True
+
+    return False

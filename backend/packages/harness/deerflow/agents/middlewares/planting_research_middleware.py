@@ -12,6 +12,10 @@ Phases enforced:
   Phase 4: Chemistry must have pH range, NPK per stage, deficiency table
   Phase 5: Process must contain specific local product/store names
   Phase 8: Local details must include water quality, local pests, local stores
+
+Forced context gate: the middleware only activates when the planting-research
+skill is active in the thread (slash-activated or loaded into skill_context).
+All other conversations pass through untouched.
 """
 
 from __future__ import annotations
@@ -24,6 +28,8 @@ from langchain.agents import AgentState
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ModelCallResult, ModelRequest, ModelResponse
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+from deerflow.agents.middlewares.skill_context import skill_is_active
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +70,10 @@ PHASE_ORDER = [
     PHASE_TUTORIAL,
     PHASE_LOCAL,
 ]
+
+# Skill directory name this middleware enforces. The gate only fires when this
+# skill is active in the thread (slash-activated or loaded into skill_context).
+_SKILL_NAME = "planting-research"
 
 
 class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
@@ -257,6 +267,9 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
         messages = list(request.messages)
         state = request.state or {}
 
+        if not skill_is_active(messages, state, _SKILL_NAME):
+            return handler(request)
+
         search_count, unique_queries = self._extract_search_queries(messages)
         locale_confirmed = self._detect_locale_confirmation(messages)
         current_phase = self._current_phase(state)
@@ -315,6 +328,9 @@ class PlantingResearchMiddleware(AgentMiddleware[AgentState]):
         # Same logic as sync version
         messages = list(request.messages)
         state = request.state or {}
+
+        if not skill_is_active(messages, state, _SKILL_NAME):
+            return await handler(request)
 
         search_count, unique_queries = self._extract_search_queries(messages)
         locale_confirmed = self._detect_locale_confirmation(messages)
