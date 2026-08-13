@@ -1,43 +1,46 @@
-"""Patched ChatOpenAI that preserves thought_signature for Gemini thinking models.
+"""Patched ChatOpenAI that preserves provider thinking metadata.
 
-When using Gemini with thinking enabled via an OpenAI-compatible gateway (e.g.
-Vertex AI, Google AI Studio, or any proxy), the API requires that the
-``thought_signature`` field on tool-call objects is echoed back verbatim in
-every subsequent request.
+Two OpenAI-compatible extensions are handled here:
 
-The OpenAI-compatible gateway stores the raw tool-call dicts (including
-``thought_signature``) in ``additional_kwargs["tool_calls"]``, but standard
-``langchain_openai.ChatOpenAI`` only serialises the standard fields (``id``,
-``type``, ``function``) into the outgoing payload, silently dropping the
-signature.  That causes an HTTP 400 ``INVALID_ARGUMENT`` error:
+1. Gemini thinking via OpenAI-compatible gateways: the API requires the
+   ``thought_signature`` field on tool-call objects to be echoed back verbatim
+   in every subsequent request. Standard ``langchain_openai.ChatOpenAI`` only
+   serialises the standard fields (``id``, ``type``, ``function``), silently
+   dropping the signature and causing HTTP 400 ``INVALID_ARGUMENT`` errors.
 
-    Unable to submit request because function call `<tool>` in the N. content
-    block is missing a `thought_signature`.
-
-This module fixes the problem by overriding ``_get_request_payload`` to
-re-inject tool-call signatures back into the outgoing payload for any assistant
-message that originally carried them.
+2. Reasoning models behind OpenAI-compatible gateways (DeepSeek-style
+   ``reasoning_content``, OpenRouter-style ``reasoning``): base ChatOpenAI
+   drops these fields from both stream deltas and final responses, so
+   thinking never reaches the frontend. This patched class captures them
+   into ``additional_kwargs["reasoning_content"]`` (the same contract
+   ``ChatDeepSeek`` uses) and replays them back on assistant messages in
+   multi-turn payloads when thinking mode is enabled.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
+import openai
 from langchain_core.language_models import LanguageModelInput
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, AIMessageChunk
+from langchain_core.outputs import ChatGenerationChunk, ChatResult
 from langchain_openai import ChatOpenAI
 
-from deerflow.models.assistant_payload_replay import restore_assistant_payloads
+from deerflow.models.assistant_payload_replay import restore_assistant_payloads, restore_reasoning_content
 
 
 class PatchedChatOpenAI(ChatOpenAI):
-    """ChatOpenAI with ``thought_signature`` preservation for Gemini thinking via OpenAI gateway.
+    """ChatOpenAI with thinking-metadata preservation for OpenAI-compatible gateways.
 
-    When using Gemini with thinking enabled via an OpenAI-compatible gateway,
-    the API expects ``thought_signature`` to be present on tool-call objects in
-    multi-turn conversations.  This patched version restores those signatures
-    from ``AIMessage.additional_kwargs["tool_calls"]`` into the serialised
-    request payload before it is sent to the API.
+    Extends the base client with two behaviors:
+
+    - Restores ``thought_signature`` onto tool-call objects for Gemini thinking
+      through OpenAI-compatible gateways (multi-turn requirement).
+    - Captures ``reasoning_content`` / ``reasoning`` from stream deltas and
+      final responses into ``additional_kwargs["reasoning_content"]`` so
+      thinking streams to the frontend, and replays it on assistant messages
+      in subsequent payloads (multi-turn requirement for reasoning APIs).
 
     Usage in ``config.yaml``::
 
@@ -63,12 +66,12 @@ class PatchedChatOpenAI(ChatOpenAI):
         stop: list[str] | None = None,
         **kwargs: Any,
     ) -> dict:
-        """Get request payload with ``thought_signature`` preserved on tool-call objects.
+        """Get request payload with ``thought_signature`` and ``reasoning_content`` preserved.
 
         Overrides the parent method to re-inject ``thought_signature`` fields
-        on tool-call objects that were stored in
-        ``additional_kwargs["tool_calls"]`` by LangChain but dropped during
-        serialisation.
+        on tool-call objects and ``reasoning_content`` on assistant messages
+        that were stored in ``additional_kwargs`` by LangChain but dropped
+        during serialisation.
         """
         # Capture the original LangChain messages *before* conversion so we can
         # access fields that the serialiser might drop.
@@ -78,8 +81,71 @@ class PatchedChatOpenAI(ChatOpenAI):
         payload = super()._get_request_payload(input_, stop=stop, **kwargs)
 
         restore_assistant_payloads(payload.get("messages", []), original_messages, _restore_tool_call_signatures)
+        restore_assistant_payloads(payload.get("messages", []), original_messages, restore_reasoning_content)
 
         return payload
+
+    def _convert_chunk_to_generation_chunk(
+        self,
+        chunk: dict,
+        default_chunk_class: type,
+        base_generation_info: dict | None,
+    ) -> ChatGenerationChunk | None:
+        """Convert a stream delta to a generation chunk, preserving reasoning content.
+
+        Base ``ChatOpenAI`` drops ``reasoning_content`` from stream deltas;
+        this override attaches it to ``additional_kwargs`` so chunk merging
+        accumulates thinking and the SSE stream carries it to the frontend.
+        """
+        generation_chunk = super()._convert_chunk_to_generation_chunk(
+            chunk,
+            default_chunk_class,
+            base_generation_info,
+        )
+        if (choices := chunk.get("choices")) and generation_chunk:
+            top = choices[0]
+            if isinstance(generation_chunk.message, AIMessageChunk):
+                delta = top.get("delta") or {}
+                if (reasoning_content := delta.get("reasoning_content")) is not None:
+                    generation_chunk.message.additional_kwargs["reasoning_content"] = reasoning_content
+                elif (reasoning := delta.get("reasoning")) is not None:
+                    generation_chunk.message.additional_kwargs["reasoning_content"] = reasoning
+
+        return generation_chunk
+
+    def _create_chat_result(
+        self,
+        response: dict | openai.BaseModel,
+        generation_info: dict | None = None,
+    ) -> ChatResult:
+        """Attach reasoning content to the final message for non-streaming responses.
+
+        Handles DeepSeek-style ``message.reasoning_content`` and gateways that
+        stash it in ``model_extra`` (e.g. OpenRouter ``reasoning``).
+        """
+        rtn = super()._create_chat_result(response, generation_info)
+
+        if not isinstance(response, openai.BaseModel):
+            return rtn
+
+        choices = getattr(response, "choices", None)
+        if not choices or not rtn.generations:
+            return rtn
+
+        message = choices[0].message
+        reasoning: str | None = None
+        if hasattr(message, "reasoning_content") and isinstance(message.reasoning_content, str):
+            reasoning = message.reasoning_content
+        if reasoning is None:
+            model_extra = getattr(message, "model_extra", None)
+            if isinstance(model_extra, dict):
+                candidate = model_extra.get("reasoning") or model_extra.get("reasoning_content")
+                if isinstance(candidate, str):
+                    reasoning = candidate
+        if reasoning:
+            rtn.generations[0].message.additional_kwargs["reasoning_content"] = reasoning
+
+        return rtn
 
 
 def _restore_tool_call_signatures(payload_msg: dict, orig_msg: AIMessage) -> None:

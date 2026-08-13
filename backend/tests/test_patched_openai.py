@@ -8,9 +8,10 @@ fallback, camelCase keys, and several edge-cases.
 
 from __future__ import annotations
 
-from langchain_core.messages import AIMessage
+import openai
+from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
 
-from deerflow.models.patched_openai import _restore_tool_call_signatures
+from deerflow.models.patched_openai import PatchedChatOpenAI, _restore_tool_call_signatures
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -174,3 +175,122 @@ def test_tool_call_multiple_sequential_signatures():
 
 # Integration behavior for PatchedChatOpenAI is validated indirectly via
 # _restore_tool_call_signatures unit coverage above.
+
+
+# ---------------------------------------------------------------------------
+# Reasoning content capture (streaming and non-streaming)
+# ---------------------------------------------------------------------------
+
+
+def _model() -> PatchedChatOpenAI:
+    return PatchedChatOpenAI(model="test-model", api_key="test-key")
+
+
+def _stream_chunk(delta: dict) -> dict:
+    return {
+        "id": "chatcmpl-1",
+        "object": "chat.completion.chunk",
+        "created": 0,
+        "model": "test-model",
+        "choices": [{"index": 0, "delta": delta, "finish_reason": None}],
+    }
+
+
+def test_stream_chunk_captures_reasoning_content():
+    """reasoning_content from a stream delta lands in additional_kwargs."""
+    model = _model()
+    generation_chunk = model._convert_chunk_to_generation_chunk(
+        _stream_chunk({"content": "hi", "reasoning_content": "thinking..."}),
+        AIMessageChunk,
+        None,
+    )
+    assert generation_chunk is not None
+    assert generation_chunk.message.additional_kwargs["reasoning_content"] == "thinking..."
+
+
+def test_stream_chunk_captures_reasoning_fallback():
+    """OpenRouter-style `reasoning` delta is mapped to reasoning_content."""
+    model = _model()
+    generation_chunk = model._convert_chunk_to_generation_chunk(
+        _stream_chunk({"content": "hi", "reasoning": "thinking..."}),
+        AIMessageChunk,
+        None,
+    )
+    assert generation_chunk is not None
+    assert generation_chunk.message.additional_kwargs["reasoning_content"] == "thinking..."
+
+
+def test_stream_chunk_without_reasoning_has_no_reasoning_key():
+    """Plain content deltas do not get a reasoning_content key."""
+    model = _model()
+    generation_chunk = model._convert_chunk_to_generation_chunk(
+        _stream_chunk({"content": "hi"}),
+        AIMessageChunk,
+        None,
+    )
+    assert generation_chunk is not None
+    assert "reasoning_content" not in generation_chunk.message.additional_kwargs
+
+
+def test_non_streaming_result_captures_reasoning_content():
+    """Non-streaming responses attach reasoning_content to the AIMessage."""
+    response = openai.types.chat.ChatCompletion(
+        id="chatcmpl-1",
+        choices=[
+            openai.types.chat.chat_completion.Choice(
+                finish_reason="stop",
+                index=0,
+                logprobs=None,
+                message=openai.types.chat.ChatCompletionMessage(
+                    role="assistant",
+                    content="answer",
+                    reasoning_content="thinking...",
+                ),
+            )
+        ],
+        created=0,
+        model="test-model",
+        object="chat.completion",
+    )
+    result = _model()._create_chat_result(response)
+    message = result.generations[0].message
+    assert message.additional_kwargs["reasoning_content"] == "thinking..."
+
+
+def test_non_streaming_result_captures_model_extra_reasoning():
+    """Gateways that stash reasoning in model_extra (e.g. OpenRouter) are handled."""
+    response = openai.types.chat.ChatCompletion(
+        id="chatcmpl-1",
+        choices=[
+            openai.types.chat.chat_completion.Choice(
+                finish_reason="stop",
+                index=0,
+                logprobs=None,
+                message=openai.types.chat.ChatCompletionMessage(
+                    role="assistant",
+                    content="answer",
+                    reasoning="thinking...",
+                ),
+            )
+        ],
+        created=0,
+        model="test-model",
+        object="chat.completion",
+    )
+    result = _model()._create_chat_result(response)
+    message = result.generations[0].message
+    assert message.additional_kwargs["reasoning_content"] == "thinking..."
+
+
+def test_request_payload_restores_reasoning_content():
+    """Multi-turn payloads replay reasoning_content on assistant messages."""
+    model = _model()
+    payload = model._get_request_payload(
+        [
+            HumanMessage(content="question"),
+            AIMessage(content="answer", additional_kwargs={"reasoning_content": "rc"}),
+        ]
+    )
+    assistant_payloads = [m for m in payload["messages"] if m.get("role") == "assistant"]
+    assert len(assistant_payloads) == 1
+    assert assistant_payloads[0]["reasoning_content"] == "rc"
