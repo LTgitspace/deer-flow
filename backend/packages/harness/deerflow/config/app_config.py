@@ -18,6 +18,7 @@ from deerflow.config.channel_connections_config import ChannelConnectionsConfig
 from deerflow.config.checkpointer_config import CheckpointerConfig, load_checkpointer_config_from_dict
 from deerflow.config.database_config import DatabaseConfig
 from deerflow.config.dedupe_storage_config import DedupeStorageConfig
+from deerflow.config.emoji_gate_config import EmojiGateConfig, load_emoji_gate_config_from_dict
 from deerflow.config.extensions_config import ExtensionsConfig
 from deerflow.config.file_signature import ConfigSignature as _ConfigSignature
 from deerflow.config.file_signature import get_config_signature as _get_config_signature
@@ -229,6 +230,7 @@ class AppConfig(BaseModel):
     title: TitleConfig = Field(default_factory=TitleConfig, description="Automatic title generation configuration")
     metacognition: MetacognitionConfig = Field(default_factory=MetacognitionConfig, description="Metacognition think-first enforcement configuration")
     planner: PlannerConfig = Field(default_factory=PlannerConfig, description="Planner plan-first enforcement configuration")
+    emoji_gate: EmojiGateConfig = Field(default_factory=EmojiGateConfig, description="Emoji-free technical output enforcement configuration")
     summarization: SummarizationConfig = Field(default_factory=SummarizationConfig, description="Conversation summarization configuration")
     memory: MemoryConfig = Field(default_factory=MemoryConfig, description="Memory subsystem configuration")
     agents_api: AgentsApiConfig = Field(default_factory=AgentsApiConfig, description="Custom-agent management API configuration")
@@ -446,6 +448,7 @@ class AppConfig(BaseModel):
         load_title_config_from_dict(config.title.model_dump())
         load_metacognition_config_from_dict(config.metacognition.model_dump())
         load_planner_config_from_dict(config.planner.model_dump())
+        load_emoji_gate_config_from_dict(config.emoji_gate.model_dump())
         load_summarization_config_from_dict(config.summarization.model_dump())
         load_memory_config_from_dict(config.memory.model_dump())
         load_agents_api_config_from_dict(config.agents_api.model_dump())

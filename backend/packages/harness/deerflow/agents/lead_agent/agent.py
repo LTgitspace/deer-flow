@@ -466,6 +466,11 @@ def build_middlewares(
 
     middlewares.append(PlannerMiddleware(app_config=resolved_app_config))
 
+    # Emoji gate: keep code blocks and file writes strictly emoji-free.
+    from deerflow.agents.middlewares.emoji_gate_middleware import EmojiGateMiddleware
+
+    middlewares.append(EmojiGateMiddleware(app_config=resolved_app_config))
+
     # Planting Research skill enforcement: counts web_search calls, tracks
     # locale confirmation, and injects structured nudges when phases are skipped.
     # Only activates when the planting-research skill is slash-activated or

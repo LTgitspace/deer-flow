@@ -1590,6 +1590,16 @@ planner:
   min_chars: 40
 
 # ============================================================================
+# Emoji Gate Configuration
+# ============================================================================
+# Deterministic emoji-free enforcement for technical output: code blocks and
+# file writes must be strictly emoji-free. allow_in_chat=true keeps casual
+# visible chat emojis allowed; set false to gate all output.
+emoji_gate:
+  enabled: true
+  allow_in_chat: true
+
+# ============================================================================
 # Summarization Configuration
 # ============================================================================
 # Automatically summarize conversation history when token limits are approached
