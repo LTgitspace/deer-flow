@@ -2093,6 +2093,10 @@ export function useThreadStream({
             // custom events, while subgraph frames would leak a delegated
             // subagent's values/messages into the thread view (#4399).
             streamResumable: true,
+            // messages-tuple = token-level model deltas (the gateway maps it
+            // to LangGraph "messages" mode). Without it the SDK defaults to
+            // values-only and answers render as whole blocks, not streams.
+            streamMode: ["values", "messages-tuple"],
             config: {
               recursion_limit: 1000,
             },
@@ -2215,6 +2219,10 @@ export function useThreadStream({
           metadata: prepared.metadata,
           // No streamSubgraphs — same contract as the main submit path (#4399).
           streamResumable: true,
+          // messages-tuple = token-level model deltas (the gateway maps it
+          // to LangGraph "messages" mode). Without it the SDK defaults to
+          // values-only and answers render as whole blocks, not streams.
+          streamMode: ["values", "messages-tuple"],
           config: {
             recursion_limit: 1000,
           },
