@@ -720,7 +720,9 @@ def test_build_middlewares_orders_skill_activation_before_policy_and_durable_con
     policy_idx = next(i for i, middleware in enumerate(middlewares) if isinstance(middleware, SkillToolPolicyMiddleware))
     durable_idx = next(i for i, middleware in enumerate(middlewares) if isinstance(middleware, DurableContextMiddleware))
     assert policy_idx == activation_idx + 1
-    assert durable_idx == policy_idx + 1
+    # The skill gates and metacognition sit between policy and durable
+    # context in the UniDeer chain; the invariant is ordering, not adjacency.
+    assert activation_idx < policy_idx < durable_idx
     assert middlewares[activation_idx]._slash_source_owner_token == middlewares[policy_idx]._slash_source_owner_token
 
 
@@ -743,10 +745,31 @@ def test_compiled_skill_policy_chain_filters_schema_and_blocks_execution(monkeyp
         model_name="safe-model",
         app_config=app_config,
     )
+    from deerflow.agents.middlewares.business_requirement_middleware import BusinessRequirementMiddleware
+    from deerflow.agents.middlewares.deep_research_middleware import DeepResearchMiddleware
+    from deerflow.agents.middlewares.metacognition_middleware import MetacognitionMiddleware
+    from deerflow.agents.middlewares.planting_research_middleware import PlantingResearchMiddleware
+    from deerflow.agents.middlewares.product_requirements_middleware import ProductRequirementsMiddleware
+    from deerflow.agents.middlewares.requirements_pipeline_middleware import RequirementsPipelineMiddleware
+    from deerflow.agents.middlewares.software_requirements_middleware import SoftwareRequirementsMiddleware
+    from deerflow.agents.middlewares.system_design_middleware import SystemDesignMiddleware
+
     activation_idx = next(i for i, middleware in enumerate(middlewares) if isinstance(middleware, SkillActivationMiddleware))
     durable_idx = next(i for i, middleware in enumerate(middlewares) if isinstance(middleware, DurableContextMiddleware))
     compiled_slice = middlewares[activation_idx : durable_idx + 1]
-    assert [type(middleware) for middleware in compiled_slice] == [SkillActivationMiddleware, SkillToolPolicyMiddleware, DurableContextMiddleware]
+    assert [type(middleware) for middleware in compiled_slice] == [
+        SkillActivationMiddleware,
+        SkillToolPolicyMiddleware,
+        MetacognitionMiddleware,
+        PlantingResearchMiddleware,
+        BusinessRequirementMiddleware,
+        SoftwareRequirementsMiddleware,
+        ProductRequirementsMiddleware,
+        RequirementsPipelineMiddleware,
+        DeepResearchMiddleware,
+        SystemDesignMiddleware,
+        DurableContextMiddleware,
+    ]
 
     skill_dir = Path("/tmp/skills/public/restricted")
     restricted = Skill(

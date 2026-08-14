@@ -29,6 +29,7 @@ from app.gateway.routers import (
     mcp,
     memory,
     models,
+    projects,
     runs,
     scheduled_tasks,
     skills,
@@ -599,6 +600,9 @@ This gateway provides runtime endpoints for agent runs plus custom endpoints for
 
     # Artifacts API is mounted at /api/threads/{thread_id}/artifacts
     app.include_router(artifacts.router)
+
+    # Projects API is mounted at /api/projects
+    app.include_router(projects.router)
 
     # Browser API is mounted at /api/threads/{thread_id}/browser
     app.include_router(browser.router)

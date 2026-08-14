@@ -453,6 +453,13 @@ def build_middlewares(
         )
     )
 
+    # Metacognition: deterministic think-first enforcement. Complex prompts get
+    # a reasoning obligation; trivial prompts are left alone. Registered before
+    # the skill gates so it applies to every turn, skill-driven or not.
+    from deerflow.agents.middlewares.metacognition_middleware import MetacognitionMiddleware
+
+    middlewares.append(MetacognitionMiddleware(app_config=resolved_app_config))
+
     # Planting Research skill enforcement: counts web_search calls, tracks
     # locale confirmation, and injects structured nudges when phases are skipped.
     # Only activates when the planting-research skill is slash-activated or
@@ -514,6 +521,19 @@ def build_middlewares(
             skill_file_read_tool_names=resolved_app_config.summarization.skill_file_read_tool_names,
         )
     )
+
+    # Project state: persists pipeline artifacts (BRD/PRD/SRS/SAD) to the
+    # versioned project store and injects resume context when a thread binds
+    # to a project across sessions.
+    from deerflow.agents.middlewares.project_state_middleware import ProjectStateMiddleware
+
+    middlewares.append(ProjectStateMiddleware())
+
+    # Skill evolution: reviewer-first writes and user-ratified drafts around
+    # the skill_manage tool. Silent unless skill_evolution.enabled is set.
+    from deerflow.agents.middlewares.skill_evolution_middleware import SkillEvolutionMiddleware
+
+    middlewares.append(SkillEvolutionMiddleware(app_config=resolved_app_config))
 
     # Add summarization middleware if enabled
     summarization_middleware = _create_summarization_middleware(app_config=resolved_app_config, run_model_name=model_name)

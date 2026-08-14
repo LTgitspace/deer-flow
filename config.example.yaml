@@ -1570,6 +1570,16 @@ title:
   model_name: null # null = fast local fallback; set a model name to use LLM title generation
 
 # ============================================================================
+# Metacognition Configuration
+# ============================================================================
+# Deterministic think-first enforcement: complex prompts get a reasoning
+# obligation, trivial prompts are left alone. Classification thresholds and
+# trigger vocabulary default in MetacognitionConfig.
+metacognition:
+  enabled: true
+  min_complexity_chars: 60
+
+# ============================================================================
 # Summarization Configuration
 # ============================================================================
 # Automatically summarize conversation history when token limits are approached

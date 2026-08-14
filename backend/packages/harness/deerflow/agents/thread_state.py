@@ -265,6 +265,7 @@ class ThreadState(AgentState):
     sandbox: SandboxStateField
     thread_data: NotRequired[ThreadDataState | None]
     title: NotRequired[str | None]
+    project: NotRequired[str | None]
     artifacts: Annotated[list[str], merge_artifacts]
     todos: Annotated[list | None, merge_todos]
     goal: Annotated[GoalState | None, merge_goal]
