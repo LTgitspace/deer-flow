@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 from langchain.agents.middleware.types import ModelRequest
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.runtime import Runtime
 
 from deerflow.agents.middlewares.system_design_middleware import (
@@ -107,3 +107,151 @@ def test_searched_while_inactive_escalates() -> None:
     nudges = _injected_nudges(result)
     assert len(nudges) == 1
     assert "STOP designing" in str(nudges[0].content)
+
+
+def _intake_prompt(greenfield: bool) -> HumanMessage:
+    tail = "greenfield project with no existing code." if greenfield else "existing Flask app to integrate with."
+    return HumanMessage(
+        content=(
+            "Design the architecture for my note sync system. The goal is offline-first sync; "
+            "must-have: real-time sync, priority: reliability. It runs on my personal machine "
+            "for 5 users. Budget zero, timeline 2 weeks, platform Windows, solo dev, " + tail
+        )
+    )
+
+
+def test_intake_blocks_when_wanting_and_constraints_missing() -> None:
+    messages = [
+        HumanMessage(
+            content=(
+                "Design the architecture for a system with 5 users running on my personal "
+                "machine with a database backend."
+            )
+        )
+    ]
+    result = _run(messages, state=_active_skill_state())
+    nudges = _injected_nudges(result)
+    assert len(nudges) == 1
+    assert "Grounded intake is incomplete" in str(nudges[0].content)
+
+
+def test_reality_gate_blocks_before_inspection() -> None:
+    messages = [_intake_prompt(greenfield=False)]
+    result = _run(messages, state=_active_skill_state())
+    nudges = _injected_nudges(result)
+    assert len(nudges) == 1
+    assert "reality has not been inspected" in str(nudges[0].content)
+
+
+def test_greenfield_statement_waives_reality_gate() -> None:
+    messages = [_intake_prompt(greenfield=True)]
+    result = _run(messages, state=_active_skill_state())
+    nudges = _injected_nudges(result)
+    assert len(nudges) == 1
+    content = str(nudges[0].content)
+    assert "Requirements are not established" in content
+    assert "reality has not been inspected" not in content
+
+
+def test_reality_inspection_evidence_satisfies_gate() -> None:
+    messages = [
+        _intake_prompt(greenfield=False),
+        ToolMessage(content="repo root listing", name="read_file", tool_call_id="call-read-1"),
+    ]
+    result = _run(messages, state=_active_skill_state())
+    nudges = _injected_nudges(result)
+    assert len(nudges) == 1
+    assert "Requirements are not established" in str(nudges[0].content)
+
+
+def _mature_design_messages() -> list:
+    return [
+        _intake_prompt(greenfield=True),
+        ToolMessage(content="q1", name="web_search", tool_call_id="s1"),
+        ToolMessage(content="q2", name="web_search", tool_call_id="s2"),
+        ToolMessage(content="q3", name="web_search", tool_call_id="s3"),
+        ToolMessage(content="q4", name="web_search", tool_call_id="s4"),
+        ToolMessage(content="u1", name="web_fetch", tool_call_id="f1"),
+        ToolMessage(content="u2", name="web_fetch", tool_call_id="f2"),
+        AIMessage(
+            content=(
+                "## Scope\n## Functional Requirements\n## Non-Functional Requirements\n"
+                "```mermaid\ngraph TD\n A --> B\n```\n"
+                "| component | api | http |\n"
+                "storage, database, communication async, write path, read path, "
+                "deployment topology, tradeoff, | risk |, build order, https://example.com, ok?"
+            )
+        ),
+    ]
+
+
+def test_grounding_gates_fire_for_mature_design_without_unknowns_or_traceability() -> None:
+    result = _run(_mature_design_messages(), state=_active_skill_state())
+    nudges = _injected_nudges(result)
+    assert len(nudges) == 2
+    joined = " ".join(str(n.content) for n in nudges)
+    assert "UNKNOWN" in joined
+    assert "Traceability" in joined
+
+
+def test_grounding_gates_clear_when_unknowns_and_traceability_present() -> None:
+    messages = _mature_design_messages()
+    ai = messages[-1]
+    messages[-1] = AIMessage(
+        content=str(ai.content) + " UNKNOWN: none. Traceability: | decision | requirement | ok?"
+    )
+    result = _run(messages, state=_active_skill_state())
+    nudges = _injected_nudges(result)
+    assert nudges == []
+
+
+def _chain_docs() -> list:
+    return [
+        AIMessage(
+            content=(
+                "# BRD: Note Sync\n## Business Objectives\n- BR-01 Retention\n"
+                "budget $0, timeline 2 weeks, solo dev, goal: offline-first sync"
+            )
+        ),
+        AIMessage(
+            content=(
+                "# PRD: Note Sync\n## Product Vision\nFor users who need sync.\n"
+                "## Personas\n| Persona | Goals |\n| Saver | sync |\n"
+                "must-have sync, priority reliability, mobile, personal use, 5 users"
+            )
+        ),
+        AIMessage(
+            content=(
+                "# Software Requirements Specification: Note Sync\n"
+                "## Functional Requirements\n| requirement id | REQ-001 |\n"
+                "## Data Dictionary\n| Field | Type |\ngreenfield project, no existing code"
+            )
+        ),
+    ]
+
+
+def test_chain_docs_satisfy_intake_and_reality_gates() -> None:
+    messages = [_design_prompt(), *_chain_docs()]
+    result = _run(messages, state=_active_skill_state())
+    nudges = _injected_nudges(result)
+    assert len(nudges) == 1
+    content = str(nudges[0].content)
+    assert "Grounded intake is incomplete" not in content
+    assert "reality has not been inspected" not in content
+
+
+def test_chain_docs_without_wanting_fall_back_to_interview() -> None:
+    docs = [
+        AIMessage(
+            content=(
+                "# Software Requirements Specification: Note Sync\n"
+                "## Functional Requirements\n| requirement id | REQ-001 |\n"
+                "budget $0, timeline 2 weeks, solo dev, personal use, 5 users"
+            )
+        )
+    ]
+    messages = [_design_prompt(), *docs]
+    result = _run(messages, state=_active_skill_state())
+    nudges = _injected_nudges(result)
+    assert len(nudges) == 1
+    assert "Grounded intake is incomplete" in str(nudges[0].content)

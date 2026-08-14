@@ -23,7 +23,7 @@ from typing import Any, override
 
 from langchain.agents import AgentState
 from langchain.agents.middleware import AgentMiddleware
-from langchain.agents.middleware.types import ModelCallResult, ModelRequest, ModelResponse
+from langchain.agents.middleware.types import ModelCallResult, ModelRequest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
 logger = logging.getLogger(__name__)
@@ -96,7 +96,6 @@ class VisionBridgeMiddleware(AgentMiddleware[AgentState]):
         for msg in messages[assistant_idx + 1 :]:
             if not isinstance(msg, ToolMessage):
                 continue
-            content = str(getattr(msg, "content", "") or "")
             # The view_image ToolMessage content is a data URL; the path is
             # in the tool call args. Match by tool_call_id instead.
             pass
@@ -140,8 +139,8 @@ class VisionBridgeMiddleware(AgentMiddleware[AgentState]):
         data_url = f"data:{mime_type};base64,{base64.b64encode(image_bytes).decode('utf-8')}"
 
         try:
-            from deerflow.models.factory import create_chat_model
             from deerflow.config.app_config import get_app_config
+            from deerflow.models.factory import create_chat_model
 
             config = get_app_config()
             vision_llm = create_chat_model(

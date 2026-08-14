@@ -5,10 +5,14 @@ SKILL.md in code. This is NOT a prompt — it nudges, counts, and validates
 regardless of what the model decides to do.
 
 Contract enforced (per user requirements):
-  Phase 0: Sizing checkpoint first — BRD-style context discovery: ask ONE
-    question at a time via ask_clarification (no batching) until the user's
-    answers contain >= 3 context signals (scale, deployment target, budget,
-    stack). Then classify Lane A/B/C.
+  Phase 0: Grounded intake first — interview the user ONE question at a time
+    via ask_clarification (no batching) until three pillars are recorded:
+    user wanting (goal, must-haves, priorities), constraints (budget,
+    timeline, platform, stack, team), and sizing (scale, deployment
+    target). Then classify Lane A/B/C.
+  Phase 0.5: System reality — inspect the existing system (files, code,
+    config) before designing, unless the user states the project is
+    greenfield. Unanswered intake items must be recorded as UNKNOWN.
   Phase 1: Requirements (goal, FR, NFR, constraints) before architecture.
   Phase 2: Architecture must be a mermaid diagram, not ASCII art, and must
     include a component decomposition table + communication patterns.
@@ -18,6 +22,11 @@ Contract enforced (per user requirements):
     concurrency internals) trigger a scope-correction nudge.
   Phase 5: Deployment topology per lane; tradeoffs, risks, and a numbered
     Build Order are mandatory.
+  Grounding: later phases require explicit UNKNOWN/assumption marking and a
+    requirement-to-decision Traceability table.
+  Chaining: when upstream pipeline documents (BRD/PRD/SRS) exist in the
+    thread, their documented facts satisfy the intake pillars and greenfield
+    statements — the interview only asks for what the chain has not recorded.
   Lane consistency: a personal/local design must not reference
     Kubernetes/microservices/sharding.
 
@@ -114,10 +123,37 @@ _DESIGN_CONTEXT_SIGNALS = (
 
 _QUESTION_SEQUENCE = (
     "What is the core problem this system solves, and who uses it?",
+    "What are the top 3 must-have capabilities, in priority order?",
     "How many users, and where does it run (personal machine / VPS / cluster)?",
     "What is the budget and timeline?",
-    "Are there stack constraints or existing systems to integrate with?",
-    "What are the must-have capabilities (top 3)?",
+    "What platform and stack constraints exist (OS, frameworks, existing systems)?",
+    "Are there team or compliance constraints (solo / team, legal, security)?",
+)
+
+# Pillar 1 — user wanting: goals, must-haves, priorities (interview intake).
+_WANTING_SIGNALS = (
+    "goal", "problem", "must-have", "must have", "priority", "want", "need it",
+    "success", "purpose",
+)
+
+# Pillar 2 — constraints: budget, timeline, platform, stack, team (interview intake).
+_CONSTRAINT_SIGNALS = (
+    "budget", "timeline", "deadline", "month", "week", "cost", "platform",
+    "windows", "linux", "macos", "stack", "framework", "team", "solo",
+    "constraint", "compliance", "existing",
+)
+
+# Greenfield statements that waive the system-reality inspection gate.
+_GREENFIELD_SIGNALS = (
+    "from scratch", "greenfield", "brand new", "new system", "nothing exists",
+    "no existing", "empty repo",
+)
+
+# Upstream pipeline documents (BRD/PRD/SRS) that count as grounded intake
+# evidence when chaining BRD -> PRD -> SRS -> system-design.
+_CHAIN_DOC_MARKERS = (
+    "business requirement", "# brd", "business objectives", "# prd", "product vision",
+    "software requirements specification", "| requirement id |", "data dictionary",
 )
 
 # Scale-out vocabulary that must never appear in a Lane A design.
@@ -165,21 +201,86 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
                     count += 1
         return count
 
-    def _context_answered(self, messages: list) -> bool:
-        """True when a recent user message contains >= 3 design-context signals.
+    @staticmethod
+    def _signals_answered(messages: list, signals: tuple, threshold: int, lookback: int = 12) -> bool:
+        """True when a recent visible user message contains >= threshold pillar signals.
 
-        Scoped to the last 12 messages so context from a previous topic does
-        not permanently satisfy the gate (re-arming behavior).
+        Scoped to the last `lookback` messages so context from a previous topic
+        does not permanently satisfy the gate (re-arming behavior).
         """
-        for msg in reversed(messages[-12:]):
+        for msg in reversed(messages[-lookback:]):
             if not isinstance(msg, HumanMessage):
                 continue
             if (getattr(msg, "additional_kwargs", None) or {}).get("hide_from_ui"):
                 continue
             content = str(getattr(msg, "content", "") or "").lower()
-            if sum(1 for s in _DESIGN_CONTEXT_SIGNALS if s in content) >= 3:
+            if sum(1 for s in signals if s in content) >= threshold:
                 return True
         return False
+
+    def _context_answered(self, messages: list) -> bool:
+        """Sizing pillar: scale and deployment target recorded."""
+        return self._signals_answered(messages, _DESIGN_CONTEXT_SIGNALS, 3)
+
+    def _wanting_answered(self, messages: list) -> bool:
+        """User-wanting pillar: goal, must-haves, priorities recorded."""
+        return self._signals_answered(messages, _WANTING_SIGNALS, 2)
+
+    def _constraints_answered(self, messages: list) -> bool:
+        """Constraints pillar: budget, timeline, platform, stack, team recorded."""
+        return self._signals_answered(messages, _CONSTRAINT_SIGNALS, 2)
+
+    def _chain_doc_content(self, messages: list, lookback: int = 16) -> str:
+        """AI text from upstream pipeline documents (BRD/PRD/SRS) in the thread.
+
+        When chaining, documented facts satisfy the intake pillars instead of
+        re-interviewing the user for what the chain already recorded.
+        """
+        chunks: list[str] = []
+        for msg in reversed(messages[-lookback:]):
+            if not isinstance(msg, AIMessage):
+                continue
+            content = str(getattr(msg, "content", "") or "").lower()
+            if any(m in content for m in _CHAIN_DOC_MARKERS):
+                chunks.append(content)
+        return "\n".join(chunks)
+
+    def _pillar_from_chain_docs(self, messages: list, signals: tuple, threshold: int) -> bool:
+        content = self._chain_doc_content(messages)
+        return sum(1 for s in signals if s in content) >= threshold
+
+    def _intake_answered(self, messages: list) -> bool:
+        """All three intake pillars recorded, via the interview or upstream chain docs."""
+        if (
+            self._context_answered(messages)
+            and self._wanting_answered(messages)
+            and self._constraints_answered(messages)
+        ):
+            return True
+        return (
+            self._pillar_from_chain_docs(messages, _WANTING_SIGNALS, 2)
+            and self._pillar_from_chain_docs(messages, _CONSTRAINT_SIGNALS, 2)
+            and self._pillar_from_chain_docs(messages, _DESIGN_CONTEXT_SIGNALS, 3)
+        )
+
+    def _reality_inspected(self, messages: list) -> bool:
+        """True when the model has inspected the actual system (files, dirs, code)."""
+        for msg in messages:
+            if not isinstance(msg, ToolMessage):
+                continue
+            name = str(getattr(msg, "name", "") or "").lower()
+            if any(t in name for t in ("read_file", "list", "search_code", "code_search", "grep", "find")):
+                return True
+        return False
+
+    def _greenfield_stated(self, messages: list) -> bool:
+        """True when the user or an upstream chain document stated greenfield."""
+        for msg in reversed(messages[-12:]):
+            if isinstance(msg, HumanMessage) and not (getattr(msg, "additional_kwargs", None) or {}).get("hide_from_ui"):
+                content = str(getattr(msg, "content", "") or "").lower()
+                if any(s in content for s in _GREENFIELD_SIGNALS):
+                    return True
+        return any(s in self._chain_doc_content(messages) for s in _GREENFIELD_SIGNALS)
 
     @staticmethod
     def _user_replied_after_last_ask(messages: list, lookback: int = 12) -> bool:
@@ -303,6 +404,14 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
         c = self._ai_content(messages)
         return "tradeoff" in c or "build order" in c or ("| risk |" in c)
 
+    def _has_unknowns_marked(self, messages: list) -> bool:
+        c = self._ai_content(messages)
+        return "unknown" in c or "assumption" in c
+
+    def _has_traceability(self, messages: list) -> bool:
+        c = self._ai_content(messages)
+        return "traceability" in c or "| requirement" in c or "requirement id" in c
+
     def _ai_question_recent(self, messages: list, lookback: int = 4) -> bool:
         """True if the model recently asked the user a question."""
         for msg in reversed(messages[-lookback:]):
@@ -325,8 +434,8 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
     def _build_nudges(self, messages: list) -> list[HumanMessage]:
         nudges: list[HumanMessage] = []
 
-        # Phase 0 — sizing checkpoint, BRD-style: one question at a time.
-        if not self._context_answered(messages):
+        # Phase 0 — grounded intake (wanting + constraints + sizing): one question at a time.
+        if not self._intake_answered(messages):
             # Wait-gate: do not advance the question sequence while the user
             # has not answered the current question.
             if not self._user_replied_after_last_ask(messages):
@@ -341,11 +450,23 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
             question = _QUESTION_SEQUENCE[min(asks, len(_QUESTION_SEQUENCE) - 1)]
             return [
                 self._nudge(
-                    "[SYSTEM REMINDER] Gather full design context. No guessing. Ask ONE question at "
+                    "[SYSTEM REMINDER] Grounded intake is incomplete. No guessing. Ask ONE question at "
                     "a time via ask_clarification — do not batch questions. "
-                    f"Next question: {question} Keep asking until you have: scale, deployment "
-                    "target, budget/timeline, and stack constraints. If the user cannot answer, "
-                    "default to Lane A (local/personal) and state the assumption explicitly."
+                    f"Next question: {question} Keep asking until all three pillars are recorded: "
+                    "user wanting (goal, must-haves, priorities), constraints (budget, timeline, "
+                    "platform, stack, team), and sizing (scale, deployment target). If the user "
+                    "cannot answer a pillar, record it as UNKNOWN — never invent it."
+                )
+            ]
+
+        # Phase 0.5 — system reality: inspect the existing system before designing.
+        if not self._reality_inspected(messages) and not self._greenfield_stated(messages):
+            return [
+                self._nudge(
+                    "[SYSTEM REMINDER] The system's reality has not been inspected. If an existing "
+                    "codebase, environment, or prior design exists, examine it first (read_file, "
+                    "list directories, search code) so the architecture reflects what is real. If "
+                    "this is greenfield, the user must state it explicitly — never assume."
                 )
             ]
 
@@ -481,6 +602,25 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
                     "[SYSTEM REMINDER] The design document must cite sources for its key decisions "
                     "(links or [n](url) references): architecture style, storage choices, and API "
                     "decisions need validated references from the evidence phase."
+                )
+            )
+
+        # Grounding — unanswered intake items must be marked, not invented.
+        if self._has_tradeoffs(messages) and not self._has_unknowns_marked(messages):
+            nudges.append(
+                self._nudge(
+                    "[SYSTEM REMINDER] Mark every unanswered intake item explicitly as UNKNOWN or as a "
+                    "stated assumption. Silent invention of scale, budget, or stack facts is not allowed."
+                )
+            )
+
+        # Traceability — every decision must cite the requirement and constraint it serves.
+        if self._has_tradeoffs(messages) and not self._has_traceability(messages):
+            nudges.append(
+                self._nudge(
+                    "[SYSTEM REMINDER] Add a Traceability section mapping each architecture decision to "
+                    "the requirement and constraint it serves "
+                    "(| decision | requirement | constraint | component |)."
                 )
             )
 

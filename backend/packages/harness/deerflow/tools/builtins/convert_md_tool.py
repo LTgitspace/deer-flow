@@ -182,8 +182,8 @@ def _apply_formatting(doc, items: list) -> None:
             run.font.color.rgb = None  # will set hyperlink style below
             try:
                 from docx.opc.constants import RELATIONSHIP_TYPE as RT
-                from docx.oxml.ns import nsdecls
                 from docx.oxml import parse_xml
+                from docx.oxml.ns import nsdecls
                 r_id = doc.part.relate_to(item["url"], RT.HYPERLINK, is_external=True)
                 rPr = run._r.get_or_add_rPr()
                 cS = parse_xml(f'<w:color {nsdecls("w")} w:val="0000FF"/>')
@@ -276,7 +276,7 @@ def _strip_inline(text: str) -> str:
 def _to_docx(content: str, output_path: str) -> str:
     try:
         from docx import Document
-        from docx.shared import RGBColor, Pt
+        from docx.shared import Pt
 
         doc = Document()
 
@@ -354,6 +354,8 @@ def _to_docx(content: str, output_path: str) -> str:
 
 def _apply_formatting(doc, items: list, heading_level: int | None = None, bullet: bool = False) -> None:
     """Add a paragraph with inline formatting from parsed items."""
+    from docx.shared import Pt, RGBColor
+
     if heading_level:
         p = doc.add_heading("", level=heading_level)
     elif bullet:
@@ -381,7 +383,7 @@ def _apply_formatting(doc, items: list, heading_level: int | None = None, bullet
         if item.get("url"):
             try:
                 from docx.opc.constants import RELATIONSHIP_TYPE as RT
-                r_id = doc.part.relate_to(item["url"], RT.HYPERLINK, is_external=True)
+                doc.part.relate_to(item["url"], RT.HYPERLINK, is_external=True)
                 run.font.color.rgb = RGBColor(0, 0, 255)
                 run.underline = True
             except Exception:

@@ -17,4 +17,5 @@ __all__ = [
     "view_image_tool",
     "task_tool",
     "list_uploaded_files",
+    "convert_md_tool",
 ]

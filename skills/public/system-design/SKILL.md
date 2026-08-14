@@ -1,6 +1,6 @@
 ---
 name: system-design
-description: "Produce high-level system architecture designs — system boundaries, components, their interactions, data flow, and key architecture decisions. NOT an implementation spec: no entity schemas, no endpoint-level API definitions, no concurrency internals. Use when the user asks for \"design this\", \"architecture\", \"system design\", \"how to build\", \"technical design\", or \"architecture review\". Always starts with a sizing checkpoint (Local / Team / Scale-out), then evidence-backed architecture, mermaid diagrams, and a build order."
+description: "Produce high-level system architecture designs — system boundaries, components, their interactions, data flow, and key architecture decisions. NOT an implementation spec: no entity schemas, no endpoint-level API definitions, no concurrency internals. Use when the user asks for \"design this\", \"architecture\", \"system design\", \"how to build\", \"technical design\", or \"architecture review\". Always starts with a grounded intake interview (user wanting, constraints, sizing), inspects the system's reality, then evidence-backed architecture, mermaid diagrams, traceable decisions, and a build order."
 ---
 
 # System Design Skill (High-Level Architecture)
@@ -14,21 +14,39 @@ Produce a complete **high-level system architecture design**: what the system is
 1. **Size first, always.** Never design without a sizing checkpoint. A personal tool and a public platform are different documents with different decisions.
 2. **Boring architecture wins.** Prefer a modular monolith, synchronous calls, and a plain relational DB. Microservices, queues, and sharding are liabilities until a lane requires them.
 3. **Mermaid-first diagrams.** Architecture diagrams are `mermaid` code blocks, not ASCII art. One diagram per critical flow.
-4. **No guessing.** Requirements are clarified, not invented. If the user has not given scale, users, or constraints — ask before designing.
-5. **Evidence over intuition.** Every architecture decision must cite a validated source — official guidelines, best practices, reference architectures, or case studies. Never invent a practice nobody has confirmed.
-6. **Architecture, not implementation.** Every section stays at the level of components, responsibilities, and interactions. If you catch yourself writing field schemas, endpoint signatures, or thread-pool details — stop. Note it as "implementation detail — defer to tech spec".
-7. **Always end with a build order.** A design nobody can implement is decoration. Ordered implementation milestones are mandatory output.
+4. **No guessing.** Requirements, constraints, and the system's reality are clarified, not invented. If the user has not given scale, users, or constraints — ask before designing. Anything still unanswered is recorded as `UNKNOWN`.
+5. **System reality first.** If an existing codebase or environment exists, inspect it before designing. If the project is greenfield, the user says so explicitly — the design states which it is.
+6. **Evidence over intuition.** Every architecture decision must cite a validated source — official guidelines, best practices, reference architectures, or case studies. Never invent a practice nobody has confirmed.
+7. **Every decision is traceable.** Each architecture decision cites the requirement and the constraint it serves, in an explicit traceability table.
+8. **Architecture, not implementation.** Every section stays at the level of components, responsibilities, and interactions. If you catch yourself writing field schemas, endpoint signatures, or thread-pool details — stop. Note it as "implementation detail — defer to tech spec".
+9. **Always end with a build order.** A design nobody can implement is decoration. Ordered implementation milestones are mandatory output.
 
 ---
 
-## Phase 0: Sizing Checkpoint (MANDATORY — before anything else)
+## Phase 0: Grounded Intake (MANDATORY — before anything else)
 
-Ask the user (via `ask_clarification` or direct questions) before any architecture work:
+Interview the user (via `ask_clarification`, ONE question at a time — never batch) until all three pillars are recorded:
 
-1. **Who uses it and how many?** (just you / team / public)
-2. **Where does it run?** (your machine / one VPS / cluster)
-3. **Budget and timeline?**
-4. **Stack constraints?** (existing code, team skills, must-use technologies)
+### Pillar 1 — User Wanting
+
+- The core problem the system solves
+- Top 3 must-have capabilities, in priority order
+- What success looks like
+
+### Pillar 2 — Constraints
+
+- Budget and timeline
+- Platform (Windows / Linux / macOS) and stack constraints
+- Team (solo / team) and compliance requirements (legal, security, privacy)
+
+### Pillar 3 — Sizing
+
+- Who uses it and how many? (just you / team / public)
+- Where does it run? (your machine / one VPS / cluster)
+
+**Unknown rule:** if the user cannot answer a pillar item, record it explicitly as `UNKNOWN` — never invent a value. The architecture must later state what it assumed.
+
+**Pipeline reuse:** if this thread already contains a BRD, PRD, or SRS from the requirements pipeline, their documented facts count as intake — do not re-ask for what the chain already recorded. Cite the document instead (BRD objectives = user wanting, SRS requirement IDs = traceability anchors).
 
 ### Lane Classification
 
@@ -45,7 +63,18 @@ Ask the user (via `ask_clarification` or direct questions) before any architectu
 
 ---
 
-## Phase 1: Requirements (Gate: Phase 0 confirmed)
+## Phase 0.5: System Reality (Gate: intake recorded)
+
+The architecture must reflect what actually exists, not what the model imagines:
+
+1. If an existing codebase, environment, or prior design exists — **inspect it** (read files, list directories, search code) and summarize what is real.
+2. If the project is greenfield, the user must state it explicitly ("from scratch", "nothing exists yet").
+3. State in the design what was inspected, or the greenfield statement.
+4. Anything from the intake that is still unanswered is recorded as `UNKNOWN`.
+
+---
+
+## Phase 1: Requirements (Gate: Phase 0 + 0.5 confirmed)
 
 Requirements are **architecture drivers**, not a product spec. Establish:
 
@@ -191,6 +220,15 @@ A short section documenting the decisions that shape the whole system — with a
 | Storage | SQLite → Postgres | Cassandra | Overkill for the lane |
 | Deployment | Single machine | Kubernetes | Lane A; ops cost not justified |
 
+### Traceability (mandatory)
+
+Every decision must cite the requirement and the constraint it serves:
+
+| Decision | Requirement | Constraint | Component |
+|---|---|---|---|
+| Modular monolith | FR: messaging, notes | Team: solo | API Service |
+| SQLite | FR: durable notes | Budget: $0 | Storage |
+
 Also record: scale characteristics (current + projected per lane) and what would force a lane change.
 
 ---
@@ -232,6 +270,8 @@ Under tight constraints, at minimum deliver:
 5. Write + read path traced at system level
 6. One tradeoff + the build order
 7. Key decisions cited (evidence phase)
+8. Unknowns and assumptions stated explicitly
+9. Traceability table (decision → requirement → constraint)
 
 ## Output
 
@@ -244,6 +284,6 @@ Present the complete document via `present_file`:
 ## 1.5 Evidence & Sources
 ## 2. High-Level Architecture  (context, mermaid diagram, components, communication)
 ## 3. Data Flow & Storage
-## 4. Key Architecture Decisions
+## 4. Key Architecture Decisions (+ Traceability table)
 ## 5. Tradeoffs, Risks & Build Order
 ```

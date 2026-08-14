@@ -1,22 +1,25 @@
-"""Pipeline middleware chaining BRD -> PRD -> SRS.
+"""Pipeline middleware chaining BRD -> PRD -> SRS -> system-design.
 
-The three requirements middlewares enforce their own documents in isolation.
+The four skill middlewares enforce their own documents in isolation.
 This middleware chains them deterministically:
 
   - Ordering: a PRD must not be produced before the business case exists
-    (BRD) and an SRS must not be produced before the product definition
-    (PRD) exists. A user waiver ("skip the BRD", "no PRD needed") releases
-    the gate - the chain is a nudge, not a hard block.
+    (BRD), an SRS must not be produced before the product definition
+    (PRD) exists, and an architecture design must not be produced before
+    the requirements spec (SRS) exists. A user waiver ("skip the BRD",
+    "no PRD needed", "skip the SRS") releases the gate - the chain is a
+    nudge, not a hard block.
   - Traceability: once the predecessor document exists in the thread, the
     successor must reference it (PRD maps to BRD objectives, SRS maps to
-    PRD stories). A document that ignores its predecessor gets a correction
-    nudge until it traces back.
+    PRD stories, the architecture maps decisions to SRS requirement IDs).
+    A document that ignores its predecessor gets a correction nudge until
+    it traces back.
 
-Activation: only when at least one of the three skills is active in the
+Activation: only when at least one of the four skills is active in the
 thread context. The business-requirement skill is the root of the chain and
-gets no pipeline nudges; product-requirements and software-requirements are
-the chained stages. All state is derived from message history and
-skill_context - no custom_data writes, deterministic across runs.
+gets no pipeline nudges; product-requirements, software-requirements, and
+system-design are the chained stages. All state is derived from message
+history and skill_context - no custom_data writes, deterministic across runs.
 """
 
 from __future__ import annotations
@@ -37,14 +40,19 @@ logger = logging.getLogger(__name__)
 _BRD_SKILL = "business-requirement"
 _PRD_SKILL = "product-requirements"
 _SRS_SKILL = "software-requirements"
+_SAD_SKILL = "system-design"
 
-_CHAIN_SKILLS = (_BRD_SKILL, _PRD_SKILL, _SRS_SKILL)
+_CHAIN_SKILLS = (_BRD_SKILL, _PRD_SKILL, _SRS_SKILL, _SAD_SKILL)
 
 MAX_NUDGES_PER_CALL = 1
 
 # User statements that release an ordering gate.
 _BRD_WAIVER_PATTERNS = ("skip the brd", "no brd", "without brd", "skip brd", "brd is not needed", "don't need a brd", "no business case")
 _PRD_WAIVER_PATTERNS = ("skip the prd", "no prd", "without prd", "skip prd", "prd is not needed", "don't need a prd", "straight to srs", "directly to srs")
+_SRS_WAIVER_PATTERNS = (
+    "skip the srs", "no srs", "without srs", "skip srs", "srs is not needed",
+    "don't need an srs", "straight to architecture", "directly to architecture",
+)
 
 
 class RequirementsPipelineMiddleware(AgentMiddleware[AgentState]):
@@ -126,6 +134,15 @@ class RequirementsPipelineMiddleware(AgentMiddleware[AgentState]):
         return False
 
     @classmethod
+    def _has_sad(cls, messages: list) -> bool:
+        for content in cls._ai_contents(messages):
+            if "# system design" in content:
+                return True
+            if "architecture overview" in content and "mermaid" in content:
+                return True
+        return False
+
+    @classmethod
     def _latest_doc_content(cls, messages: list, marker: str) -> str:
         """Content of the latest AI message carrying the document marker."""
         for msg in reversed(messages):
@@ -163,8 +180,11 @@ class RequirementsPipelineMiddleware(AgentMiddleware[AgentState]):
         if current == _PRD_SKILL:
             return self._prd_stage_nudges(messages)
 
-        # current == _SRS_SKILL
-        return self._srs_stage_nudges(messages)
+        if current == _SRS_SKILL:
+            return self._srs_stage_nudges(messages)
+
+        # current == _SAD_SKILL
+        return self._sad_stage_nudges(messages)
 
     def _prd_stage_nudges(self, messages: list) -> list[HumanMessage]:
         brd_exists = self._has_brd(messages)
@@ -240,6 +260,47 @@ class RequirementsPipelineMiddleware(AgentMiddleware[AgentState]):
                         "IDs to PRD stories/features (reference the story IDs in the "
                         "Source column). Requirements without a product source are not "
                         "acceptable."
+                    )
+                ]
+
+        return []
+
+    def _sad_stage_nudges(self, messages: list) -> list[HumanMessage]:
+        srs_exists = self._has_srs(messages)
+        sad_exists = self._has_sad(messages)
+
+        if not srs_exists and not self._waived(messages, _SRS_WAIVER_PATTERNS):
+            if sad_exists:
+                text = (
+                    "[PIPELINE REMINDER] STOP: an architecture design has been produced but "
+                    "this thread has no SRS. The engineering spec must come first - activate "
+                    "/software-requirements and produce the SRS (stories, acceptance criteria, "
+                    "data dictionary, traceability to the PRD), or ask the user to explicitly "
+                    "waive it ('skip the SRS'). Architecture without a requirements spec is not "
+                    "acceptable."
+                )
+            else:
+                text = (
+                    "[PIPELINE REMINDER] You are about to design the architecture, but this "
+                    "thread has no SRS. Requirements first: activate /software-requirements "
+                    "and produce the SRS, or ask the user to explicitly waive it ('skip the "
+                    "SRS'). The architecture must then trace each decision to an SRS "
+                    "requirement ID (REQ-...) and reuse the BRD objectives as the "
+                    "user-wanting context."
+                )
+            return [self._nudge(text)]
+
+        if srs_exists and sad_exists:
+            doc = self._latest_doc_content(messages, "# system design") or self._latest_doc_content(messages, "architecture overview")
+            traceable = "req-" in doc or "srs" in doc or "| requirement id |" in doc
+            if not traceable:
+                return [
+                    self._nudge(
+                        "[PIPELINE REMINDER] This thread contains an SRS, but the architecture "
+                        "does not reference it. The traceability table must map each architecture "
+                        "decision to the SRS requirement IDs it serves (REQ-...) and to the "
+                        "constraints recorded upstream. Architecture that ignores the "
+                        "requirements spec is not acceptable."
                     )
                 ]
 

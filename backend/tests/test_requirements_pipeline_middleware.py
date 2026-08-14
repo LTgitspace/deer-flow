@@ -180,3 +180,56 @@ def test_full_chain_after_waivers_is_quiet() -> None:
         _SRS_DOC,
     ]
     assert _nudges(messages, state) == []
+
+
+# ── System design (SAD) stage ──
+
+_SAD_DOC = AIMessage(content="# System Design: Expense Tracker\n\n## Architecture Overview\n```mermaid\ngraph TD\n A --> B\n```\n| component | api |")
+_SAD_DOC_TRACEABLE = AIMessage(
+    content=(
+        "# System Design: Expense Tracker\n\n## Architecture Overview\n```mermaid\ngraph TD\n A --> B\n```\n"
+        "| component | api |\n\nTraceability: | decision | requirement | constraint |\n"
+        "| monolith | REQ-001 | budget |"
+    )
+)
+
+
+def test_sad_without_srs_gets_srs_first_nudge() -> None:
+    messages = [HumanMessage(content="design the architecture for the expense tracker")]
+    nudges = _nudges(messages, _skill_state("system-design"))
+    assert len(nudges) == 1
+    assert "Requirements first" in str(nudges[0].content)
+
+
+def test_sad_produced_without_srs_escalates() -> None:
+    messages = [HumanMessage(content="design the architecture"), _SAD_DOC]
+    nudges = _nudges(messages, _skill_state("system-design"))
+    assert len(nudges) == 1
+    assert "STOP" in str(nudges[0].content)
+
+
+def test_sad_without_srs_waived_no_nudges() -> None:
+    messages = [HumanMessage(content="design the architecture, skip the SRS")]
+    assert _nudges(messages, _skill_state("system-design")) == []
+
+
+def test_sad_after_srs_not_traceable_gets_traceability_nudge() -> None:
+    messages = [HumanMessage(content="design the architecture"), _SRS_DOC, _SAD_DOC]
+    nudges = _nudges(messages, _skill_state("system-design"))
+    assert len(nudges) == 1
+    assert "traceability" in str(nudges[0].content).lower()
+
+
+def test_sad_after_srs_traceable_no_nudges() -> None:
+    messages = [HumanMessage(content="design the architecture"), _SRS_DOC, _SAD_DOC_TRACEABLE]
+    assert _nudges(messages, _skill_state("system-design")) == []
+
+
+def test_full_four_stage_chain_with_waivers_is_quiet() -> None:
+    messages = [
+        HumanMessage(content="skip the BRD"),
+        HumanMessage(content="skip the PRD, straight to SRS"),
+        HumanMessage(content="skip the SRS, straight to architecture"),
+        _SAD_DOC_TRACEABLE,
+    ]
+    assert _nudges(messages, _skill_state("system-design")) == []
