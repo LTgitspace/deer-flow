@@ -460,6 +460,12 @@ def build_middlewares(
 
     middlewares.append(MetacognitionMiddleware(app_config=resolved_app_config))
 
+    # Planner: deterministic plan-first enforcement for multi-step work.
+    # Think first (metacognition), plan second (planner), execute third.
+    from deerflow.agents.middlewares.planner_middleware import PlannerMiddleware
+
+    middlewares.append(PlannerMiddleware(app_config=resolved_app_config))
+
     # Planting Research skill enforcement: counts web_search calls, tracks
     # locale confirmation, and injects structured nudges when phases are skipped.
     # Only activates when the planting-research skill is slash-activated or

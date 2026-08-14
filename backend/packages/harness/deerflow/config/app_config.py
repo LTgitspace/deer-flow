@@ -27,6 +27,7 @@ from deerflow.config.loop_detection_config import LoopDetectionConfig
 from deerflow.config.memory_config import MemoryConfig, load_memory_config_from_dict
 from deerflow.config.metacognition_config import MetacognitionConfig, load_metacognition_config_from_dict
 from deerflow.config.model_config import ModelConfig
+from deerflow.config.planner_config import PlannerConfig, load_planner_config_from_dict
 from deerflow.config.read_before_write_config import ReadBeforeWriteConfig
 from deerflow.config.reload_boundary import format_field_description
 from deerflow.config.run_events_config import RunEventsConfig
@@ -227,6 +228,7 @@ class AppConfig(BaseModel):
     tool_search: ToolSearchConfig = Field(default_factory=ToolSearchConfig, description="Tool search / deferred loading configuration")
     title: TitleConfig = Field(default_factory=TitleConfig, description="Automatic title generation configuration")
     metacognition: MetacognitionConfig = Field(default_factory=MetacognitionConfig, description="Metacognition think-first enforcement configuration")
+    planner: PlannerConfig = Field(default_factory=PlannerConfig, description="Planner plan-first enforcement configuration")
     summarization: SummarizationConfig = Field(default_factory=SummarizationConfig, description="Conversation summarization configuration")
     memory: MemoryConfig = Field(default_factory=MemoryConfig, description="Memory subsystem configuration")
     agents_api: AgentsApiConfig = Field(default_factory=AgentsApiConfig, description="Custom-agent management API configuration")
@@ -443,6 +445,7 @@ class AppConfig(BaseModel):
 
         load_title_config_from_dict(config.title.model_dump())
         load_metacognition_config_from_dict(config.metacognition.model_dump())
+        load_planner_config_from_dict(config.planner.model_dump())
         load_summarization_config_from_dict(config.summarization.model_dump())
         load_memory_config_from_dict(config.memory.model_dump())
         load_agents_api_config_from_dict(config.agents_api.model_dump())

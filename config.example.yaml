@@ -1580,6 +1580,16 @@ metacognition:
   min_complexity_chars: 60
 
 # ============================================================================
+# Planner Configuration
+# ============================================================================
+# Deterministic plan-first enforcement for multi-step work: numbered plan
+# before any file edits, strict execution within the plan. Classification
+# thresholds and action vocabulary default in PlannerConfig.
+planner:
+  enabled: true
+  min_chars: 40
+
+# ============================================================================
 # Summarization Configuration
 # ============================================================================
 # Automatically summarize conversation history when token limits are approached
