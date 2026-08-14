@@ -482,6 +482,13 @@ def build_middlewares(
 
     middlewares.append(ProductRequirementsMiddleware())
 
+    # Requirements pipeline: chains BRD -> PRD -> SRS. Enforces ordering
+    # (business case before product, product before engineering) and
+    # cross-document traceability, with an explicit user-waiver escape hatch.
+    from deerflow.agents.middlewares.requirements_pipeline_middleware import RequirementsPipelineMiddleware
+
+    middlewares.append(RequirementsPipelineMiddleware())
+
     # Deep Research skill enforcement: clarification-first research (3 questions
     # before searching, follow-ups for thin answers), no guessing, mandatory
     # search/fetch depth, mid-process direction checks, and citations.
