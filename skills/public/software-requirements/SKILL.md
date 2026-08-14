@@ -1,6 +1,6 @@
 ---
 name: software-requirements
-description: Elicit, structure, and validate software requirements with clear acceptance criteria. Use when the user asks for "requirements", "specification", "user stories", "acceptance criteria", "functional spec", "PRD", or "product requirements". Produces user stories, functional specs, data dictionaries, and traceability matrices.
+description: Elicit, structure, and validate software requirements with clear acceptance criteria. Use when the user asks for "requirements", "specification", "user stories", "acceptance criteria", or "functional spec". Produces user stories, functional specs, data dictionaries, and traceability matrices. For product-level docs (vision, personas, metrics, roadmap) use the product-requirements skill instead.
 ---
 
 # Software Requirements Skill
@@ -122,6 +122,8 @@ Example:
 3. System {reaction}
 4. User sees {result}
 
+**Diagram**: include a mermaid flowchart or state diagram (```mermaid ... ``` code block) for every non-trivial flow.
+
 **Edge cases**:
 - {edge case}: {expected behavior}
 - {edge case}: {expected behavior}
@@ -175,6 +177,7 @@ Example:
 - [ ] Every functional requirement has an acceptance criterion that proves it
 - [ ] Every acceptance criterion is testable (not "fast" but "< 2 seconds")
 - [ ] Non-functional requirements have concrete targets (not "reliable" but "99.9%")
+- [ ] Non-trivial flows have a mermaid flowchart or state diagram
 - [ ] No requirement contradicts another
 - [ ] All roles/permissions are defined
 - [ ] All error states are documented (not just the happy path)

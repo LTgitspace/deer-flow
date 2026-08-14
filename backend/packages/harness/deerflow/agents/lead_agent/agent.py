@@ -468,6 +468,20 @@ def build_middlewares(
 
     middlewares.append(BusinessRequirementMiddleware())
 
+    # Software Requirements skill enforcement: one-question context discovery,
+    # user stories with testable acceptance criteria, functional specs with error
+    # states, data dictionary, traceability, and final validation.
+    from deerflow.agents.middlewares.software_requirements_middleware import SoftwareRequirementsMiddleware
+
+    middlewares.append(SoftwareRequirementsMiddleware())
+
+    # Product Requirements skill enforcement: personas, vision, measurable
+    # success metrics, scope boundaries, prioritized features, user journey
+    # diagram, dependencies, release criteria, and roadmap.
+    from deerflow.agents.middlewares.product_requirements_middleware import ProductRequirementsMiddleware
+
+    middlewares.append(ProductRequirementsMiddleware())
+
     # Deep Research skill enforcement: clarification-first research (3 questions
     # before searching, follow-ups for thin answers), no guessing, mandatory
     # search/fetch depth, mid-process direction checks, and citations.
