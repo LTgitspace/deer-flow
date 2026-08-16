@@ -207,6 +207,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         startup_config = get_app_config()
         configure_logging(startup_config)
+        from deerflow.agents.middlewares.nudge_log import install_nudge_capture
+
+        install_nudge_capture()
         ensure_browser_runtime_available(startup_config)
         logger.info("Configuration loaded successfully")
         warn_if_auth_disabled_enabled()

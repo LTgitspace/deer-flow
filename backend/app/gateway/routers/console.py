@@ -513,3 +513,19 @@ async def console_usage(
         total_cost=total_cost,
         currency=_pricing_currency(pricing),
     )
+
+
+@router.get(
+    "/threads/{thread_id}/nudges",
+    summary="Recent Gate Triggers",
+    description="Recent deterministic gate triggers (nudges) captured for a thread, newest last.",
+)
+@require_permission("runs", "read")
+async def thread_nudges(
+    thread_id: str,
+    limit: int = Query(default=50, ge=1, le=100),
+) -> dict:
+    """Return the captured nudge ring buffer for a thread."""
+    from deerflow.agents.middlewares.nudge_log import recent_nudges
+
+    return {"thread_id": thread_id, "nudges": recent_nudges(thread_id, limit=limit)}

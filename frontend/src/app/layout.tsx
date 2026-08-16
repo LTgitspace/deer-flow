@@ -7,7 +7,7 @@ import { DEFAULT_LOCALE } from "@/core/i18n/locale";
 
 export const metadata: Metadata = {
   title: "UniDeer",
-  description: "A LangChain-based framework for building super agents.",
+  description: "Arnatov's academic and technical super agent harness.",
 };
 
 export default function RootLayout({
