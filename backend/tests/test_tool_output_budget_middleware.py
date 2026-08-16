@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import tempfile
 from types import SimpleNamespace
 
@@ -159,6 +160,7 @@ class TestExternalize:
             with open(os.path.join(storage_dir, files[0]), encoding="utf-8") as f:
                 assert f.read() == "full content here"
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="/dev/null is not a character device on Windows")
     def test_returns_none_on_invalid_path(self):
         # ``/dev/null`` is a character device on both Linux and macOS, so
         # ``os.makedirs`` cannot create any subdirectory under it for any
@@ -657,10 +659,12 @@ class TestWrapToolCallFallback:
 
         assert isinstance(result, ToolMessage)
         assert result is not msg
+        # Fallback path: no outputs dir, so the result is head/tail truncated.
         assert "omitted from mcp_tool output" in result.content
         assert "Persistent storage unavailable" in result.content
         assert len(result.content) < len(content)
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="/dev/null is not a character device on Windows")
     def test_fallback_when_disk_write_fails(self):
         config = ToolOutputConfig(
             externalize_min_chars=50,
