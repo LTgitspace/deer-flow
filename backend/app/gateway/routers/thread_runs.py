@@ -858,9 +858,13 @@ async def stream_run(thread_id: ThreadId, body: RunCreateRequest, request: Reque
         sse_consumer(bridge, record, request, run_mgr),
         media_type="text/event-stream",
         headers={
-            "Cache-Control": "no-cache",
+            "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
+            # Never compress the SSE stream: gzip is a block compressor and
+            # would hold small token events until flush, making streaming
+            # appear as delayed blocks in the browser.
+            "Content-Encoding": "identity",
             # LangGraph Platform includes run metadata in this header.
             # The SDK uses a greedy regex to extract the run id from this path,
             # so it must point at the canonical run resource without extra suffixes.
