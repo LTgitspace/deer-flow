@@ -29,6 +29,7 @@ from deerflow.config.memory_config import MemoryConfig, load_memory_config_from_
 from deerflow.config.metacognition_config import MetacognitionConfig, load_metacognition_config_from_dict
 from deerflow.config.model_config import ModelConfig
 from deerflow.config.planner_config import PlannerConfig, load_planner_config_from_dict
+from deerflow.config.pushback_config import PushbackConfig, load_pushback_config_from_dict
 from deerflow.config.read_before_write_config import ReadBeforeWriteConfig
 from deerflow.config.reload_boundary import format_field_description
 from deerflow.config.run_events_config import RunEventsConfig
@@ -232,6 +233,7 @@ class AppConfig(BaseModel):
     metacognition: MetacognitionConfig = Field(default_factory=MetacognitionConfig, description="Metacognition think-first enforcement configuration")
     planner: PlannerConfig = Field(default_factory=PlannerConfig, description="Planner plan-first enforcement configuration")
     emoji_gate: EmojiGateConfig = Field(default_factory=EmojiGateConfig, description="Emoji-free technical output enforcement configuration")
+    pushback: PushbackConfig = Field(default_factory=PushbackConfig, description="Pushback informed-consent enforcement configuration")
     token_forensics: TokenForensicsConfig = Field(default_factory=TokenForensicsConfig, description="Per-turn token decomposition logging configuration")
     summarization: SummarizationConfig = Field(default_factory=SummarizationConfig, description="Conversation summarization configuration")
     memory: MemoryConfig = Field(default_factory=MemoryConfig, description="Memory subsystem configuration")
@@ -451,6 +453,7 @@ class AppConfig(BaseModel):
         load_metacognition_config_from_dict(config.metacognition.model_dump())
         load_planner_config_from_dict(config.planner.model_dump())
         load_emoji_gate_config_from_dict(config.emoji_gate.model_dump())
+        load_pushback_config_from_dict(config.pushback.model_dump())
         load_token_forensics_config_from_dict(config.token_forensics.model_dump())
         load_summarization_config_from_dict(config.summarization.model_dump())
         load_memory_config_from_dict(config.memory.model_dump())

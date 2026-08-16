@@ -1600,6 +1600,17 @@ emoji_gate:
   allow_in_chat: true
 
 # ============================================================================
+# Pushback Configuration
+# ============================================================================
+# Deterministic informed-consent enforcement: when a user directive
+# contradicts a recorded commitment (prior user statement or memory fact),
+# the agent must voice the tradeoff before executing. Never blocks — the
+# user's call is final; it is simply informed.
+pushback:
+  enabled: true
+  min_chars: 30
+
+# ============================================================================
 # Token Forensics Configuration
 # ============================================================================
 # Per-turn token decomposition logging: input breakdown (prompt/tools/memory/

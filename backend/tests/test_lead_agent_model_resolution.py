@@ -752,6 +752,7 @@ def test_compiled_skill_policy_chain_filters_schema_and_blocks_execution(monkeyp
     from deerflow.agents.middlewares.planner_middleware import PlannerMiddleware
     from deerflow.agents.middlewares.planting_research_middleware import PlantingResearchMiddleware
     from deerflow.agents.middlewares.product_requirements_middleware import ProductRequirementsMiddleware
+    from deerflow.agents.middlewares.pushback_middleware import PushbackMiddleware
     from deerflow.agents.middlewares.requirements_pipeline_middleware import RequirementsPipelineMiddleware
     from deerflow.agents.middlewares.software_requirements_middleware import SoftwareRequirementsMiddleware
     from deerflow.agents.middlewares.system_design_middleware import SystemDesignMiddleware
@@ -765,6 +766,7 @@ def test_compiled_skill_policy_chain_filters_schema_and_blocks_execution(monkeyp
         MetacognitionMiddleware,
         PlannerMiddleware,
         EmojiGateMiddleware,
+        PushbackMiddleware,
         PlantingResearchMiddleware,
         BusinessRequirementMiddleware,
         SoftwareRequirementsMiddleware,

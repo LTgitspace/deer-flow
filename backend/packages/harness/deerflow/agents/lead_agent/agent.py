@@ -471,6 +471,11 @@ def build_middlewares(
 
     middlewares.append(EmojiGateMiddleware(app_config=resolved_app_config))
 
+    # Pushback: voice tradeoffs before executing contradictory user decisions.
+    from deerflow.agents.middlewares.pushback_middleware import PushbackMiddleware
+
+    middlewares.append(PushbackMiddleware(app_config=resolved_app_config))
+
     # Planting Research skill enforcement: counts web_search calls, tracks
     # locale confirmation, and injects structured nudges when phases are skipped.
     # Only activates when the planting-research skill is slash-activated or
