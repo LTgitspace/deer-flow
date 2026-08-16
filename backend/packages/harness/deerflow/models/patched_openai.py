@@ -19,6 +19,7 @@ Two OpenAI-compatible extensions are handled here:
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import openai
@@ -28,6 +29,8 @@ from langchain_core.outputs import ChatGenerationChunk, ChatResult
 from langchain_openai import ChatOpenAI
 
 from deerflow.models.assistant_payload_replay import restore_assistant_payloads, restore_reasoning_content
+
+logger = logging.getLogger(__name__)
 
 
 class PatchedChatOpenAI(ChatOpenAI):
@@ -58,6 +61,17 @@ class PatchedChatOpenAI(ChatOpenAI):
               thinking:
                 type: enabled
     """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Debug instrumentation: count reasoning deltas per stream to
+        # distinguish provider-side buffering (1 large delta) from
+        # harness-side buffering (many deltas). Summary logged once per
+        # stream when the first content delta arrives.
+        self._reasoning_delta_count = 0
+        self._reasoning_char_count = 0
+        self._reasoning_max_delta = 0
+        self._reasoning_streamed = False
 
     def _get_request_payload(
         self,
@@ -108,8 +122,28 @@ class PatchedChatOpenAI(ChatOpenAI):
                 delta = top.get("delta") or {}
                 if (reasoning_content := delta.get("reasoning_content")) is not None:
                     generation_chunk.message.additional_kwargs["reasoning_content"] = reasoning_content
+                    self._reasoning_delta_count += 1
+                    self._reasoning_char_count += len(reasoning_content or "")
+                    self._reasoning_max_delta = max(self._reasoning_max_delta, len(reasoning_content or ""))
+                    self._reasoning_streamed = True
                 elif (reasoning := delta.get("reasoning")) is not None:
                     generation_chunk.message.additional_kwargs["reasoning_content"] = reasoning
+                    self._reasoning_delta_count += 1
+                    self._reasoning_char_count += len(reasoning or "")
+                    self._reasoning_max_delta = max(self._reasoning_max_delta, len(reasoning or ""))
+                    self._reasoning_streamed = True
+                elif delta.get("content"):
+                    if self._reasoning_streamed:
+                        logger.info(
+                            "reasoning stream summary: deltas=%d chars=%d max_delta=%d",
+                            self._reasoning_delta_count,
+                            self._reasoning_char_count,
+                            self._reasoning_max_delta,
+                        )
+                        self._reasoning_delta_count = 0
+                        self._reasoning_char_count = 0
+                        self._reasoning_max_delta = 0
+                        self._reasoning_streamed = False
 
         return generation_chunk
 
