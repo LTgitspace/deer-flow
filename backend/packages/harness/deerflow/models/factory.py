@@ -258,7 +258,10 @@ def create_chat_model(name: str | None = None, thinking_enabled: bool = False, *
                 model_settings_from_config.get("extra_body"),
                 {"thinking": {"type": "disabled"}},
             )
-            model_settings_from_config["reasoning_effort"] = "minimal"
+            # "low" instead of the historical "minimal": CommandCode and other
+            # strict OpenAI-compatible validators only accept low|medium|high|
+            # xhigh|max ("minimal" 400s there).
+            model_settings_from_config["reasoning_effort"] = "low"
         elif has_thinking_settings and (disable_chat_template_kwargs := _vllm_disable_chat_template_kwargs(effective_wte.get("extra_body", {}).get("chat_template_kwargs") or {})):
             # vLLM uses chat template kwargs to switch thinking on/off.
             model_settings_from_config["extra_body"] = _deep_merge_dicts(
@@ -281,7 +284,9 @@ def create_chat_model(name: str | None = None, thinking_enabled: bool = False, *
             if thinking_enabled and explicit_effort in ("low", "medium", "high", "xhigh"):
                 model_settings_from_config["reasoning_effort"] = explicit_effort
             elif not thinking_enabled:
-                model_settings_from_config["reasoning_effort"] = "minimal"
+                # "low" instead of the historical "minimal": strict OpenAI
+                # compatible validators (CommandCode) reject "minimal".
+                model_settings_from_config["reasoning_effort"] = "low"
 
     # Normalize the api_base -> base_url alias FIRST, so the downstream OpenAI-compatible
     # heuristics (stream_usage default below / stream_chunk_timeout) see the canonical endpoint key.
