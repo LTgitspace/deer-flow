@@ -15,6 +15,7 @@ import {
 } from "@/components/workspace/chats";
 import { ContextUsageBadge } from "@/components/workspace/context-usage-badge";
 import { ExportTrigger } from "@/components/workspace/export-trigger";
+import { GateActivityBadge } from "@/components/workspace/gate-activity-badge";
 import { GoalStatus } from "@/components/workspace/goal-status";
 import {
   InputBox,
@@ -313,6 +314,7 @@ export default function ChatPage() {
                 {browserEnabled && <BrowserTrigger />}
                 <ExportTrigger threadId={threadId} />
                 <ArtifactTrigger />
+                <GateActivityBadge threadId={isNewThread ? undefined : threadId} />
               </div>
             </header>
             <main className="flex min-h-0 max-w-full grow flex-col">
