@@ -21,6 +21,10 @@ const config = {
     process.env.NEXT_CONFIG_BUILD_OUTPUT === "standalone"
       ? "standalone"
       : undefined,
+  // Disable Next's response compression: the gateway serves the API (SSE
+  // streaming must never be gzip-buffered), and static assets are small
+  // enough to skip compression in this deployment.
+  compression: false,
   i18n: {
     locales: ["en", "zh"],
     defaultLocale: "en",
