@@ -1600,6 +1600,16 @@ emoji_gate:
   allow_in_chat: true
 
 # ============================================================================
+# Token Forensics Configuration
+# ============================================================================
+# Per-turn token decomposition logging: input breakdown (prompt/tools/memory/
+# history/hidden) plus output and cache reads. Logs at WARNING level when
+# input_tokens reaches warn_input_tokens.
+token_forensics:
+  enabled: true
+  warn_input_tokens: 15000
+
+# ============================================================================
 # Summarization Configuration
 # ============================================================================
 # Automatically summarize conversation history when token limits are approached

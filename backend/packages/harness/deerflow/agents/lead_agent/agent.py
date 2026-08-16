@@ -562,6 +562,12 @@ def build_middlewares(
     if resolved_app_config.token_usage.enabled:
         middlewares.append(TokenUsageMiddleware())
 
+    # Token forensics: per-turn decomposition logging (prompt/tools/memory/
+    # history/cache) for the resolved usage metadata. Observation only.
+    from deerflow.agents.middlewares.token_forensics_middleware import TokenForensicsMiddleware
+
+    middlewares.append(TokenForensicsMiddleware(app_config=resolved_app_config))
+
     # Add TitleMiddleware
     middlewares.append(TitleMiddleware(app_config=resolved_app_config))
 

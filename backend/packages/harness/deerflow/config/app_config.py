@@ -46,6 +46,7 @@ from deerflow.config.suggestions_config import SuggestionsConfig
 from deerflow.config.summarization_config import SummarizationConfig, load_summarization_config_from_dict
 from deerflow.config.title_config import TitleConfig, load_title_config_from_dict
 from deerflow.config.token_budget_config import TokenBudgetConfig
+from deerflow.config.token_forensics_config import TokenForensicsConfig, load_token_forensics_config_from_dict
 from deerflow.config.token_usage_config import TokenUsageConfig
 from deerflow.config.tool_config import ToolConfig, ToolGroupConfig
 from deerflow.config.tool_output_config import ToolOutputConfig
@@ -231,6 +232,7 @@ class AppConfig(BaseModel):
     metacognition: MetacognitionConfig = Field(default_factory=MetacognitionConfig, description="Metacognition think-first enforcement configuration")
     planner: PlannerConfig = Field(default_factory=PlannerConfig, description="Planner plan-first enforcement configuration")
     emoji_gate: EmojiGateConfig = Field(default_factory=EmojiGateConfig, description="Emoji-free technical output enforcement configuration")
+    token_forensics: TokenForensicsConfig = Field(default_factory=TokenForensicsConfig, description="Per-turn token decomposition logging configuration")
     summarization: SummarizationConfig = Field(default_factory=SummarizationConfig, description="Conversation summarization configuration")
     memory: MemoryConfig = Field(default_factory=MemoryConfig, description="Memory subsystem configuration")
     agents_api: AgentsApiConfig = Field(default_factory=AgentsApiConfig, description="Custom-agent management API configuration")
@@ -449,6 +451,7 @@ class AppConfig(BaseModel):
         load_metacognition_config_from_dict(config.metacognition.model_dump())
         load_planner_config_from_dict(config.planner.model_dump())
         load_emoji_gate_config_from_dict(config.emoji_gate.model_dump())
+        load_token_forensics_config_from_dict(config.token_forensics.model_dump())
         load_summarization_config_from_dict(config.summarization.model_dump())
         load_memory_config_from_dict(config.memory.model_dump())
         load_agents_api_config_from_dict(config.agents_api.model_dump())
