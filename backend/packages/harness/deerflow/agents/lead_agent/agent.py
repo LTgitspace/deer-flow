@@ -526,6 +526,14 @@ def build_middlewares(
 
     middlewares.append(SystemDesignMiddleware())
 
+    # Startup Sketch skill enforcement: idea core first, mermaid sketch
+    # before prose, product description before business description, and a
+    # plain HTML/CSS landing page. Standalone lean vertical — not chained
+    # into the BRD/PRD/SRS requirements pipeline.
+    from deerflow.agents.middlewares.startup_sketch_middleware import StartupSketchMiddleware
+
+    middlewares.append(StartupSketchMiddleware())
+
     # Capture completed task delegations and loaded skill files before
     # summarization can compact them, then inject durable context channels
     # (summary + ledger + skills) into model calls.

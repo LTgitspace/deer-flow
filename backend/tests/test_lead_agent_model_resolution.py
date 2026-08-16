@@ -755,6 +755,7 @@ def test_compiled_skill_policy_chain_filters_schema_and_blocks_execution(monkeyp
     from deerflow.agents.middlewares.pushback_middleware import PushbackMiddleware
     from deerflow.agents.middlewares.requirements_pipeline_middleware import RequirementsPipelineMiddleware
     from deerflow.agents.middlewares.software_requirements_middleware import SoftwareRequirementsMiddleware
+    from deerflow.agents.middlewares.startup_sketch_middleware import StartupSketchMiddleware
     from deerflow.agents.middlewares.system_design_middleware import SystemDesignMiddleware
 
     activation_idx = next(i for i, middleware in enumerate(middlewares) if isinstance(middleware, SkillActivationMiddleware))
@@ -774,6 +775,7 @@ def test_compiled_skill_policy_chain_filters_schema_and_blocks_execution(monkeyp
         RequirementsPipelineMiddleware,
         DeepResearchMiddleware,
         SystemDesignMiddleware,
+        StartupSketchMiddleware,
         DurableContextMiddleware,
     ]
 
