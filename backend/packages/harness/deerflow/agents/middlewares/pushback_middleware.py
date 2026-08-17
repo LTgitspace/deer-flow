@@ -126,22 +126,30 @@ class PushbackMiddleware(AgentMiddleware[AgentState]):
         return any(verb in content.lower() for verb in config.positive_verbs)
 
     def _commitments(self, messages: list) -> list[tuple[set, str]]:
-        """Return (objects, polarity) commitments from prior user and hidden messages."""
+        """Return (objects, polarity) commitments from prior visible user messages.
+
+        Hidden messages (memory reminders, date injects) are system-generated,
+        not real user commitments. They are skipped — except for explicit
+        ``avoid:`` memory facts, which are deliberate and intentional.
+        """
         config = self._get_config()
         commitments: list[tuple[set, str]] = []
         for msg in messages[-config.lookback :]:
-            if isinstance(msg, HumanMessage):
-                hidden = self._hidden_text(msg)
-                if hidden and "avoid:" in hidden:
-                    commitments.append((self._objects(hidden), "hard"))
-                    continue
-                content = str(getattr(msg, "content", "") or "")
-                if len(content) < config.min_chars:
-                    continue
-                if self._has_hard(content):
-                    commitments.append((self._objects(content), "hard"))
-                elif self._has_soft(content):
-                    commitments.append((self._objects(content), "soft"))
+            if not isinstance(msg, HumanMessage):
+                continue
+            hidden = self._hidden_text(msg)
+            if hidden and "avoid:" in hidden:
+                commitments.append((self._objects(hidden), "hard"))
+                continue
+            if hidden:
+                continue  # skip system-injected hidden messages
+            content = str(getattr(msg, "content", "") or "")
+            if len(content) < config.min_chars:
+                continue
+            if self._has_hard(content):
+                commitments.append((self._objects(content), "hard"))
+            elif self._has_soft(content):
+                commitments.append((self._objects(content), "soft"))
         return commitments
 
     # ── History-derived state ──

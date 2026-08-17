@@ -110,6 +110,28 @@ def test_memory_avoid_fact_creates_hard_commitment() -> None:
     assert "confirm" in str(nudges[0].content).lower()
 
 
+def test_memory_reminder_does_not_trigger_pushback() -> None:
+    """Hidden memory blocks containing 'user' must not create false commitments."""
+    memory = HumanMessage(
+        content="<memory>\nUser Context:\n- Work: the user is working on DeerChain.\n</memory>",
+        additional_kwargs={"hide_from_ui": True},
+    )
+    messages = [memory, HumanMessage(content="hi")]
+    nudges = _injected(_run(messages))
+    assert nudges == [], f"memory reminder falsely triggered: {nudges}"
+
+
+def test_hidden_non_avoid_messages_are_silently_skipped() -> None:
+    """Hidden messages without 'avoid:' are never treated as commitments."""
+    hidden = HumanMessage(
+        content="<system-reminder>\n<current_date>2026-08-16</current_date>\n</system-reminder>",
+        additional_kwargs={"hide_from_ui": True},
+    )
+    messages = [hidden, HumanMessage(content="hi")]
+    nudges = _injected(_run(messages))
+    assert nudges == []
+
+
 # ── Discharge ──
 
 
