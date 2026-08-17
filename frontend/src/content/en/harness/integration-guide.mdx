@@ -23,7 +23,7 @@ The primary integration point is `UniDeerClient`. It wraps the LangGraph runtime
 from unideer.client import UniDeerClient
 from unideer.config import load_config
 
-# Load configuration (reads config.yaml or DEER_FLOW_CONFIG_PATH)
+# Load configuration (reads config.yaml or UNI_DEER_CONFIG_PATH)
 load_config()
 
 client = UniDeerClient()
@@ -157,7 +157,7 @@ When embedded in another application, set the config path explicitly to avoid am
 
 ```python
 import os
-os.environ["DEER_FLOW_CONFIG_PATH"] = "/path/to/my-unideer-config.yaml"
+os.environ["UNI_DEER_CONFIG_PATH"] = "/path/to/my-unideer-config.yaml"
 
 from unideer.config import load_config
 load_config()

@@ -1,6 +1,6 @@
-# DeerFlow Architecture
+# UniDeer Architecture
 
-> **DeerFlow** (Deep Exploration and Efficient Research Flow) is an open-source
+> **UniDeer** (Deep Exploration and Efficient Research Flow) is an open-source
 > **super agent harness** that orchestrates sub-agents, memory, and sandboxes to
 > do almost anything — powered by extensible skills.
 
@@ -35,7 +35,7 @@
 
 ## High-Level Overview
 
-DeerFlow is a full-stack AI agent platform. It takes a user query, plans a
+UniDeer is a full-stack AI agent platform. It takes a user query, plans a
 multi-step execution strategy, spawns parallel sub-agents to do the work,
 manages a sandboxed filesystem for intermediate artifacts, remembers past
 interactions across sessions, and returns a synthesized result.
@@ -337,7 +337,7 @@ built-in `task` tool. Each sub-agent:
 
 **Path**: `backend/packages/harness/deerflow/agents/memory/`
 
-DeerFlow builds persistent, cross-session memory of user profile, preferences,
+UniDeer builds persistent, cross-session memory of user profile, preferences,
 and accumulated knowledge.
 
 **Components**:
@@ -415,7 +415,7 @@ workflow, best practices, and references to supporting resources.
 | `skill-creator`                | Meta-skill for creating new skills              |
 | `skill-reviewer`               | Read-only skill quality review                  |
 | `bootstrap`                    | Project bootstrapping and scaffolding           |
-| `claude-to-deerflow`           | Interact with DeerFlow from Claude Code CLI     |
+| `claude-to-deerflow`           | Interact with UniDeer from Claude Code CLI     |
 | `find-skills`                  | Skill search and discovery                      |
 | `surprise-me`                  | Random creative tasks                           |
 | `vercel-deploy-claimable`      | Deploy projects to Vercel                       |
@@ -516,7 +516,7 @@ Each agent task gets its own execution environment with a full filesystem view.
 
 **Path**: `backend/packages/harness/deerflow/mcp/`
 
-DeerFlow supports the Model Context Protocol (MCP) for connecting external tool
+UniDeer supports the Model Context Protocol (MCP) for connecting external tool
 servers. MCP servers are configured in `extensions_config.json` or via the
 Gateway API.
 
@@ -529,7 +529,7 @@ Gateway API.
 
 **Path**: `backend/packages/harness/deerflow/models/`
 
-DeerFlow is model-agnostic. It supports any LLM that exposes an
+UniDeer is model-agnostic. It supports any LLM that exposes an
 OpenAI-compatible API, plus custom providers.
 
 **Supported model providers**:
@@ -585,7 +585,7 @@ Models cover:
 
 **Path**: `backend/app/channels/`
 
-DeerFlow bridges into external instant messaging platforms so users can interact
+UniDeer bridges into external instant messaging platforms so users can interact
 with the agent from their preferred chat app. All channels share a common
 execution path through the Gateway run lifecycle.
 
@@ -771,7 +771,7 @@ deer-flow/
 │   │   ├── uploads/                # File upload management
 │   │   ├── workspace_changes/      # Workspace diff computation
 │   │   ├── tracing/                # LangSmith/Langfuse/Monocle integration
-│   │   └── client.py               # Embedded Python client (DeerFlowClient)
+│   │   └── client.py               # Embedded Python client (UniDeerClient)
 │   ├── app/                        # Application layer
 │   │   ├── gateway/                # FastAPI Gateway + REST routers
 │   │   └── channels/               # IM platform integrations
@@ -822,11 +822,11 @@ deer-flow/
 | **Goal**              | A thread-scoped completion condition set via `/goal` — agent auto-continues until satisfied     |
 | **Workspace Changes** | Per-run diff summary of files created, modified, or deleted in the sandbox                     |
 | **Provisioner**       | Optional service that manages sandbox infrastructure for Kubernetes deployments                |
-| **TUI**               | Terminal User Interface — a CLI workbench for interacting with DeerFlow                        |
+| **TUI**               | Terminal User Interface — a CLI workbench for interacting with UniDeer                        |
 | **SkillScan**         | Deterministic safety scanner that runs on installed skills before activation                   |
-| **DeerFlowClient**    | Embedded Python client for programmatic interaction with a DeerFlow instance                   |
+| **UniDeerClient**    | Embedded Python client for programmatic interaction with a UniDeer instance                   |
 
 ---
 
-*Generated from the DeerFlow repository source. See [README.md](../README.md) for
+*Generated from the UniDeer repository source. See [README.md](../README.md) for
 usage instructions, and [AGENTS.md](../AGENTS.md) for development orientation.*

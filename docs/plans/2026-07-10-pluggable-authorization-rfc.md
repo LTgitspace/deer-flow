@@ -18,7 +18,7 @@
 
 ## TL;DR
 
-DeerFlow's authorization today is **authentication + ownership**: every authenticated user gets every API permission (`authz.py:144` hands all users `_ALL_PERMISSIONS`), and the only real authorization beyond login is thread ownership (`owner_check`) and a handful of hard-coded `require_admin_user()` routes. There is **no resource-level authorization** — no role can be told "you may not call `write_file`", "you may not use model X", or "you may not run sandbox code".
+UniDeer's authorization today is **authentication + ownership**: every authenticated user gets every API permission (`authz.py:144` hands all users `_ALL_PERMISSIONS`), and the only real authorization beyond login is thread ownership (`owner_check`) and a handful of hard-coded `require_admin_user()` routes. There is **no resource-level authorization** — no role can be told "you may not call `write_file`", "you may not use model X", or "you may not run sandbox code".
 
 This RFC proposes a **single pluggable `AuthorizationProvider` Protocol** that is the policy brain for all fine-grained authz, enforced at **two layers** from one policy:
 
@@ -40,7 +40,7 @@ The two hard problems raised in the thread — **dynamic resources** and the **f
 | Source | `system_role` | When |
 |---|---|---|
 | Session (JWT cookie → `User`) | `"admin"` or `"user"` | Browser / API callers |
-| Internal (`X-DeerFlow-Internal-Token`) | `"internal"` | IM channel workers, scheduler |
+| Internal (`X-UniDeer-Internal-Token`) | `"internal"` | IM channel workers, scheduler |
 | Auth-disabled | `"admin"` | `auth_disabled` mode |
 
 The `User` model (`backend/app/gateway/auth/models.py:15`) carries `system_role: Literal["admin", "user"]`; the DB column is `String(16)` *deliberately*, with a comment: *"kept as plain string to avoid ALTER TABLE pain when new roles are introduced"* (`persistence/user/model.py:33`). **The schema is already forward-compatible with new roles.**
@@ -88,9 +88,9 @@ Three agent build paths assemble tools, and they must all apply the same filter 
 |---|---|---|
 | Lead agent | `agents/lead_agent/agent.py:562` | ✅ |
 | Subagent | `subagents/executor.py:578` (`_apply_skill_allowed_tools`) | ✅ |
-| `DeerFlowClient` | `client.py:259` | ❌ *(passes `tools` straight to `assemble_deferred_tools`)* |
+| `UniDeerClient` | `client.py:259` | ❌ *(passes `tools` straight to `assemble_deferred_tools`)* |
 
-The `DeerFlowClient` gap is a pre-existing inconsistency; any new authz filter must be applied on all three.
+The `UniDeerClient` gap is a pre-existing inconsistency; any new authz filter must be applied on all three.
 
 ### 1.5 Identity flow into the run — reliable for the web, gap for channels
 
@@ -477,7 +477,7 @@ Backend tests in `backend/tests/`. Minimum coverage for Phase 1:
 
 - `test_authz_provider_protocol.py` — Protocol conformance, `@runtime_checkable`, default `filter_resources` delegates to `authorize`.
 - `test_rbac_authorization_provider.py` — per-role allow/deny, `*` wildcard, `deny` wins, unknown role → `default_role` → `fail_closed`, all resource types.
-- `test_authz_tool_filter.py` — Layer 1: tools removed at assembly on all three build paths (lead / subagent / `DeerFlowClient`); filtered tools absent from `DeferredToolCatalog` (fail-closed promotion).
+- `test_authz_tool_filter.py` — Layer 1: tools removed at assembly on all three build paths (lead / subagent / `UniDeerClient`); filtered tools absent from `DeferredToolCatalog` (fail-closed promotion).
 - `test_authz_guardrail_adapter.py` — Layer 2: adapter deny → `GuardrailMiddleware` returns error `ToolMessage`; `user_role` flows from context; `fail_closed` on provider error.
 - `test_authz_prompt_injection.py` — a tool removed at assembly cannot be invoked even when the prompt tries to call it (the security-boundary guarantee).
 - `test_authz_principal.py` — `user_role=None` → `default_role`; internal caller; subagent inherits principal.

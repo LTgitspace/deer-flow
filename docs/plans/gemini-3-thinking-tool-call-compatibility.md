@@ -8,7 +8,7 @@
 
 ## Problem
 
-DeerFlow's `PatchedChatOpenAI` (`backend/packages/harness/deerflow/models/patched_openai.py`)
+UniDeer's `PatchedChatOpenAI` (`backend/packages/harness/deerflow/models/patched_openai.py`)
 preserves the `thought_signature` field on tool-call objects required by Gemini 2.5's
 OpenAI-compatible API. Gemini 3 introduced a **new signature format** that this adapter
 does not recognize. The result: thinking-mode multi-turn tool-call conversations fail
@@ -17,7 +17,7 @@ the payload.
 
 ## Background — Why This Matters
 
-DeerFlow is a **deterministic harness**, not a probabilistic wrapper. Tool-call ID
+UniDeer is a **deterministic harness**, not a probabilistic wrapper. Tool-call ID
 validation, orphan recovery, dangling-call injection, and provider-specific field
 replay are all enforced by code — not by prompting the model. When the adapter
 silently drops a required field, the harness has no way to recover because the

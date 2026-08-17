@@ -1,6 +1,6 @@
-# Releasing DeerFlow
+# Releasing UniDeer
 
-DeerFlow releases are **tag-driven**: pushing a `v*` git tag triggers the
+UniDeer releases are **tag-driven**: pushing a `v*` git tag triggers the
 publishing workflows. There is no separate release script that bumps versions —
 the maintainer bumps the version sources, updates the changelog, commits, and
 tags. The helper scripts below keep the version sources in lockstep, and CI
@@ -123,7 +123,7 @@ the upstream `larksuite/cli` version, so they publish independently via
 - Builds multi-arch (`linux/amd64,linux/arm64`) and pushes
   `ghcr.io/<owner>/deer-flow-{lark-cli-init,lark-cli-broker}:<lark-cli-version>`.
 - Gated on `github.repository == 'bytedance/deer-flow'`; not tied to the
-  `verify-versions` gate (its version is the lark-cli release, not the DeerFlow
+  `verify-versions` gate (its version is the lark-cli release, not the UniDeer
   release), and it never touches `latest`.
 
 Both features stay opt-in: the provisioner ignores them until

@@ -1417,7 +1417,7 @@ done
 >
 > 前置条件：
 > - `.env` 中设置 `AUTH_JWT_SECRET`（否则每次容器重启 session 全部失效）
-> - `DEER_FLOW_HOME` 挂载到宿主机目录（持久化 `deerflow.db`）
+> - `UNI_DEER_HOME` 挂载到宿主机目录（持久化 `deerflow.db`）
 
 #### TC-DOCKER-01: deerflow.db 通过 volume 持久化
 
@@ -1435,12 +1435,12 @@ curl -s -X POST $BASE/api/v1/auth/register \
   -d '{"email":"docker-test@example.com","password":"DockerTest1!"}' -w "\nHTTP %{http_code}"
 
 # 检查宿主机上的 deerflow.db
-ls -la ${DEER_FLOW_HOME:-backend/.deer-flow}/data/deerflow.db
-sqlite3 ${DEER_FLOW_HOME:-backend/.deer-flow}/data/deerflow.db \
+ls -la ${UNI_DEER_HOME:-backend/.deer-flow}/data/deerflow.db
+sqlite3 ${UNI_DEER_HOME:-backend/.deer-flow}/data/deerflow.db \
   "SELECT email FROM users WHERE email='docker-test@example.com';"
 ```
 
-**预期：** deerflow.db 在宿主机 `DEER_FLOW_HOME` 目录中，查询可见刚注册的用户。
+**预期：** deerflow.db 在宿主机 `UNI_DEER_HOME` 目录中，查询可见刚注册的用户。
 
 #### TC-DOCKER-02: 重启容器后 session 保持
 
@@ -1499,13 +1499,13 @@ docker logs deer-flow-gateway 2>&1 | grep -E "ChannelManager|channel" | head -10
 #### TC-DOCKER-05: reset_admin 密码写入 0600 凭证文件（不再走日志）
 
 ```bash
-# 首次启动不会自动生成 admin 密码。先重置已有 admin，凭据文件写在挂载到宿主机的 DEER_FLOW_HOME 下。
+# 首次启动不会自动生成 admin 密码。先重置已有 admin，凭据文件写在挂载到宿主机的 UNI_DEER_HOME 下。
 docker exec deer-flow-gateway python -m app.gateway.auth.reset_admin --email docker-test@example.com
 
-ls -la ${DEER_FLOW_HOME:-backend/.deer-flow}/admin_initial_credentials.txt
+ls -la ${UNI_DEER_HOME:-backend/.deer-flow}/admin_initial_credentials.txt
 # 预期文件权限: -rw------- (0600)
 
-cat ${DEER_FLOW_HOME:-backend/.deer-flow}/admin_initial_credentials.txt
+cat ${UNI_DEER_HOME:-backend/.deer-flow}/admin_initial_credentials.txt
 # 预期内容: email + password 行
 
 # 容器日志只输出文件路径，不输出密码本身
@@ -1517,7 +1517,7 @@ docker logs deer-flow-gateway 2>&1 | grep -iE "Password: .{15,}" && echo "FAIL: 
 ```
 
 **预期：**
-- 凭证文件存在于 `DEER_FLOW_HOME` 下，权限 `0600`
+- 凭证文件存在于 `UNI_DEER_HOME` 下，权限 `0600`
 - 容器日志输出**路径**（不是密码本身），符合 CodeQL `py/clear-text-logging-sensitive-data` 规则
 - `grep "Password:"` 在日志中**应当无匹配**（旧行为已废弃，simplify pass 移除了日志泄露路径）
 

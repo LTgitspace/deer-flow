@@ -1,6 +1,6 @@
 # OpenViking memory backend
 
-DeerFlow can use a remote OpenViking server as an optional long-term memory
+UniDeer can use a remote OpenViking server as an optional long-term memory
 backend. The integration is a pluggable `MemoryManager`; DeerMem remains the
 default and the agent/Gateway runtime does not import the OpenViking Python
 runtime.
@@ -12,9 +12,9 @@ runtime.
 - OpenViking Session commit and asynchronous memory extraction.
 - Automatic prompt injection from OpenViking memory search.
 - Explicit search through the backend-neutral `MemoryManager.search` API.
-- Hard isolation by hashing each DeerFlow `(user_id, agent_name)` scope into a
+- Hard isolation by hashing each UniDeer `(user_id, agent_name)` scope into a
   separate OpenViking trusted user identity.
-- Local bounded message watermarks under DeerFlow's runtime home. An ordered
+- Local bounded message watermarks under UniDeer's runtime home. An ordered
   prefix digest handles append-only histories of any length, while a recent-ID
   window handles history compaction without resubmitting known messages.
 
@@ -32,11 +32,11 @@ OpenViking must be configured with:
 - `server.auth_mode: trusted`;
 - a non-empty `server.root_api_key` when exposed beyond localhost.
 
-DeerFlow passes trusted `X-OpenViking-Account` and
+UniDeer passes trusted `X-OpenViking-Account` and
 `X-OpenViking-User` headers. Do not expose a trusted-mode OpenViking endpoint
 directly to untrusted clients.
 
-## Configure DeerFlow
+## Configure UniDeer
 
 Put the trusted OpenViking key in the repository root `.env`:
 
@@ -71,8 +71,8 @@ memory:
       max_injection_chars: 12000
 ```
 
-For a locally installed DeerFlow process, use
-`http://127.0.0.1:1933`. For a DeerFlow container connecting to OpenViking on
+For a locally installed UniDeer process, use
+`http://127.0.0.1:1933`. For a UniDeer container connecting to OpenViking on
 the host, use `http://host.docker.internal:1933` and set
 `allow_insecure_http: true`.
 
@@ -83,7 +83,7 @@ tracked by a constant-size prefix digest and do not depend on that window.
 
 ## Docker first-time startup
 
-Create the standard DeerFlow local files if they no longer exist:
+Create the standard UniDeer local files if they no longer exist:
 
 ```bash
 make config
@@ -91,7 +91,7 @@ cp .env.example .env
 cp frontend/.env.example frontend/.env
 ```
 
-Set at least the normal DeerFlow secrets in `.env`, including
+Set at least the normal UniDeer secrets in `.env`, including
 `BETTER_AUTH_SECRET`, model provider credentials, and
 `OPENVIKING_API_KEY`.
 
@@ -100,10 +100,10 @@ by `scripts/deploy.sh`. Export them before using the OpenViking overlay
 directly:
 
 ```bash
-export DEER_FLOW_CONFIG_PATH="$PWD/config.yaml"
-export DEER_FLOW_EXTENSIONS_CONFIG_PATH="$PWD/extensions_config.json"
-export DEER_FLOW_HOME="$PWD/backend/.deer-flow"
-export DEER_FLOW_REPO_ROOT="$PWD"
+export UNI_DEER_CONFIG_PATH="$PWD/config.yaml"
+export UNI_DEER_EXTENSIONS_CONFIG_PATH="$PWD/extensions_config.json"
+export UNI_DEER_HOME="$PWD/backend/.deer-flow"
+export UNI_DEER_REPO_ROOT="$PWD"
 ```
 
 Start only OpenViking:
@@ -131,7 +131,7 @@ docker restart deer-flow-openviking
 curl http://localhost:1933/health
 ```
 
-Then start DeerFlow with the same overlay:
+Then start UniDeer with the same overlay:
 
 ```bash
 docker compose \
@@ -140,7 +140,7 @@ docker compose \
   up -d --build
 ```
 
-Open DeerFlow at <http://localhost:2026> and OpenViking Studio at
+Open UniDeer at <http://localhost:2026> and OpenViking Studio at
 <http://localhost:1933/studio>.
 
 ## Routine Docker operations
@@ -188,24 +188,24 @@ openviking-server
 curl http://127.0.0.1:1933/health
 ```
 
-Set `base_url: http://127.0.0.1:1933`, then start DeerFlow normally:
+Set `base_url: http://127.0.0.1:1933`, then start UniDeer normally:
 
 ```bash
 make doctor
 make dev
 ```
 
-The DeerFlow entrypoint is <http://localhost:2026>.
+The UniDeer entrypoint is <http://localhost:2026>.
 
 ## Failure behavior
 
-- Invalid backend configuration fails loudly; DeerFlow never silently writes
+- Invalid backend configuration fails loudly; UniDeer never silently writes
   to DeerMem instead.
 - With `read: fail_open`, retrieval failures produce no injected memory and
   the main agent continues.
 - With `write: log_and_drop`, a failed OpenViking commit is logged without
   failing an already generated assistant response.
-- Once a message batch is accepted, DeerFlow persists a submitted-message
+- Once a message batch is accepted, UniDeer persists a submitted-message
   watermark before committing the Session. If commit then fails, later updates
   do not resubmit those messages or retry the ambiguous commit; a future batch
   can commit the still-open Session together with new messages.

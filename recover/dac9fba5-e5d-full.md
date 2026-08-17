@@ -5050,7 +5050,7 @@ Given the constraints, here's my plan:
 3. **Save the HTML** in the outputs directory
 4. **Be honest with the user** that I don't have direct PDF generation tools but provide them with the HTML they can easily print to PDF (browser print → "Save as PDF")
 
-Actually wait, let me look more carefully at the system. There may be a way. Let me think about this differently. The user is using DeerFlow, and there might be hidden tools I haven't seen. But based on the function definitions provided, I only have what's listed.
+Actually wait, let me look more carefully at the system. There may be a way. Let me think about this differently. The user is using UniDeer, and there might be hidden tools I haven't seen. But based on the function definitions provided, I only have what's listed.
 
 Let me proceed with my plan:
 1. Add TOC to markdown

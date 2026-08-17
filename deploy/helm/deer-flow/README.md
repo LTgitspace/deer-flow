@@ -1,6 +1,6 @@
-# DeerFlow Helm Chart
+# UniDeer Helm Chart
 
-Deploys the full DeerFlow stack to Kubernetes: **gateway** (backend + embedded
+Deploys the full UniDeer stack to Kubernetes: **gateway** (backend + embedded
 LangGraph runtime), **frontend** (Next.js), **nginx** (internal reverse proxy
 preserving the compose routing), and the **provisioner** (K8s-native sandbox
 that spawns code-execution Pods on demand).
@@ -12,7 +12,7 @@ Kubernetes resources. No existing repo files are modified.
 
 - A Kubernetes cluster (Docker Desktop K8s, OrbStack, kind, k3d, or a real cluster).
 - `kubectl` + `helm` 3.8+ installed (OCI registry support stabilized in 3.8; earlier 3.x needs `HELM_EXPERIMENTAL_OCI=1`).
-- The three DeerFlow images — either the published ones (see "Install the
+- The three UniDeer images — either the published ones (see "Install the
   published chart" below) or built locally (see step 1).
 - An Ingress controller (e.g. ingress-nginx) if you enable `ingress`.
 
@@ -143,7 +143,7 @@ config: |
     type: postgres
     connection_string: $DATABASE_URL
   stream_bridge:
-    type: redis   # cross-pod SSE; URL from DEER_FLOW_STREAM_BRIDGE_REDIS_URL
+    type: redis   # cross-pod SSE; URL from UNI_DEER_STREAM_BRIDGE_REDIS_URL
   # Tools MUST be listed explicitly - the agent gets none otherwise
   # (BUILTIN_TOOLS only adds present_file + ask_clarification). The chart
   # default in values.yaml enables the sandbox tools + web tools (web_search,
@@ -246,7 +246,7 @@ kubectl -n deer-flow exec deploy/deer-flow-provisioner -- curl -s localhost:8002
   Redis Streams (PR #3191) so a client connected to any gateway pod receives
   live events and reconnect resumes from `Last-Event-ID`. The URL is
   auto-generated into a Secret (key `redis-url`) and injected as
-  `DEER_FLOW_STREAM_BRIDGE_REDIS_URL`; `config.yaml` sets `stream_bridge.type:
+  `UNI_DEER_STREAM_BRIDGE_REDIS_URL`; `config.yaml` sets `stream_bridge.type:
   redis` by default. No-auth by default (ClusterIP isolation, matching compose);
   set `redis.auth.password` to enable AUTH. For a managed Redis, disable the
   bundled instance and point at it via `redis.external`.

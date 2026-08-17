@@ -1,6 +1,6 @@
 # Authentication Upgrade Guide
 
-DeerFlow 内置了认证模块。本文档面向从无认证版本升级的用户。
+UniDeer 内置了认证模块。本文档面向从无认证版本升级的用户。
 
 完整设计见 [AUTH_DESIGN.md](AUTH_DESIGN.md)。
 
@@ -128,7 +128,7 @@ python -c "import secrets; print(secrets.token_urlsafe(32))"
 - **Gateway embedded runtime**：标准脚本、Docker dev 和生产部署均通过 Gateway 提供认证与 LangGraph-compatible API
 - **Docker 部署**：完全兼容，`.deer-flow/data/deerflow.db` 需持久化卷挂载
 - **IM 渠道**（Feishu/Slack/Telegram）：通过 Gateway 内部认证通信，使用 `default` 用户桶
-- **DeerFlowClient**（嵌入式）：不经过 HTTP，不受认证影响
+- **UniDeerClient**（嵌入式）：不经过 HTTP，不受认证影响
 
 ## 故障排查
 

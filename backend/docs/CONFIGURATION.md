@@ -1,6 +1,6 @@
 # Configuration Guide
 
-This guide explains how to configure DeerFlow for your environment.
+This guide explains how to configure UniDeer for your environment.
 
 ## Config Versioning
 
@@ -72,7 +72,7 @@ models:
 - `CodexChatModel` loads Codex CLI auth from `~/.codex/auth.json`
 - The Codex Responses endpoint currently rejects `max_tokens` and `max_output_tokens`, so `CodexChatModel` does not expose a request-level token cap
 - `ClaudeChatModel` accepts `CLAUDE_CODE_OAUTH_TOKEN`, `ANTHROPIC_AUTH_TOKEN`, `CLAUDE_CODE_OAUTH_TOKEN_FILE_DESCRIPTOR`, `CLAUDE_CODE_CREDENTIALS_PATH`, or plaintext `~/.claude/.credentials.json`
-- On macOS, DeerFlow does not probe Keychain automatically. Use `scripts/export_claude_code_oauth.py` to export Claude Code auth explicitly when needed
+- On macOS, UniDeer does not probe Keychain automatically. Use `scripts/export_claude_code_oauth.py` to export Claude Code auth explicitly when needed
 
 To use OpenAI's `/v1/responses` endpoint with LangChain, keep using `langchain_openai:ChatOpenAI` and set:
 
@@ -360,7 +360,7 @@ deployment and configuration options.
 
 ### Sandbox
 
-DeerFlow supports multiple sandbox execution modes. Configure your preferred mode in `config.yaml`:
+UniDeer supports multiple sandbox execution modes. Configure your preferred mode in `config.yaml`:
 
 **Local Execution** (runs sandbox code directly on the host machine):
 ```yaml
@@ -411,10 +411,10 @@ sandbox:
    provisioner_url: http://provisioner:8002
 ```
 
-When using Docker development (`make docker-start`), DeerFlow starts the `provisioner` service only if this provisioner mode is configured. In local or plain Docker sandbox modes, `provisioner` is skipped.
+When using Docker development (`make docker-start`), UniDeer starts the `provisioner` service only if this provisioner mode is configured. In local or plain Docker sandbox modes, `provisioner` is skipped.
 
 Remote/provisioner backends default to explicit file synchronization because
-DeerFlow cannot infer whether their `/mnt/user-data` mount points reference the
+UniDeer cannot infer whether their `/mnt/user-data` mount points reference the
 same storage as the Gateway. When the deployment guarantees that both sides use
 the same thread user-data directories, opt out of that extra transfer:
 
@@ -468,8 +468,8 @@ provider in `config.yaml`.
 
 Notes specific to `E2BSandboxProvider`:
 
-- Each DeerFlow thread is bound to its E2B sandbox via metadata
-  (`deer_flow_user`, `deer_flow_thread`). Startup and periodic reconciliation
+- Each UniDeer thread is bound to its E2B sandbox via metadata
+  (`uni_deer_user`, `uni_deer_thread`). Startup and periodic reconciliation
   probe every bounded candidate, adopt one healthy canonical sandbox, and reap
   duplicates after a grace period. Provider-tagged entries without a complete
   user/thread identity are reaped only after the orphan TTL.
@@ -500,7 +500,7 @@ sandbox:
   allow_host_bash: false
 ```
 
-`allow_host_bash` is intentionally `false` by default. DeerFlow's local sandbox is a host-side convenience mode, not a secure shell isolation boundary. If you need `bash`, prefer `AioSandboxProvider`. Only set `allow_host_bash: true` for fully trusted single-user local workflows.
+`allow_host_bash` is intentionally `false` by default. UniDeer's local sandbox is a host-side convenience mode, not a secure shell isolation boundary. If you need `bash`, prefer `AioSandboxProvider`. Only set `allow_host_bash: true` for fully trusted single-user local workflows.
 
 When `LocalSandboxProvider` runs under `make up`, it runs inside the `deer-flow-gateway` container. In that mode, `sandbox.mounts[].host_path` is resolved from the gateway container's filesystem, not from your Docker host. If you need a local-sandbox custom mount in production Docker, bind the host directory into the gateway service first, then use the in-container path in `config.yaml`:
 
@@ -509,7 +509,7 @@ When `LocalSandboxProvider` runs under `make up`, it runs inside the `deer-flow-
 services:
   gateway:
     volumes:
-      - ${DEER_FLOW_REPO_ROOT}/.deer-flow/knowledge:/app/.deer-flow/knowledge:ro
+      - ${UNI_DEER_REPO_ROOT}/.deer-flow/knowledge:/app/.deer-flow/knowledge:ro
 ```
 
 ```yaml
@@ -521,7 +521,7 @@ sandbox:
       read_only: true
 ```
 
-If the configured `host_path` is not visible to the gateway process, DeerFlow logs an error and ignores that mount.
+If the configured `host_path` is not visible to the gateway process, UniDeer logs an error and ignores that mount.
 
 **Option 2: Docker Sandbox** (isolated, more secure):
 ```yaml
@@ -538,9 +538,9 @@ sandbox:
       read_only: false
 ```
 
-When you configure `sandbox.mounts`, DeerFlow exposes those `container_path` values in the agent prompt so the agent can discover and operate on mounted directories directly instead of assuming everything must live under `/mnt/user-data`.
+When you configure `sandbox.mounts`, UniDeer exposes those `container_path` values in the agent prompt so the agent can discover and operate on mounted directories directly instead of assuming everything must live under `/mnt/user-data`.
 
-For bare-metal Docker sandbox runs that use localhost, DeerFlow binds the sandbox HTTP port to `127.0.0.1` by default so it is not exposed on every host interface. Docker-outside-of-Docker deployments that connect through `host.docker.internal` keep the broad legacy bind for compatibility. Set `DEER_FLOW_SANDBOX_BIND_HOST` explicitly if your deployment needs a different bind address.
+For bare-metal Docker sandbox runs that use localhost, UniDeer binds the sandbox HTTP port to `127.0.0.1` by default so it is not exposed on every host interface. Docker-outside-of-Docker deployments that connect through `host.docker.internal` keep the broad legacy bind for compatibility. Set `UNI_DEER_SANDBOX_BIND_HOST` explicitly if your deployment needs a different bind address.
 
 Sandbox control-plane HTTP calls to loopback/private IPs, single-label cluster
 hosts, and Docker/Podman internal hostnames bypass `HTTP_PROXY`/`HTTPS_PROXY`
@@ -550,7 +550,7 @@ continue to use the normal environment proxy configuration.
 
 ### Building a Custom AIO Sandbox Image
 
-`AioSandboxProvider` talks to the sandbox container through the `agent-sandbox` SDK. The Dockerfile for the default `enterprise-public-cn-beijing.cr.volces.com/vefaas-public/all-in-one-sandbox:latest` image is not part of this repository; DeerFlow treats that image as an upstream AIO sandbox runtime.
+`AioSandboxProvider` talks to the sandbox container through the `agent-sandbox` SDK. The Dockerfile for the default `enterprise-public-cn-beijing.cr.volces.com/vefaas-public/all-in-one-sandbox:latest` image is not part of this repository; UniDeer treats that image as an upstream AIO sandbox runtime.
 
 For persistent system or language dependencies, extend the published image and keep its startup command intact:
 
@@ -558,7 +558,7 @@ For persistent system or language dependencies, extend the published image and k
 FROM enterprise-public-cn-beijing.cr.volces.com/vefaas-public/all-in-one-sandbox:latest
 
 USER root
-# Example user dependency; not required by DeerFlow itself.
+# Example user dependency; not required by UniDeer itself.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends graphviz \
     && rm -rf /var/lib/apt/lists/*
@@ -579,11 +579,11 @@ sandbox:
 
 In provisioner mode, sandbox Pods are created by the provisioner service, so configure the provisioner `SANDBOX_IMAGE` environment variable instead of `sandbox.image`. See the [Provisioner Setup Guide](../../docker/provisioner/README.md#custom-sandbox-image).
 
-If you rebuild the runtime from scratch instead of extending the published image, it must expose the same HTTP API used by `agent-sandbox`. DeerFlow currently depends on:
+If you rebuild the runtime from scratch instead of extending the published image, it must expose the same HTTP API used by `agent-sandbox`. UniDeer currently depends on:
 
 - `sandbox.get_context()`, including `home_dir`
 - `shell.exec_command(...)`
-- `bash.exec(...)` — only exercised for per-command environment injection (skills that declare `required-secrets`). The `/v1/bash/*` routes exist since upstream all-in-one-sandbox `1.9.3`; on older images (including a `latest` tag still frozen on the `1.0.0.x` line) DeerFlow fails fast with an actionable error instead of surfacing the raw 404. Pin `sandbox.image` to `1.9.3` or newer (e.g. `1.11.0`) and recreate the sandbox container to use `required-secrets` with the AIO sandbox.
+- `bash.exec(...)` — only exercised for per-command environment injection (skills that declare `required-secrets`). The `/v1/bash/*` routes exist since upstream all-in-one-sandbox `1.9.3`; on older images (including a `latest` tag still frozen on the `1.0.0.x` line) UniDeer fails fast with an actionable error instead of surfacing the raw 404. Pin `sandbox.image` to `1.9.3` or newer (e.g. `1.11.0`) and recreate the sandbox container to use `required-secrets` with the AIO sandbox.
 - `file.read_file(...)`
 - `file.write_file(...)`, including base64 writes for binary content
 - streamed `file.download_file(...)`
@@ -594,9 +594,9 @@ If you rebuild the runtime from scratch instead of extending the published image
 Custom images must also keep these compatibility constraints:
 
 - The container should listen on the configured sandbox port, `8080` by default.
-- `/mnt/user-data` must remain writable because DeerFlow mounts thread workspace, uploads, and outputs there.
-- `home_dir` comes from the sandbox context endpoint; do not assume DeerFlow hardcodes it.
-- Shell command handling must remain compatible with serialized `exec_command` calls. DeerFlow serializes shell access on the host side to avoid corrupting the sandbox's persistent shell session.
+- `/mnt/user-data` must remain writable because UniDeer mounts thread workspace, uploads, and outputs there.
+- `home_dir` comes from the sandbox context endpoint; do not assume UniDeer hardcodes it.
+- Shell command handling must remain compatible with serialized `exec_command` calls. UniDeer serializes shell access on the host side to avoid corrupting the sandbox's persistent shell session.
 
 ### Skills
 
@@ -654,11 +654,11 @@ The default GitHub API rate limits are quite restrictive. For frequent project r
 
 **Configuration Steps**:
 1. Uncomment the `GITHUB_TOKEN` line in the `.env` file and add your personal access token
-2. Restart the DeerFlow service to apply changes
+2. Restart the UniDeer service to apply changes
 
 ## Environment Variables
 
-DeerFlow supports environment variable substitution using the `$` prefix:
+UniDeer supports environment variable substitution using the `$` prefix:
 
 ```yaml
 models:
@@ -676,30 +676,30 @@ models:
 - `SERPER_API_KEY` - Serper (Google Search/Images API) key for `web_search` and `image_search`
 - `GROUNDROUTE_API_KEY` - GroundRoute meta-search API key for `web_search` and `web_fetch` (routes across Serper, Brave, Exa, Tavily, Firecrawl, Perplexity with gain-share pricing)
 - `BROWSERLESS_TOKEN` - Browserless Cloud token for `web_capture` (optional for self-hosted Browserless)
-- `DEER_FLOW_PROJECT_ROOT` - Project root for relative runtime paths
-- `DEER_FLOW_CONFIG_PATH` - Custom config file path
-- `DEER_FLOW_EXTENSIONS_CONFIG_PATH` - Custom extensions config file path
-- `DEER_FLOW_HOME` - Runtime state directory (defaults to `.deer-flow` under the project root)
-- `DEER_FLOW_SKILLS_PATH` - Skills directory when `skills.path` is omitted
+- `UNI_DEER_PROJECT_ROOT` - Project root for relative runtime paths
+- `UNI_DEER_CONFIG_PATH` - Custom config file path
+- `UNI_DEER_EXTENSIONS_CONFIG_PATH` - Custom extensions config file path
+- `UNI_DEER_HOME` - Runtime state directory (defaults to `.deer-flow` under the project root)
+- `UNI_DEER_SKILLS_PATH` - Skills directory when `skills.path` is omitted
 - `GATEWAY_ENABLE_DOCS` - Set to `false` to disable Swagger UI (`/docs`), ReDoc (`/redoc`), and OpenAPI schema (`/openapi.json`) endpoints (default: `true`)
 
 ## Configuration Location
 
-The configuration file should be placed in the **project root directory** (`deer-flow/config.yaml`). Set `DEER_FLOW_PROJECT_ROOT` when the process may start from another working directory, or set `DEER_FLOW_CONFIG_PATH` to point at a specific file.
+The configuration file should be placed in the **project root directory** (`deer-flow/config.yaml`). Set `UNI_DEER_PROJECT_ROOT` when the process may start from another working directory, or set `UNI_DEER_CONFIG_PATH` to point at a specific file.
 
 ## Configuration Priority
 
-DeerFlow searches for configuration in this order:
+UniDeer searches for configuration in this order:
 
 1. Path specified in code via `config_path` argument
-2. Path from `DEER_FLOW_CONFIG_PATH` environment variable
-3. `config.yaml` under `DEER_FLOW_PROJECT_ROOT`, or under the current working directory when `DEER_FLOW_PROJECT_ROOT` is unset
+2. Path from `UNI_DEER_CONFIG_PATH` environment variable
+3. `config.yaml` under `UNI_DEER_PROJECT_ROOT`, or under the current working directory when `UNI_DEER_PROJECT_ROOT` is unset
 4. Legacy backend/repository-root locations for monorepo compatibility
 
 ## Security Notes
 ### Sandbox Isolation and the Docker Socket (DooD)
 
-DeerFlow executes agent-generated shell/code through a configurable sandbox
+UniDeer executes agent-generated shell/code through a configurable sandbox
 (`sandbox.use` in `config.yaml`). The isolation guarantees differ by mode, and
 one mode requires mounting the host Docker socket. Understand the trade-offs
 before exposing an instance to untrusted input.
@@ -715,7 +715,7 @@ before exposing an instance to untrusted input.
 Mounting `/var/run/docker.sock` into a container grants that container
 **root-equivalent control of the host**: anything able to reach the socket can
 start a new container that bind-mounts the host filesystem and escape. This
-matters for DeerFlow because the gateway executes model-generated commands, so a
+matters for UniDeer because the gateway executes model-generated commands, so a
 prompt injection or any in-container code-execution primitive could pivot to the
 host through the socket.
 
@@ -738,7 +738,7 @@ To keep this off the default attack surface:
 
 ### CLI Credential Mounts (Claude Code / Codex)
 
-DeerFlow can reuse your Claude Code / Codex CLI subscription login as a model
+UniDeer can reuse your Claude Code / Codex CLI subscription login as a model
 provider (`ClaudeChatModel`, the Codex provider) or for ACP agents that run the
 CLI in-container. The Compose stack used to bind-mount the **entire** `~/.claude`
 and `~/.codex` directories (read-only) into the gateway container in **every**
@@ -757,7 +757,7 @@ with the least exposure that fits your setup:
 
 The Gateway credential loader checks environment variables **before** the
 default credential files, so the env-token paths need no bind mount at all. ACP
-adapters authenticate independently of DeerFlow via their own documented env —
+adapters authenticate independently of UniDeer via their own documented env —
 for example the common `claude-code-acp` adapter starts as
 `ANTHROPIC_API_KEY=… claude-code-acp` and honors `CLAUDE_CONFIG_DIR` to redirect
 its config directory, so it needs no `~/.claude` mount at all. Prefer the
@@ -768,7 +768,7 @@ genuinely reads the full CLI config directory.
 
 ## Best Practices
 
-1. **Place `config.yaml` in project root** - Set `DEER_FLOW_PROJECT_ROOT` if the runtime starts elsewhere
+1. **Place `config.yaml` in project root** - Set `UNI_DEER_PROJECT_ROOT` if the runtime starts elsewhere
 2. **Never commit `config.yaml`** - It's already in `.gitignore`
 3. **Use environment variables for secrets** - Don't hardcode API keys
 4. **Keep `config.example.yaml` updated** - Document all new options
@@ -779,8 +779,8 @@ genuinely reads the full CLI config directory.
 
 ### "Config file not found"
 - Ensure `config.yaml` exists in the **project root** directory (`deer-flow/config.yaml`)
-- If the runtime starts outside the project root, set `DEER_FLOW_PROJECT_ROOT`
-- Alternatively, set `DEER_FLOW_CONFIG_PATH` environment variable to custom location
+- If the runtime starts outside the project root, set `UNI_DEER_PROJECT_ROOT`
+- Alternatively, set `UNI_DEER_CONFIG_PATH` environment variable to custom location
 
 ### "Invalid API key"
 - Verify environment variables are set correctly
@@ -789,7 +789,7 @@ genuinely reads the full CLI config directory.
 ### "Skills not loading"
 - Check that `deer-flow/skills/` directory exists
 - Verify skills have valid `SKILL.md` files
-- Check `skills.path` or `DEER_FLOW_SKILLS_PATH` if using a custom path
+- Check `skills.path` or `UNI_DEER_SKILLS_PATH` if using a custom path
 
 ### "Docker sandbox fails to start"
 - Ensure Docker is running

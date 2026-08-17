@@ -1,11 +1,11 @@
-# DeerFlow Terminal Workbench (TUI)
+# UniDeer Terminal Workbench (TUI)
 
-`deerflow` is a terminal-native workbench for the DeerFlow harness. It runs
-**embedded** over `DeerFlowClient` — no Gateway, frontend, nginx, or Docker
+`deerflow` is a terminal-native workbench for the UniDeer harness. It runs
+**embedded** over `UniDeerClient` — no Gateway, frontend, nginx, or Docker
 services required — while honoring the same `config.yaml`, checkpointer, skills,
-memory, MCP, and sandbox settings as the rest of DeerFlow.
+memory, MCP, and sandbox settings as the rest of UniDeer.
 
-![DeerFlow TUI](../../docs/tui/tui-preview.svg)
+![UniDeer TUI](../../docs/tui/tui-preview.svg)
 
 ## Install & run
 
@@ -28,7 +28,7 @@ Launch modes:
 | `deerflow --print "question"` | Headless one-shot answer to stdout |
 | `deerflow --json "question"` | Headless newline-delimited `StreamEvent`s |
 | `echo "q" \| deerflow --print` | Read the message from stdin |
-| `DEER_FLOW_TUI=1 deerflow` | Force the TUI via environment |
+| `UNI_DEER_TUI=1 deerflow` | Force the TUI via environment |
 
 If no TTY is available and no headless flag is given, `deerflow` prints guidance
 instead of hanging.
@@ -63,7 +63,7 @@ instead of hanging.
 `/help` `/new` `/clear` `/goal` `/threads` (`/switch`) `/model` `/skills` `/tools`
 `/mcp` `/memory` `/uploads` `/usage` `/config` `/quit`, plus
 `/<skill-name> task` to activate any enabled skill for the current turn (same
-semantics as elsewhere in DeerFlow). `/model` and `/threads` open modal pickers.
+semantics as elsewhere in UniDeer). `/model` and `/threads` open modal pickers.
 
 `/clear` removes the current transcript rows from the terminal display only; it keeps the active thread and persisted conversation intact. During an active run, `/new` and `/clear` ask you to wait for the run to finish instead of resetting in-flight display state.
 Use `/goal <condition>` to set the active thread goal, `/goal` to show it, and
@@ -76,7 +76,7 @@ agent behavior.
 
 ```
 cli.py          launch-mode planning (pure) + headless print/json + entry point
-session.py      builds DeerFlowClient (+ checkpointer) and the persistence writer
+session.py      builds UniDeerClient (+ checkpointer) and the persistence writer
 runtime.py      StreamEvent  ->  reducer actions  (pure translate + threaded driver)
 view_state.py   ViewState + reduce(state, action)  (pure, the testable heart)
 message_format  compact tool summaries / truncation (pure)
@@ -89,7 +89,7 @@ app.py          Textual App: composes widgets, drives runs on a worker thread,
 persistence.py  writes threads_meta so sessions appear in the Web UI (below)
 ```
 
-`DeerFlowClient.stream()` is a **synchronous** generator, so the app runs it on a
+`UniDeerClient.stream()` is a **synchronous** generator, so the app runs it on a
 Textual worker *thread* and marshals each yielded action back to the UI thread
 via `call_from_thread`. The pure layers (everything except `app.py`) have no
 Textual dependency and are unit-tested directly with synthetic `StreamEvent`s.

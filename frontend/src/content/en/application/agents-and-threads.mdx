@@ -125,7 +125,7 @@ backend/.unideer/threads/{thread_id}/user-data/
 
 This directory is mounted into the sandbox as `/mnt/user-data/` for the agent to read and write.
 
-In Docker deployments, this path is bind-mounted from the host so that thread data persists across container restarts. Set `DEER_FLOW_ROOT` to the absolute path of your unideer repository root to ensure the correct host path is used.
+In Docker deployments, this path is bind-mounted from the host so that thread data persists across container restarts. Set `UNI_DEER_ROOT` to the absolute path of your unideer repository root to ensure the correct host path is used.
 
 <Cards num={2}>
   <Cards.Card

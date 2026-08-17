@@ -1,6 +1,6 @@
-# Contributing to DeerFlow
+# Contributing to UniDeer
 
-Thank you for your interest in contributing to DeerFlow! This guide will help you set up your development environment and understand our development workflow.
+Thank you for your interest in contributing to UniDeer! This guide will help you set up your development environment and understand our development workflow.
 
 ## Development Environment Setup
 
@@ -83,11 +83,11 @@ Use these as practical starting points for development and review environments:
 
 | Scenario | Starting point | Recommended | Notes |
 |---------|-----------|------------|-------|
-| `make dev` on one machine | 4 vCPU, 8 GB RAM | 8 vCPU, 16 GB RAM | Best when DeerFlow uses hosted model APIs. |
+| `make dev` on one machine | 4 vCPU, 8 GB RAM | 8 vCPU, 16 GB RAM | Best when UniDeer uses hosted model APIs. |
 | `make docker-start` review environment | 4 vCPU, 8 GB RAM | 8 vCPU, 16 GB RAM | Docker image builds and sandbox containers need extra headroom. |
 | Shared Linux test server | 8 vCPU, 16 GB RAM | 16 vCPU, 32 GB RAM | Prefer this for heavier multi-agent runs or multiple reviewers. |
 
-`2 vCPU / 4 GB` environments often fail to start reliably or become unresponsive under normal DeerFlow workloads.
+`2 vCPU / 4 GB` environments often fail to start reliably or become unresponsive under normal UniDeer workloads.
 
 #### Linux: Docker daemon permission denied
 
@@ -115,7 +115,7 @@ Recommended fix: add your current user to the `docker` group so Docker commands 
    ```bash
    docker ps
    ```
-5. Retry the DeerFlow command:
+5. Retry the UniDeer command:
    ```bash
    make docker-stop
    make docker-start
@@ -289,7 +289,7 @@ Nginx (port 2026) ← Unified entry point
 
 ## AI assistance disclosure
 
-DeerFlow is an AI project and we welcome AI-assisted contributions. To help
+UniDeer is an AI project and we welcome AI-assisted contributions. To help
 reviewers calibrate how closely to read a change, **every pull request must
 complete the "AI assistance" section of the
 [PR template](.github/pull_request_template.md)**:
@@ -309,7 +309,7 @@ before review.
 cd backend
 make test
 
-# Live DeerFlowClient integration tests (explicit opt-in)
+# Live UniDeerClient integration tests (explicit opt-in)
 # Requires a valid root config.yaml and API credentials.
 make test-live
 
@@ -325,7 +325,7 @@ make test-e2e
 `make test-live` calls real external APIs and may incur API costs or create
 local sandboxes, artifacts, and files. It is never run by the default backend
 test command or CI. Direct pytest invocations of `tests/test_client_live.py`
-must also set `DEER_FLOW_RUN_LIVE_TESTS=1`.
+must also set `UNI_DEER_RUN_LIVE_TESTS=1`.
 
 ### PR Regression Checks
 
@@ -387,4 +387,4 @@ the generated zip before attaching it to a public issue.
 
 ## License
 
-By contributing to DeerFlow, you agree that your contributions will be licensed under the [MIT License](./LICENSE).
+By contributing to UniDeer, you agree that your contributions will be licensed under the [MIT License](./LICENSE).

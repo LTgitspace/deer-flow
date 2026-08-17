@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to DeerFlow are documented in this file.
+All notable changes to UniDeer are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -13,9 +13,9 @@ This section accumulates work toward the **2.1.0** milestone
 ### ⚠ Breaking changes
 
 - **skills:** Sandboxes now reserve `/mnt/skills` for managed enabled-only
-  projections. `DEER_FLOW_HOST_SKILLS_PATH` and `SKILLS_HOST_PATH` are no longer
+  projections. `UNI_DEER_HOST_SKILLS_PATH` and `SKILLS_HOST_PATH` are no longer
   used; Docker/AIO and hostPath deployments derive projection paths from
-  `DEER_FLOW_HOST_BASE_DIR`. E2B operator mounts targeting `/mnt/skills` or any
+  `UNI_DEER_HOST_BASE_DIR`. E2B operator mounts targeting `/mnt/skills` or any
   child path are skipped with a warning so they cannot shadow the managed
   projection; move extra E2B content to a different container path. User
   projections re-read global enable state from disk so toggles propagate across
@@ -26,7 +26,7 @@ This section accumulates work toward the **2.1.0** milestone
   PVC materialization is implemented. ([#4178])
 - **sandbox:** E2B now enforces `sandbox.replicas` as a process-local capacity
   limit. The default `wait` policy waits for `acquire_timeout`, then fails the
-  agent turn. DeerFlow does not retry the turn automatically. Use `burst` with
+  agent turn. UniDeer does not retry the turn automatically. Use `burst` with
   `burst_limit` to permit bounded extra VMs. The `reject` policy can remove one
   warm VM before it returns a capacity error. ([#4391])
 - **skills:** A directory containing `SKILL.md` is now a runtime package
@@ -215,7 +215,7 @@ This section accumulates work toward the **2.1.0** milestone
 - **observability:** Trace-id correlation with enhanced logging and agent
   observability via Monocle. ([#3902], [#4024])
 - **tooling:** A Hermes-like terminal workbench (`deerflow` CLI) backed by
-  `DeerFlowClient`, plus a redacted community support-bundle generator. ([#3760],
+  `UniDeerClient`, plus a redacted community support-bundle generator. ([#3760],
   [#3886])
 - **setup:** The setup wizard now asks whether OpenAI-compatible gateway models
   support thinking, and a Volcengine Coding Plan quick-setup path was added.
@@ -369,7 +369,7 @@ This section accumulates work toward the **2.1.0** milestone
   same-stem `.md` upload) no longer silently clobber each other within one
   request. When `uploads.auto_convert_documents` is on, the companion `.md` now
   gets a unique name (e.g. `a_1.md`); `POST /threads/{id}/uploads` and
-  `DeerFlowClient.upload_files` both report the actual name in `markdown_file`.
+  `UniDeerClient.upload_files` both report the actual name in `markdown_file`.
   ([#4288])
 - **config:** Coerce null object config sections to their defaults; honor the
   unified database configuration in the store and sync checkpointer; and have
@@ -577,7 +577,7 @@ This section accumulates work toward the **2.1.0** milestone
 
 ## [2.0.0] — 2026-06-15
 
-DeerFlow 2.0 is a ground-up rewrite around a "super agent" harness with
+UniDeer 2.0 is a ground-up rewrite around a "super agent" harness with
 sub-agents, persistent memory, sandbox execution, and an extensible
 skills/tools system. It shares no code with the 1.x line, which now lives on
 the [`main-1.x` branch](https://github.com/bytedance/deer-flow/tree/main-1.x).

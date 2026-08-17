@@ -1,4 +1,4 @@
-# 🦌 DeerFlow - 2.0
+# 🦌 UniDeer - 2.0
 
 English | [中文](./README_zh.md) | [日本語](./README_ja.md) | [Français](./README_fr.md) | [Русский](./README_ru.md)
 
@@ -7,14 +7,14 @@ English | [中文](./README_zh.md) | [日本語](./README_ja.md) | [Français](.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 <a href="https://trendshift.io/repositories/14699" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14699" alt="bytedance%2Fdeer-flow | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-> On February 28th, 2026, DeerFlow claimed the 🏆 #1 spot on GitHub Trending following the launch of version 2. Thanks a million to our incredible community — you made this happen! 💪🔥
+> On February 28th, 2026, UniDeer claimed the 🏆 #1 spot on GitHub Trending following the launch of version 2. Thanks a million to our incredible community — you made this happen! 💪🔥
 
-DeerFlow (**D**eep **E**xploration and **E**fficient **R**esearch **Flow**) is an open-source **super agent harness** that orchestrates **sub-agents**, **memory**, and **sandboxes** to do almost anything — powered by **extensible skills**.
+UniDeer (**D**eep **E**xploration and **E**fficient **R**esearch **Flow**) is an open-source **super agent harness** that orchestrates **sub-agents**, **memory**, and **sandboxes** to do almost anything — powered by **extensible skills**.
 
 https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
 
 > [!NOTE]
-> **DeerFlow 2.0 is a ground-up rewrite.** It shares no code with v1. If you're looking for the original Deep Research framework, it's maintained on the [`1.x` branch](https://github.com/bytedance/deer-flow/tree/main-1.x) — contributions there are still welcome. Active development has moved to 2.0.
+> **UniDeer 2.0 is a ground-up rewrite.** It shares no code with v1. If you're looking for the original Deep Research framework, it's maintained on the [`1.x` branch](https://github.com/bytedance/deer-flow/tree/main-1.x) — contributions there are still welcome. Active development has moved to 2.0.
 
 ## Official Website
 
@@ -24,17 +24,17 @@ Learn more and see **real demos** on our [**official website**](https://deerflow
 
 <img width="446" height="280" alt="image" align="middle" src="https://github.com/user-attachments/assets/077edef4-d560-41af-bb0d-d0a5f14fcc20" />
 
-- [**LLM Space**](https://github.com/deer-flow/llm-space) - Meet our secret weapon behind DeerFlow — one desktop tool to prototype agent ideas, inspect each harness step, replay failures, and benchmark performance.
+- [**LLM Space**](https://github.com/deer-flow/llm-space) - Meet our secret weapon behind UniDeer — one desktop tool to prototype agent ideas, inspect each harness step, replay failures, and benchmark performance.
 
 ## Coding Plan from ByteDance Volcengine
 
-- We strongly recommend using Doubao-Seed-2.0-Code, DeepSeek v3.2 and Kimi 2.5 to run DeerFlow
-- [Learn more](https://www.byteplus.com/en/activity/codingplan?utm_campaign=deer_flow&utm_content=deer_flow&utm_medium=devrel&utm_source=OWO&utm_term=deer_flow)
-- [中国大陆地区的开发者请点击这里](https://www.volcengine.com/activity/codingplan?utm_campaign=deer_flow&utm_content=deer_flow&utm_medium=devrel&utm_source=OWO&utm_term=deer_flow)
+- We strongly recommend using Doubao-Seed-2.0-Code, DeepSeek v3.2 and Kimi 2.5 to run UniDeer
+- [Learn more](https://www.byteplus.com/en/activity/codingplan?utm_campaign=uni_deer&utm_content=uni_deer&utm_medium=devrel&utm_source=OWO&utm_term=uni_deer)
+- [中国大陆地区的开发者请点击这里](https://www.volcengine.com/activity/codingplan?utm_campaign=uni_deer&utm_content=uni_deer&utm_medium=devrel&utm_source=OWO&utm_term=uni_deer)
 
 ## InfoQuest
 
-DeerFlow has newly integrated the intelligent search and crawling toolset independently developed by BytePlus--[InfoQuest (supports free online experience)](https://docs.byteplus.com/en/docs/InfoQuest/What_is_Info_Quest)
+UniDeer has newly integrated the intelligent search and crawling toolset independently developed by BytePlus--[InfoQuest (supports free online experience)](https://docs.byteplus.com/en/docs/InfoQuest/What_is_Info_Quest)
 
 <a href="https://docs.byteplus.com/en/docs/InfoQuest/What_is_Info_Quest" target="_blank">
   <img
@@ -46,7 +46,7 @@ DeerFlow has newly integrated the intelligent search and crawling toolset indepe
 
 ## Table of Contents
 
-- [🦌 DeerFlow - 2.0](#-deerflow---20)
+- [🦌 UniDeer - 2.0](#-deerflow---20)
   - [Official Website](#official-website)
   - [Coding Plan from ByteDance Volcengine](#coding-plan-from-bytedance-volcengine)
   - [InfoQuest](#infoquest)
@@ -95,7 +95,7 @@ DeerFlow has newly integrated the intelligent search and crawling toolset indepe
 If you use Claude Code, Codex, Cursor, Windsurf, or another coding agent, you can hand it the setup instructions in one sentence:
 
 ```text
-Help me clone DeerFlow if needed, then bootstrap it for local development by following https://raw.githubusercontent.com/bytedance/deer-flow/main/Install.md
+Help me clone UniDeer if needed, then bootstrap it for local development by following https://raw.githubusercontent.com/bytedance/deer-flow/main/Install.md
 ```
 
 That prompt is intended for coding agents. It tells the agent to clone the repo if needed, choose Docker when available, and stop with the exact next command plus any missing config the user still needs to provide.
@@ -104,7 +104,7 @@ That prompt is intended for coding agents. It tells the agent to clone the repo 
 
 ### Configuration
 
-1. **Clone the DeerFlow repository**
+1. **Clone the UniDeer repository**
 
    ```bash
    git clone https://github.com/bytedance/deer-flow.git
@@ -139,7 +139,7 @@ That prompt is intended for coding agents. It tells the agent to clone the repo 
    > **Advanced / manual configuration**: If you prefer to edit `config.yaml` directly, run `make config` instead to copy the full template. See `config.example.yaml` for the complete reference including CLI-backed providers (Codex CLI, Claude Code OAuth), OpenRouter, Responses API, subagent runtime caps such as `subagents.max_total_per_run`, and more.
 
    Optional per-model pricing must use one currency across all priced models.
-   DeerFlow disables Console cost estimates when currencies are mixed rather
+   UniDeer disables Console cost estimates when currencies are mixed rather
    than presenting an invalid aggregate.
 
    <details>
@@ -185,7 +185,7 @@ That prompt is intended for coding agents. It tells the agent to clone the repo 
 
    To route OpenAI models through `/v1/responses`, keep using `langchain_openai:ChatOpenAI` and set `use_responses_api: true` with `output_version: responses/v1`.
 
-   For vLLM 0.19.0, use `deerflow.models.vllm_provider:VllmChatModel`. For Qwen-style reasoning models, DeerFlow toggles reasoning with `extra_body.chat_template_kwargs.enable_thinking` and preserves vLLM's non-standard `reasoning` field across multi-turn tool-call conversations. Legacy `thinking` configs are normalized automatically for backward compatibility. If the endpoint reports a cumulative usage snapshot on every streaming chunk, set `cumulative_stream_usage: true` so DeerFlow converts those snapshots into per-chunk deltas; the option is disabled by default and leaves usage unchanged when a stable completion id is unavailable. Reasoning models may also require the server to be started with `--reasoning-parser ...`. If your local vLLM deployment accepts any non-empty API key, you can still set `VLLM_API_KEY` to a placeholder value.
+   For vLLM 0.19.0, use `deerflow.models.vllm_provider:VllmChatModel`. For Qwen-style reasoning models, UniDeer toggles reasoning with `extra_body.chat_template_kwargs.enable_thinking` and preserves vLLM's non-standard `reasoning` field across multi-turn tool-call conversations. Legacy `thinking` configs are normalized automatically for backward compatibility. If the endpoint reports a cumulative usage snapshot on every streaming chunk, set `cumulative_stream_usage: true` so UniDeer converts those snapshots into per-chunk deltas; the option is disabled by default and leaves usage unchanged when a stable completion id is unavailable. Reasoning models may also require the server to be started with `--reasoning-parser ...`. If your local vLLM deployment accepts any non-empty API key, you can still set `VLLM_API_KEY` to a placeholder value.
 
    CLI-backed provider examples:
 
@@ -228,7 +228,7 @@ That prompt is intended for coding agents. It tells the agent to clone the repo 
 
 #### Deployment Sizing
 
-Use the table below as a practical starting point when choosing how to run DeerFlow:
+Use the table below as a practical starting point when choosing how to run UniDeer:
 
 | Deployment target | Starting point | Recommended | Notes |
 |---------|-----------|------------|-------|
@@ -236,7 +236,7 @@ Use the table below as a practical starting point when choosing how to run DeerF
 | Docker development / `make docker-start` | 4 vCPU, 8 GB RAM, 25 GB free SSD | 8 vCPU, 16 GB RAM | Image builds, bind mounts, and sandbox containers need more headroom than pure local dev. |
 | Long-running server / `make up` | 8 vCPU, 16 GB RAM, 40 GB free SSD | 16 vCPU, 32 GB RAM | Preferred for shared use, multi-agent runs, report generation, or heavier sandbox workloads. |
 
-- These numbers cover DeerFlow itself. If you also host a local LLM, size that service separately.
+- These numbers cover UniDeer itself. If you also host a local LLM, size that service separately.
 - Linux plus Docker is the recommended deployment target for a persistent server. macOS and Windows are best treated as development or evaluation environments.
 - If CPU or memory usage stays pinned, reduce concurrent runs first, then move to the next sizing tier.
 
@@ -262,7 +262,7 @@ Backend processes automatically pick up `config.yaml` changes on the next config
 The checkpoint storage settings `database.checkpoint_channel_mode` and
 `database.checkpoint_delta.snapshot_frequency` (default `10`) are exceptions:
 both are frozen when the process first builds an agent (including through
-`DeerFlowClient`) and require a process restart to change safely.
+`UniDeerClient`) and require a process restart to change safely.
 
 The optional `database.checkpoint_cache` section (delta channel mode only)
 caches materialized checkpoint histories: `type` is `memory` (default) or
@@ -286,14 +286,14 @@ Access: http://localhost:2026
 
 For persistent deployments, configure `database.backend` as `sqlite` or
 `postgres`. The selected backend is shared by the LangGraph checkpointer,
-LangGraph Store, and DeerFlow application data. The deprecated `checkpointer`
+LangGraph Store, and UniDeer application data. The deprecated `checkpointer`
 section, when present, overrides the first two for backward compatibility.
 
 The unified nginx endpoint is same-origin by default and does not emit browser CORS headers. If you run a split-origin or port-forwarded browser client, set `GATEWAY_CORS_ORIGINS` to comma-separated exact origins such as `http://localhost:3000`; the Gateway then applies the CORS allowlist and matching CSRF origin checks.
 
-Browser login uses `HttpOnly` session cookies. The login page offers a "keep me signed in" option that extends the browser session when the request is HTTPS (including trusted `X-Forwarded-Proto: https`) or localhost HTTP. The localhost exception uses the direct request `Host` and ignores forwarded host headers. Public HTTP deployments, including many temporary sandbox URLs, fall back to session cookies by default. DeerFlow never stores the password in browser storage; the UI may remember only the email address.
+Browser login uses `HttpOnly` session cookies. The login page offers a "keep me signed in" option that extends the browser session when the request is HTTPS (including trusted `X-Forwarded-Proto: https`) or localhost HTTP. The localhost exception uses the direct request `Host` and ignores forwarded host headers. Public HTTP deployments, including many temporary sandbox URLs, fall back to session cookies by default. UniDeer never stores the password in browser storage; the UI may remember only the email address.
 
-DeerFlow still uses `Forwarded` / `X-Forwarded-*` headers to recover the browser-facing scheme and origin behind a proxy. The bundled nginx sets `X-Forwarded-Proto`, but preserves an upstream HTTPS value and does not overwrite every forwarded header. Configure the outer trusted proxy to replace or strip client-supplied forwarding headers before traffic reaches DeerFlow.
+UniDeer still uses `Forwarded` / `X-Forwarded-*` headers to recover the browser-facing scheme and origin behind a proxy. The bundled nginx sets `X-Forwarded-Proto`, but preserves an upstream HTTPS value and does not overwrite every forwarded header. Configure the outer trusted proxy to replace or strip client-supplied forwarding headers before traffic reaches UniDeer.
 
 > [!IMPORTANT]
 > The Gateway still owns active run tasks in process, so production defaults to a single Gateway worker (`GATEWAY_WORKERS=1`). Multi-worker deployments require Postgres, the Redis stream bridge (`stream_bridge.type: redis`), `run_ownership.heartbeat_enabled: true`, and `run_events.backend: db`; process-local memory/JSONL event stores cannot enforce singleton delivery receipts across workers. The bridge shares SSE delivery and bounded `Last-Event-ID` replay across workers. When a valid reconnect cursor has been trimmed, or a subscriber that already established an empty-stream wait falls behind before its first delivery, Memory and Redis emit a machine-readable SSE `gap` event instead of silently returning a partial replay; the Web UI reloads durable thread/event state and resumes from the retained tail. Lease reconciliation marks runs from dead workers as errors, persists their delivery receipts, publishes the terminal stream marker, schedules retained-stream cleanup, and updates the affected thread status. SSE and `/wait` consumers also refresh durable status on heartbeats as a fallback if terminal publication fails. Malformed Redis reconnect IDs live-tail new events instead of replaying the retained buffer, and the rolling retained-buffer TTL (`stream_ttl_seconds`) remains a cleanup safety net rather than a run timeout. IM channel state and other process-local services still need their own multi-worker coordination.
@@ -310,7 +310,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed Docker development guide.
 
 If you prefer running services locally:
 
-Prerequisite: complete the "Configuration" steps above first (`make setup`). `make dev` requires a valid `config.yaml` in the project root. Set `DEER_FLOW_PROJECT_ROOT` to define that root explicitly, or `DEER_FLOW_CONFIG_PATH` to point at a specific config file. Runtime state defaults to `.deer-flow` under the project root and can be moved with `DEER_FLOW_HOME`; skills default to `skills/` under the project root and can be moved with `DEER_FLOW_SKILLS_PATH`. Run `make doctor` to verify your setup before starting.
+Prerequisite: complete the "Configuration" steps above first (`make setup`). `make dev` requires a valid `config.yaml` in the project root. Set `UNI_DEER_PROJECT_ROOT` to define that root explicitly, or `UNI_DEER_CONFIG_PATH` to point at a specific config file. Runtime state defaults to `.deer-flow` under the project root and can be moved with `UNI_DEER_HOME`; skills default to `skills/` under the project root and can be moved with `UNI_DEER_SKILLS_PATH`. Run `make doctor` to verify your setup before starting.
 On Windows, run the local development flow from Git Bash. Native `cmd.exe` and PowerShell shells are not supported for the bash-based service scripts, and WSL is not guaranteed because some scripts rely on Git for Windows utilities such as `cygpath`.
 
 1. **Check prerequisites**:
@@ -347,7 +347,7 @@ On Windows, run the local development flow from Git Bash. Native `cmd.exe` and P
 
 #### Startup Modes
 
-DeerFlow runs the agent runtime inside the Gateway API. Development mode enables hot-reload; production mode uses a pre-built frontend.
+UniDeer runs the agent runtime inside the Gateway API. Development mode enables hot-reload; production mode uses a pre-built frontend.
 
 | | **Local Foreground** | **Local Daemon** | **Docker Dev** | **Docker Prod** |
 |---|---|---|---|---|
@@ -362,19 +362,19 @@ DeerFlow runs the agent runtime inside the Gateway API. Development mode enables
 Gateway owns `/api/langgraph/*` and translates those public LangGraph-compatible paths to its native `/api/*` routers behind nginx.
 
 For workflows that invoke `backend/langgraph.json` through LangGraph Studio or
-a direct LangGraph Server, DeerFlow consumes the authenticated identity
+a direct LangGraph Server, UniDeer consumes the authenticated identity
 published by that runtime and uses it for custom-agent configuration/SOUL, user
 skills and skill policy, uploads, thread data, and memory reads/writes. This
 keeps authenticated runs out of the shared `default` filesystem bucket, and the
 server-owned identity takes precedence over ordinary client-supplied `user_id`
 values. External identities such as email addresses are mapped to stable,
-collision-resistant directory-safe user IDs before accessing DeerFlow storage.
-The default DeerFlow service topology remains the Gateway-embedded runtime
+collision-resistant directory-safe user IDs before accessing UniDeer storage.
+The default UniDeer service topology remains the Gateway-embedded runtime
 described above.
 
 Gateway runs automatically enforce native delivery for artifacts created or modified under `/mnt/user-data/outputs`: `present_files` must present at least one output produced by the current run, and the terminal `run.delivery` receipt must be durably recorded. Runs that do not produce output artifacts keep ordinary conversational behavior.
 
-DeerFlow's built-in custom events are available through both LangGraph streaming interfaces: native clients can continue subscribing to `stream_mode="custom"`, while callback-based integrations can consume the same payloads as `on_custom_event` records from `astream_events(version="v2")`. The callback event name matches the payload's `type` field.
+UniDeer's built-in custom events are available through both LangGraph streaming interfaces: native clients can continue subscribing to `stream_mode="custom"`, while callback-based integrations can consume the same payloads as `on_custom_event` records from `astream_events(version="v2")`. The callback event name matches the payload's `type` field.
 
 #### Docker Production Deployment
 
@@ -395,7 +395,7 @@ deploy.sh down
 ### Advanced
 #### Sandbox Mode
 
-DeerFlow supports multiple sandbox execution modes:
+UniDeer supports multiple sandbox execution modes:
 - **Local Execution** (runs sandbox code directly on the host machine)
 - **Docker Execution** (runs sandbox code in isolated Docker containers)
 - **Docker Execution with Kubernetes** (runs sandbox code in Kubernetes pods via provisioner service)
@@ -406,12 +406,12 @@ See the [Sandbox Configuration Guide](backend/docs/CONFIGURATION.md#sandbox) to 
 
 #### MCP Server
 
-DeerFlow supports configurable MCP servers and skills to extend its capabilities.
+UniDeer supports configurable MCP servers and skills to extend its capabilities.
 For HTTP/SSE MCP servers, OAuth token flows are supported (`client_credentials`, `refresh_token`).
 For stdio MCP servers, per-tool call timeouts can be configured with `tool_call_timeout`.
 MCP tool names are prefixed with `<server_name>_` by default to prevent collisions across servers. If a server already namespaces its own tools, set `tool_name_prefix: false` on that server in `extensions_config.json` to keep the original names. Disable the prefix only when the resulting names remain unique across all enabled servers.
 Settings > Tools updates one MCP server at a time: an invalid stdio command on one server no longer blocks toggling another, while enabling that invalid server remains protected by the command allowlist and surfaces the backend validation message in the UI.
-Targeted updates accept both DeerFlow's `type` field and the MCP-spec `transport` field for SSE/HTTP servers.
+Targeted updates accept both UniDeer's `type` field and the MCP-spec `transport` field for SSE/HTTP servers.
 Runtime MCP and skill updates replace `extensions_config.json` atomically, so an interrupted write cannot leave the shared configuration truncated or partially written.
 MCP routing hints can also prefer a specific MCP tool for matching requests without forbidding other tools. When `tool_search` defers MCP schemas, matching routing metadata can auto-promote up to `tool_search.auto_promote_top_k` deferred schemas before the model call.
 See the [MCP Server Guide](backend/docs/MCP_SERVER.md) for detailed instructions.
@@ -424,9 +424,9 @@ cleanup when migrating from legacy metadata credentials.
 
 #### IM Channels
 
-DeerFlow supports receiving tasks from messaging apps. Channels auto-start when configured — no public IP required for any of them.
+UniDeer supports receiving tasks from messaging apps. Channels auto-start when configured — no public IP required for any of them.
 
-DeerFlow can also expose user-owned IM channel connections in the workspace UI. When `channel_connections` is enabled, logged-in users can bind Telegram, Slack, Discord, Feishu/Lark, DingTalk, WeChat, or WeCom from the sidebar / Settings > Channels. It reuses the existing outbound `channels.*` transports, so no public IP or provider callback URL is required. Incoming IM messages then run under the connected DeerFlow user account. See [IM Channel Connections](backend/docs/IM_CHANNEL_CONNECTIONS.md) for setup and security notes.
+UniDeer can also expose user-owned IM channel connections in the workspace UI. When `channel_connections` is enabled, logged-in users can bind Telegram, Slack, Discord, Feishu/Lark, DingTalk, WeChat, or WeCom from the sidebar / Settings > Channels. It reuses the existing outbound `channels.*` transports, so no public IP or provider callback URL is required. Incoming IM messages then run under the connected UniDeer user account. See [IM Channel Connections](backend/docs/IM_CHANNEL_CONNECTIONS.md) for setup and security notes.
 
 | Channel | Transport | Difficulty |
 |---------|-----------|------------|
@@ -521,9 +521,9 @@ channels:
 
 Notes:
 - `assistant_id: lead_agent` calls the default LangGraph assistant directly.
-- If `assistant_id` is set to a custom agent name, DeerFlow still routes through `lead_agent` and injects that value as `agent_name`, so the custom agent's SOUL/config takes effect for IM channels.
+- If `assistant_id` is set to a custom agent name, UniDeer still routes through `lead_agent` and injects that value as `agent_name`, so the custom agent's SOUL/config takes effect for IM channels.
 - IM channel workers call Gateway's LangGraph-compatible API internally and automatically attach process-local internal auth plus the CSRF cookie/header pair required for thread and run creation.
-- Feishu/Lark now queues rapid follow-up messages per mapped DeerFlow `thread_id` instead of immediately surfacing the generic busy reply, and topic replies keep a per-message card with a compact source-message preview across queued/running/final patches.
+- Feishu/Lark now queues rapid follow-up messages per mapped UniDeer `thread_id` instead of immediately surfacing the generic busy reply, and topic replies keep a per-message card with a compact source-message preview across queued/running/final patches.
 
 Set the corresponding API keys in your `.env` file:
 
@@ -578,7 +578,7 @@ DINGTALK_CLIENT_SECRET=your_client_secret
 1. Enable the `wechat` channel in `config.yaml`.
 2. Either set `WECHAT_BOT_TOKEN` in `.env`, or set `qrcode_login_enabled: true` for first-time QR bootstrap.
 3. When `bot_token` is absent and QR bootstrap is enabled, watch backend logs for the QR content returned by iLink and complete the binding flow.
-4. After the QR flow succeeds, DeerFlow persists the acquired token under `state_dir` for later restarts.
+4. After the QR flow succeeds, UniDeer persists the acquired token under `state_dir` for later restarts.
 5. For Docker Compose deployments, keep `state_dir` on a persistent volume so the `get_updates_buf` cursor and saved auth state survive restarts.
 
 **WeCom Setup**
@@ -597,11 +597,11 @@ DINGTALK_CLIENT_SECRET=your_client_secret
 4. *(Optional)* To enable streaming AI Card replies (typewriter effect), create an **AI Card** template on the [DingTalk Card Platform](https://open.dingtalk.com/document/dingstart/typewriter-effect-streaming-ai-card), then set `card_template_id` in `config.yaml` to the template ID. You also need to apply for the `Card.Streaming.Write` and `Card.Instance.Write` permissions.
 
 
-When DeerFlow runs in Docker Compose, IM channels execute inside the `gateway` container. In that case, do not point `channels.langgraph_url` or `channels.gateway_url` at `localhost`; use container service names such as `http://gateway:8001/api` and `http://gateway:8001`, or set `DEER_FLOW_CHANNELS_LANGGRAPH_URL` and `DEER_FLOW_CHANNELS_GATEWAY_URL`.
+When UniDeer runs in Docker Compose, IM channels execute inside the `gateway` container. In that case, do not point `channels.langgraph_url` or `channels.gateway_url` at `localhost`; use container service names such as `http://gateway:8001/api` and `http://gateway:8001`, or set `UNI_DEER_CHANNELS_LANGGRAPH_URL` and `UNI_DEER_CHANNELS_GATEWAY_URL`.
 
 **Commands**
 
-Once a channel is connected, you can interact with DeerFlow directly from the chat:
+Once a channel is connected, you can interact with UniDeer directly from the chat:
 
 | Command | Description |
 |---------|-------------|
@@ -611,7 +611,7 @@ Once a channel is connected, you can interact with DeerFlow directly from the ch
 | `/memory` | View memory |
 | `/help` | Show help |
 
-> Messages without a command prefix are treated as regular chat — DeerFlow creates a thread and responds conversationally.
+> Messages without a command prefix are treated as regular chat — UniDeer creates a thread and responds conversationally.
 
 #### Request Trace Correlation
 
@@ -639,7 +639,7 @@ empty snapshot.
 
 #### LangSmith Tracing
 
-DeerFlow has built-in [LangSmith](https://smith.langchain.com) integration for observability. When enabled, all LLM calls, agent runs, and tool executions are traced and visible in the LangSmith dashboard.
+UniDeer has built-in [LangSmith](https://smith.langchain.com) integration for observability. When enabled, all LLM calls, agent runs, and tool executions are traced and visible in the LangSmith dashboard.
 
 Add the following to your `.env` file:
 
@@ -652,7 +652,7 @@ LANGSMITH_PROJECT=xxx
 
 #### Langfuse Tracing
 
-DeerFlow also supports [Langfuse](https://langfuse.com) observability for LangChain-compatible runs.
+UniDeer also supports [Langfuse](https://langfuse.com) observability for LangChain-compatible runs.
 
 Add the following to your `.env` file:
 
@@ -670,14 +670,14 @@ If you are using a self-hosted Langfuse instance, set `LANGFUSE_BASE_URL` to you
 - `session_id` = LangGraph `thread_id` — groups every trace of the same conversation
 - `user_id` = effective user from `get_effective_user_id()` (falls back to `default` in no-auth mode)
 - `trace_name` = assistant id (defaults to `lead-agent`)
-- `tags` = `[env:<DEER_FLOW_ENV>, model:<model_name>]` (omitted when not set)
-- `metadata.deerflow_trace_id` = DeerFlow request correlation id, matching `X-Trace-Id` when request trace correlation is enabled
+- `tags` = `[env:<UNI_DEER_ENV>, model:<model_name>]` (omitted when not set)
+- `metadata.deerflow_trace_id` = UniDeer request correlation id, matching `X-Trace-Id` when request trace correlation is enabled
 
-These are injected into `RunnableConfig.metadata` at the graph invocation root for both the gateway path (`runtime/runs/worker.py::run_agent`) and the embedded path (`client.py::DeerFlowClient.stream`), so any LangChain-compatible callback can read them. Set `DEER_FLOW_ENV` (or `ENVIRONMENT`) to tag traces by deployment environment.
+These are injected into `RunnableConfig.metadata` at the graph invocation root for both the gateway path (`runtime/runs/worker.py::run_agent`) and the embedded path (`client.py::UniDeerClient.stream`), so any LangChain-compatible callback can read them. Set `UNI_DEER_ENV` (or `ENVIRONMENT`) to tag traces by deployment environment.
 
 #### Monocle Tracing
 
-DeerFlow also supports [Monocle](https://github.com/monocle2ai/monocle), an OpenTelemetry-based tracer for agentic applications. It records each run end-to-end: LLM calls, agent steps, and tool and MCP invocations, with their inputs, outputs, timings, and token counts.
+UniDeer also supports [Monocle](https://github.com/monocle2ai/monocle), an OpenTelemetry-based tracer for agentic applications. It records each run end-to-end: LLM calls, agent steps, and tool and MCP invocations, with their inputs, outputs, timings, and token counts.
 
 Add the following to your `.env` file:
 
@@ -693,19 +693,19 @@ Traces capture span inputs and outputs verbatim — prompts, tool arguments, and
 
 #### Using Multiple Providers
 
-LangSmith and Langfuse attach as LangChain callbacks, so you can enable both and DeerFlow reports each run to both. If an enabled provider is missing required credentials or fails to initialize, DeerFlow fails fast and names it. Monocle uses a global OpenTelemetry provider rather than a callback; Langfuse shares that provider, so all three can run together. Because both span processors sit on the same shared provider, Monocle's exporters also see Langfuse's spans when both are enabled.
+LangSmith and Langfuse attach as LangChain callbacks, so you can enable both and UniDeer reports each run to both. If an enabled provider is missing required credentials or fails to initialize, UniDeer fails fast and names it. Monocle uses a global OpenTelemetry provider rather than a callback; Langfuse shares that provider, so all three can run together. Because both span processors sit on the same shared provider, Monocle's exporters also see Langfuse's spans when both are enabled.
 
 For Docker deployments, tracing is disabled by default. Set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` in your `.env` to enable it.
 
 ## From Deep Research to Super Agent Harness
 
-DeerFlow started as a Deep Research framework — and the community ran with it. Since launch, developers have pushed it far beyond research: building data pipelines, generating slide decks, spinning up dashboards, automating content workflows. Things we never anticipated.
+UniDeer started as a Deep Research framework — and the community ran with it. Since launch, developers have pushed it far beyond research: building data pipelines, generating slide decks, spinning up dashboards, automating content workflows. Things we never anticipated.
 
-That told us something important: DeerFlow wasn't just a research tool. It was a **harness** — a runtime that gives agents the infrastructure to actually get work done.
+That told us something important: UniDeer wasn't just a research tool. It was a **harness** — a runtime that gives agents the infrastructure to actually get work done.
 
 So we rebuilt it from scratch.
 
-DeerFlow 2.0 is no longer a framework you wire together. It's a super agent harness — batteries included, fully extensible. Built on LangGraph and LangChain, it ships with everything an agent needs out of the box: a filesystem, memory, skills, sandbox-aware execution, and the ability to plan and spawn sub-agents for complex, multi-step tasks.
+UniDeer 2.0 is no longer a framework you wire together. It's a super agent harness — batteries included, fully extensible. Built on LangGraph and LangChain, it ships with everything an agent needs out of the box: a filesystem, memory, skills, sandbox-aware execution, and the ability to plan and spawn sub-agents for complex, multi-step tasks.
 
 Use it as-is. Or tear it apart and make it yours.
 
@@ -713,19 +713,19 @@ Use it as-is. Or tear it apart and make it yours.
 
 ### Skills & Tools
 
-Skills are what make DeerFlow do *almost anything*.
+Skills are what make UniDeer do *almost anything*.
 
-A standard Agent Skill is a structured capability module — a Markdown file that defines a workflow, best practices, and references to supporting resources. DeerFlow ships with built-in skills for research, report generation, slide creation, web pages, image and video generation, and more. But the real power is extensibility: add your own skills, replace the built-in ones, or combine them into compound workflows.
+A standard Agent Skill is a structured capability module — a Markdown file that defines a workflow, best practices, and references to supporting resources. UniDeer ships with built-in skills for research, report generation, slide creation, web pages, image and video generation, and more. But the real power is extensibility: add your own skills, replace the built-in ones, or combine them into compound workflows.
 
-Skills are loaded progressively — only when the task needs them, not all at once. This keeps the context window lean and makes DeerFlow work well even with token-sensitive models.
+Skills are loaded progressively — only when the task needs them, not all at once. This keeps the context window lean and makes UniDeer work well even with token-sensitive models.
 
-A skill directory is a package boundary: once DeerFlow finds its `SKILL.md`, nested `SKILL.md` files under that package (for example evaluation fixtures) remain supporting data and are not registered as runtime skills. Namespace directories without their own `SKILL.md` can still group nested skills.
+A skill directory is a package boundary: once UniDeer finds its `SKILL.md`, nested `SKILL.md` files under that package (for example evaluation fixtures) remain supporting data and are not registered as runtime skills. Namespace directories without their own `SKILL.md` can still group nested skills.
 
-Users can explicitly activate an enabled skill for a single turn by starting the request with `/skill-name`, for example `/data-analysis analyze uploads/foo.csv`. DeerFlow loads that skill's `SKILL.md` as hidden current-turn context while leaving the base prompt limited to skill metadata. Slash activation respects disabled skills, custom-agent skill whitelists, and existing channel commands such as `/new` and `/help`.
+Users can explicitly activate an enabled skill for a single turn by starting the request with `/skill-name`, for example `/data-analysis analyze uploads/foo.csv`. UniDeer loads that skill's `SKILL.md` as hidden current-turn context while leaving the base prompt limited to skill metadata. Slash activation respects disabled skills, custom-agent skill whitelists, and existing channel commands such as `/new` and `/help`.
 
 An enabled skill's `allowed-tools` policy applies only after that skill is explicitly slash-activated or captured in the agent's active skill context after a `read_file` load. Merely enabling, advertising, or listing a skill in a custom agent or subagent `skills` allowlist does not reduce that agent's normal toolset; subagents use the same progressive discovery and activation policy as the lead agent. During a slash-activated run, that explicit skill's policy is authoritative: reading another `SKILL.md` may provide instructions but cannot widen the slash skill's tools. Without slash activation, policies from skills actually loaded into active context retain their union semantics. Once active, the policy filters both model-visible tool schemas and tool execution. Framework discovery tools (`tool_search` and `describe_skill`) remain available so an allowed deferred tool or installed skill can still be discovered, but discovery and promotion never grant permission to execute a business tool omitted from `allowed-tools`. `task` is not framework-exempt; a restrictive skill must list it explicitly to delegate to a subagent. Per-step policy decisions are internal runtime context and are removed from observable or persisted context copies. Registry failures and an active set with no remaining valid skill fail closed to framework-safe tools; individual stale paths are ignored only when another valid active skill remains. This is best-effort behavioral scoping, not a hard security boundary: loading skill instructions through another tool is not captured, and active-skill entries can be evicted from bounded context.
 
-When you install `.skill` archives through the Gateway, DeerFlow accepts standard optional frontmatter metadata such as `version`, `author`, and `compatibility` instead of rejecting otherwise valid external skills.
+When you install `.skill` archives through the Gateway, UniDeer accepts standard optional frontmatter metadata such as `version`, `author`, and `compatibility` instead of rejecting otherwise valid external skills.
 
 Disabling a skill also removes it from the sandbox filesystem view, so shell commands and structured file tools follow the same enabled state. Local, Docker/AIO, hostPath provisioner, and newly created E2B sandboxes source `/mnt/skills` from enabled-only projections that update when public, custom, legacy, or managed integration skills are toggled, edited, created, deleted, or installed. Managed integration packages remain shared, while their projected filesystem visibility follows each user's enabled state. Multi-worker Gateways re-read on-disk enable state while rebuilding user projections, so a toggle handled by one worker is honored by another worker's next sandbox acquire. Existing E2B sandboxes retain their creation-time snapshot until they are recreated. PVC-backed provisioner skills keep their configured PVC snapshot/layout for now; dynamic PVC materialization is tracked separately.
 
@@ -733,10 +733,10 @@ Managed integrations install shared read-only skill packs without mixing them
 into custom skills. The Lark/Feishu CLI integration is available under
 `Settings → Integrations → Lark / Feishu CLI`; an administrator installs or
 upgrades the official `lark-*` pack once under
-`{DEER_FLOW_HOME}/integrations/skills/lark-cli`, and every user discovers that
+`{UNI_DEER_HOME}/integrations/skills/lark-cli`, and every user discovers that
 same pack with an independent enabled state. Each user's app configuration and
 OAuth data remain isolated under
-`{DEER_FLOW_HOME}/users/{user_id}/integrations/lark-cli/{config,data}`. These
+`{UNI_DEER_HOME}/users/{user_id}/integrations/lark-cli/{config,data}`. These
 secret directories are restricted to `0700`, regular credential files to
 `0600`, and symlinks are rejected.
 
@@ -757,11 +757,11 @@ Gateway needs outbound internet access for that step (it falls back to a
 bottom-line pinned version if the release lookup fails). The settings page shows
 the installed version and, when available, the newest published version so an
 admin can reinstall to upgrade. Air-gapped deployments can pre-stage the archive
-and point `DEER_FLOW_LARK_CLI_SKILLS_ARCHIVE` at the local file. Integrity does
+and point `UNI_DEER_LARK_CLI_SKILLS_ARCHIVE` at the local file. Integrity does
 not depend on a pinned archive byte hash (GitHub does not guarantee stable
 source-archive bytes); instead the download is restricted to the official GitHub
 host, every archive member passes structural safety guards, and a content hash
-of the effective installed skill tree (including DeerFlow's injected shared
+of the effective installed skill tree (including UniDeer's injected shared
 guidance) is recorded so content changes are auditable across reinstalls.
 
 When `sandbox.use` selects the AIO provider, the same install also downloads the
@@ -771,7 +771,7 @@ the resulting runtime read-only at `/mnt/integrations/lark-cli/runtime`. An
 architecture-selecting launcher in that mount makes `lark-cli` available in the
 sandbox `PATH`. Air-gapped AIO deployments can pre-stage a symlink-free runtime
 tree containing `bin/lark-cli` plus both `linux-{amd64,arm64}/lark-cli` files and
-set `DEER_FLOW_LARK_CLI_SANDBOX_RUNTIME_DIR` to that directory.
+set `UNI_DEER_LARK_CLI_SANDBOX_RUNTIME_DIR` to that directory.
 
 > **Sandbox trust boundary:** the browser never receives the Lark app secret, but
 > agent conversations run `lark-cli` inside the sandbox, so the per-user
@@ -793,22 +793,22 @@ unset. The Lark integration status (`GET /api/integrations/lark/status`) reports
 whether `lark-cli` will actually be present in the sandbox at chat time, rather
 than a green status hiding a later `command not found`.
 
-If a trusted operator manages the configured skills directory through an external mount such as MinIO, NFS, or CSI, an administrator can call `POST /api/skills/reload` after changing files. This invalidates skill prompt caches for the current Gateway process and waits up to the bounded refresh timeout so subsequent runs rescan the latest files; running tasks are unchanged. A loader-level filesystem failure returns a generic server error and preserves the last successfully loaded process cache rather than publishing an empty catalog. Uvicorn workers and Kubernetes Pods must each be targeted separately. Direct mount writes bypass the validation, SkillScan, and history applied by DeerFlow's install/edit APIs, so only operator-controlled systems should have write access.
+If a trusted operator manages the configured skills directory through an external mount such as MinIO, NFS, or CSI, an administrator can call `POST /api/skills/reload` after changing files. This invalidates skill prompt caches for the current Gateway process and waits up to the bounded refresh timeout so subsequent runs rescan the latest files; running tasks are unchanged. A loader-level filesystem failure returns a generic server error and preserves the last successfully loaded process cache rather than publishing an empty catalog. Uvicorn workers and Kubernetes Pods must each be targeted separately. Direct mount writes bypass the validation, SkillScan, and history applied by UniDeer's install/edit APIs, so only operator-controlled systems should have write access.
 
 Skill installs and agent-managed skill edits run through **SkillScan**, a native deterministic safety scanner before the LLM-based skill scanner. Phase 1 runs offline with no Semgrep/OpenGrep dependency, blocks high-confidence `CRITICAL` findings such as private keys or shell execution, and passes warning findings to the LLM scanner for contextual review. Python instance-client exfiltration checks follow a minimal same-scope evidence chain: a simple name bound to a known client constructor, optional name-to-name aliases, and an actual outbound method or context-manager use supported by that constructor. Constructor roots must be proven imports; bare canonical-looking names are not inferred as modules. Nested scopes do not inherit client handles and inherit only constructor import aliases that are never rebound in the enclosing scope. Comprehensions, walrus-bearing statements, annotations, complex binding targets, unsupported operations, and ambiguous branch flows produce no finding from this signal; skipped constructs conservatively invalidate every name they may bind so stale client state cannot create a finding. A deterministic work budget or recursion limit reached by this best-effort analysis does not discard findings already collected for the file. Set `skill_scan.enabled: false` in `config.yaml` to disable only the deterministic analyzers; safe archive extraction and the LLM scanner still run.
 
-DeerFlow also ships with **skill-reviewer**, a public skill for read-only skill quality review. It uses the built-in `review_skill_package` tool to inspect installed skills, local packages, archives, or pasted `SKILL.md` content without activating the target skill, binding its secrets, executing its scripts, or installing it. The tool returns a compact, tag-neutralized JSON payload to the model context and keeps the full raw review payload in the tool artifact for programmatic consumers. The deterministic review core reuses DeerFlow parsing and SkillScan facts, emits versioned JSON contracts under `contracts/skill_review/`, and can be run from the backend CLI:
+UniDeer also ships with **skill-reviewer**, a public skill for read-only skill quality review. It uses the built-in `review_skill_package` tool to inspect installed skills, local packages, archives, or pasted `SKILL.md` content without activating the target skill, binding its secrets, executing its scripts, or installing it. The tool returns a compact, tag-neutralized JSON payload to the model context and keeps the full raw review payload in the tool artifact for programmatic consumers. The deterministic review core reuses UniDeer parsing and SkillScan facts, emits versioned JSON contracts under `contracts/skill_review/`, and can be run from the backend CLI:
 
 ```bash
 cd backend
 uv run python -m deerflow.skills.review.cli ../skills/public/data-analysis --format text --fail-on error --fail-on-incomplete
 ```
 
-Tools follow the same philosophy. DeerFlow comes with a core toolset — web search, web fetch, rendered web capture, file operations, bash execution — and supports custom tools via MCP servers and Python functions. Swap anything. Add anything.
+Tools follow the same philosophy. UniDeer comes with a core toolset — web search, web fetch, rendered web capture, file operations, bash execution — and supports custom tools via MCP servers and Python functions. Swap anything. Add anything.
 
 Advanced deployments can enable pluggable authorization with `authorization.enabled` in `config.yaml`. A configured `AuthorizationProvider` filters denied tools before they reach the model or deferred-tool catalog, then the same provider is checked again before every business-tool execution through the existing guardrail middleware. Gateway `threads:*` and `runs:*` route permissions are derived from the same provider, while existing owner checks and admin-only management gates remain in force. A generated `tool_search` may bypass the second tool check only when it fronts the current build's already-filtered deferred catalog. The built-in RBAC provider supports per-role `tools` and `routes` allow/deny policies and validates that `default_role` names a configured role; authorization is disabled by default. See `config.example.yaml` and the [authorization RFC](docs/plans/2026-07-10-pluggable-authorization-rfc.md).
 
-Advanced deployments can also extend the agent runtime itself by declaring zero-argument `AgentMiddleware` classes under `extensions.middlewares` in `config.yaml` or `extensions_config.json`. DeerFlow loads the same configured class list into the lead-agent and subagent pipelines after their built-in runtime middlewares and loop/token guards, but before the terminal-response/safety/clarification tail, so enterprise forks can add domain guardrails, tool-call governance, or observability hooks without patching the built-in middleware builders. Missing packages, invalid classes, and broken modules fail loudly at agent creation. Treat `config.yaml` and `extensions_config.json` as trusted operator-controlled files: middleware paths are code execution, just like custom tool, model, sandbox, guardrail, MCP server, and MCP interceptor declarations. Gateway skill/MCP toggle endpoints preserve this field but do not expose an API write path for `extensions.middlewares`. Per-context parameterization and separate lead-only/subagent-only middleware lists are not supported yet.
+Advanced deployments can also extend the agent runtime itself by declaring zero-argument `AgentMiddleware` classes under `extensions.middlewares` in `config.yaml` or `extensions_config.json`. UniDeer loads the same configured class list into the lead-agent and subagent pipelines after their built-in runtime middlewares and loop/token guards, but before the terminal-response/safety/clarification tail, so enterprise forks can add domain guardrails, tool-call governance, or observability hooks without patching the built-in middleware builders. Missing packages, invalid classes, and broken modules fail loudly at agent creation. Treat `config.yaml` and `extensions_config.json` as trusted operator-controlled files: middleware paths are code execution, just like custom tool, model, sandbox, guardrail, MCP server, and MCP interceptor declarations. Gateway skill/MCP toggle endpoints preserve this field but do not expose an API write path for `extensions.middlewares`. Per-context parameterization and separate lead-only/subagent-only middleware lists are not supported yet.
 
 Gateway-generated follow-up suggestions now normalize both plain-string model output and block/list-style rich content before parsing the JSON array response, so provider-specific content wrappers do not silently drop suggestions.
 
@@ -818,7 +818,7 @@ When the agent asks for clarification, the Web UI shows the structured response 
 
 Unsent Web UI composer drafts survive page reloads and switching between conversations within the same browser tab. Drafts are isolated by user, agent, and conversation, include a selected slash skill when present, and are cleared once a send is accepted. Attachments and quoted conversation context are intentionally not persisted.
 
-The Web UI composer also supports browser-based voice dictation when the browser exposes the Web Speech API. The microphone button transcribes speech into the local draft only; DeerFlow receives only the transcribed text, while audio handling is delegated to the browser or operating system speech-recognition service according to that environment's policy. Users can review or edit the text before sending.
+The Web UI composer also supports browser-based voice dictation when the browser exposes the Web Speech API. The microphone button transcribes speech into the local draft only; UniDeer receives only the transcribed text, while audio handling is delegated to the browser or operating system speech-recognition service according to that environment's policy. Users can review or edit the text before sending.
 
 The Web UI displays a localized AI-generated-content disclaimer below the composer in both standard and custom-agent conversations, reminding users to verify important
 information.
@@ -831,7 +831,7 @@ In the Web UI, completed assistant turns can be branched into a new main convers
 
 The Web UI reports completed task time once per run. This is total wall-clock time—including model reasoning, tool calls, and waiting—not a per-step or model-only thinking duration. Reasoning content remains available through its own separate disclosure.
 
-In the Web UI, the latest completed user turn can also be edited and rerun from the message toolbar. DeerFlow restores the conversation checkpoint before that user message, submits the edited text as a new user message, and hides the superseded turn once the replay is in progress or succeeds. This is a conversation-state replay only: files, memory updates, and external tool side effects are not undone.
+In the Web UI, the latest completed user turn can also be edited and rerun from the message toolbar. UniDeer restores the conversation checkpoint before that user message, submits the edited text as a new user message, and hides the superseded turn once the replay is in progress or succeeds. This is a conversation-state replay only: files, memory updates, and external tool side effects are not undone.
 
 Web UI chat links percent-encode custom thread identifiers before placing them in route segments, so reserved URL characters such as `#` and `?` do not change which conversation is opened.
 
@@ -853,7 +853,7 @@ Web UI chat links percent-encode custom thread identifiers before placing them i
 
 #### Claude Code Integration
 
-The `claude-to-deerflow` skill lets you interact with a running DeerFlow instance directly from [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Send research tasks, check status, manage threads — all without leaving the terminal.
+The `claude-to-deerflow` skill lets you interact with a running UniDeer instance directly from [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Send research tasks, check status, manage threads — all without leaving the terminal.
 
 **Install the skill**:
 
@@ -861,12 +861,12 @@ The `claude-to-deerflow` skill lets you interact with a running DeerFlow instanc
 npx skills add https://github.com/bytedance/deer-flow --skill claude-to-deerflow
 ```
 
-Then make sure DeerFlow is running (default at `http://localhost:2026`) and use the `/claude-to-deerflow` command in Claude Code.
+Then make sure UniDeer is running (default at `http://localhost:2026`) and use the `/claude-to-deerflow` command in Claude Code.
 
 **What you can do**:
-- Send messages to DeerFlow and get streaming responses
+- Send messages to UniDeer and get streaming responses
 - Choose execution modes: flash (fast), standard, pro (planning), ultra (sub-agents)
-- Check DeerFlow health, list models/skills/agents
+- Check UniDeer health, list models/skills/agents
 - Manage threads and conversation history
 - Upload files for analysis
 
@@ -882,7 +882,7 @@ See [`skills/public/claude-to-deerflow/SKILL.md`](skills/public/claude-to-deerfl
 
 ### Session Goals
 
-Use `/goal <completion condition>` to attach one active completion condition to the current thread. The goal is thread-scoped state, not a skill activation, so it stays active across turns until DeerFlow determines it has been satisfied or you clear it.
+Use `/goal <completion condition>` to attach one active completion condition to the current thread. The goal is thread-scoped state, not a skill activation, so it stays active across turns until UniDeer determines it has been satisfied or you clear it.
 
 Supported commands:
 
@@ -892,13 +892,13 @@ Supported commands:
 /goal clear        # clear it
 ```
 
-After each Gateway-backed run, DeerFlow evaluates the visible conversation against the active goal with a non-thinking evaluator model. The evaluator must return a typed blocker (`missing_evidence`, `needs_user_input`, `run_failed`, `external_wait`, or `goal_not_met_yet`) plus visible evidence. DeerFlow only injects a hidden continuation when the latest assistant turn is durably checkpointed, the blocker is `goal_not_met_yet`, the thread did not change during evaluation, and the no-progress breaker has not fired. The safety cap defaults to 8 hidden continuations, and repeated identical non-progress evaluations stop after 2 attempts. `/goal clear` and any user-authored new input win over queued continuations. When the goal is satisfied, DeerFlow clears it automatically and publishes the updated thread state.
+After each Gateway-backed run, UniDeer evaluates the visible conversation against the active goal with a non-thinking evaluator model. The evaluator must return a typed blocker (`missing_evidence`, `needs_user_input`, `run_failed`, `external_wait`, or `goal_not_met_yet`) plus visible evidence. UniDeer only injects a hidden continuation when the latest assistant turn is durably checkpointed, the blocker is `goal_not_met_yet`, the thread did not change during evaluation, and the no-progress breaker has not fired. The safety cap defaults to 8 hidden continuations, and repeated identical non-progress evaluations stop after 2 attempts. `/goal clear` and any user-authored new input win over queued continuations. When the goal is satisfied, UniDeer clears it automatically and publishes the updated thread state.
 
 The Web UI shows the active goal above the composer. The same command is available from the TUI and supported IM channels. In the Web UI and supported IM channels, setting `/goal <completion condition>` also starts a run with the condition as the task; status and clear commands only manage goal state. Setting or clearing a goal is rejected while that thread has a run in flight, including a run owned by another Gateway worker, so the goal checkpoint cannot branch away from an active run's checkpoint lineage.
 
 ### Manual Context Compaction
 
-Use `/compact` in the Web UI composer to summarize older context for the current thread. DeerFlow keeps the full chat visible, but future model calls use the compacted summary plus recent messages. The command is ignored when there is not enough history to compact, and it is blocked while the thread has a run in flight, including when that run is owned by another Gateway worker. If a multi-worker reservation loses its lease, DeerFlow cancels the checkpoint writer before the replacing run proceeds and returns a retryable conflict after cleanup. Thread-title edits are serialized through the same state-write boundary and show a conflict without closing the rename dialog when a run is active.
+Use `/compact` in the Web UI composer to summarize older context for the current thread. UniDeer keeps the full chat visible, but future model calls use the compacted summary plus recent messages. The command is ignored when there is not enough history to compact, and it is blocked while the thread has a run in flight, including when that run is owned by another Gateway worker. If a multi-worker reservation loses its lease, UniDeer cancels the checkpoint writer before the replacing run proceeds and returns a retryable conflict after cleanup. Thread-title edits are serialized through the same state-write boundary and show a conflict without closing the rename dialog when a run is active.
 
 The chat header also shows a context-window gauge when the selected model has a positive `context_window` configured. It estimates the latest materialized checkpoint's message tokens and keeps the previous same-thread percentage visible while data refetches, independently of the cumulative token-usage setting.
 
@@ -913,7 +913,7 @@ For example, independent read-only research can run concurrently when the wall-c
 ### Sandbox & File System
 
 `E2BSandboxProvider` uses `wait` as its default overflow policy. It waits for
-`acquire_timeout`, then fails the agent turn. DeerFlow does not retry the turn
+`acquire_timeout`, then fails the agent turn. UniDeer does not retry the turn
 automatically. Clients can use the structured error to schedule a retry.
 
 Use `burst` with `burst_limit` to permit bounded extra VMs. The `wait` and
@@ -942,15 +942,15 @@ Shutdown races retry remote cleanup after a transient kill failure.
 Reset destroys tracked active and warm E2B VMs. The old provider instance
 cannot accept new acquisitions.
 
-DeerFlow doesn't just *talk* about doing things. It has its own computer.
+UniDeer doesn't just *talk* about doing things. It has its own computer.
 
 Each task gets its own execution environment with a full filesystem view — skills, workspace, uploads, outputs. The agent reads, writes, and edits files. It can view images and, when configured safely, execute shell commands.
 
 The built-in `grep` tool searches either one text file or all matching text files below a directory, so an agent can search an uploaded document directly without first broadening the request to the entire uploads directory.
 
-Image bytes loaded for a vision-model call are transient: DeerFlow removes the hidden base64 message after the model consumes it so later checkpoints do not keep duplicating that payload.
+Image bytes loaded for a vision-model call are transient: UniDeer removes the hidden base64 message after the model consumes it so later checkpoints do not keep duplicating that payload.
 
-After each run, DeerFlow records a workspace change summary for the run-owned `workspace` and `outputs` directories. The Web UI shows a compact "files changed" badge on the assistant turn; opening it reveals created, modified, and deleted files with text diffs when safe to display. Uploads are excluded because they are user inputs, not agent-generated changes. Large, binary, or sensitive-looking files are shown as metadata only.
+After each run, UniDeer records a workspace change summary for the run-owned `workspace` and `outputs` directories. The Web UI shows a compact "files changed" badge on the assistant turn; opening it reveals created, modified, and deleted files with text diffs when safe to display. Uploads are excluded because they are user inputs, not agent-generated changes. Large, binary, or sensitive-looking files are shown as metadata only.
 
 Files presented through `present_files` remain part of the thread's artifact state, and the Web UI restores the artifact panel and selected document after a page refresh. The currently selected formal artifact is refreshed once when the run finishes so edits become visible without a manual reload. Existing UTF-8 text artifacts under `/mnt/user-data/outputs` can also be edited and explicitly saved from the panel on Unix and Windows while the thread is idle; saves use content revisions to prevent overwriting agent changes.
 
@@ -982,7 +982,7 @@ This is the difference between a chatbot with tool access and an agent with an a
 
 ### Agentic Browser Control
 
-Reading a page is not the same as *using* one. Alongside the read-only `web_fetch` and `web_capture` tools, DeerFlow ships an optional agentic browser tool group that keeps a live, per-conversation browser session so the agent can actually operate a page — navigate, read the interactive elements, click, type, submit forms, and follow multi-step flows on JavaScript-heavy sites.
+Reading a page is not the same as *using* one. Alongside the read-only `web_fetch` and `web_capture` tools, UniDeer ships an optional agentic browser tool group that keeps a live, per-conversation browser session so the agent can actually operate a page — navigate, read the interactive elements, click, type, submit forms, and follow multi-step flows on JavaScript-heavy sites.
 
 Each action returns a fresh snapshot of the page's interactive elements, each addressed by a stable `[ref]` number, so the agent acts on what it just observed instead of guessing selectors. Outbound URLs are SSRF-screened by default. It is powered by Playwright and shipped as an optional extra so the core install stays lean:
 
@@ -992,7 +992,7 @@ uv sync --extra browser
 uv run playwright install chromium
 ```
 
-Then uncomment the `group: browser` tool entries in `config.yaml` (`browser_navigate`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_get_text`, `browser_back`, `browser_screenshot`, `browser_close`). `make dev` / Docker startup detects an enabled `browser_navigate` tool and preserves the `browser` extra on dependency syncs. The Gateway fails startup if browser control is configured but Playwright is missing, and `/api/features` hides the Browser UI unless the backend can actually serve it. Keep `headless: true` and `allow_private_addresses: false` for anything but local, trusted debugging. Attaching to an existing Chrome with `cdp_url` cannot enforce DeerFlow's subresource/redirect SSRF guard and therefore fails closed unless `allow_unguarded_cdp: true` explicitly acknowledges that risk; use it only with a trusted local browser. Browser sessions are process-local; keep `GATEWAY_WORKERS=1` while this tool group is enabled because ordinary uvicorn worker dispatch does not provide thread affinity.
+Then uncomment the `group: browser` tool entries in `config.yaml` (`browser_navigate`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_get_text`, `browser_back`, `browser_screenshot`, `browser_close`). `make dev` / Docker startup detects an enabled `browser_navigate` tool and preserves the `browser` extra on dependency syncs. The Gateway fails startup if browser control is configured but Playwright is missing, and `/api/features` hides the Browser UI unless the backend can actually serve it. Keep `headless: true` and `allow_private_addresses: false` for anything but local, trusted debugging. Attaching to an existing Chrome with `cdp_url` cannot enforce UniDeer's subresource/redirect SSRF guard and therefore fails closed unless `allow_unguarded_cdp: true` explicitly acknowledges that risk; use it only with a trusted local browser. Browser sessions are process-local; keep `GATEWAY_WORKERS=1` while this tool group is enabled because ordinary uvicorn worker dispatch does not provide thread affinity.
 
 The workspace Browser Live client negotiates binary JPEG WebSocket frames,
 keeps only the newest pending frame per display refresh, and revokes replaced
@@ -1003,17 +1003,17 @@ request the binary capability retain the legacy JSON/base64 frame protocol.
 
 **Isolated Sub-Agent Context**: Each sub-agent runs in its own isolated context. This means that the sub-agent will not be able to see the context of the main agent or other sub-agents. This is important to ensure that the sub-agent is able to focus on the task at hand and not be distracted by the context of the main agent or other sub-agents.
 
-**Summarization**: Within a session, DeerFlow manages context aggressively — summarizing completed sub-tasks, offloading intermediate results to the filesystem, compressing what's no longer immediately relevant. This lets it stay sharp across long, multi-step tasks without blowing the context window.
+**Summarization**: Within a session, UniDeer manages context aggressively — summarizing completed sub-tasks, offloading intermediate results to the filesystem, compressing what's no longer immediately relevant. This lets it stay sharp across long, multi-step tasks without blowing the context window.
 
-**Strict Tool-Call Recovery**: When a provider or middleware interrupts a tool-call loop, DeerFlow now strips provider-level raw tool-call metadata on forced-stop assistant messages and injects placeholder tool results for dangling calls before the next model invocation. This keeps OpenAI-compatible reasoning models that strictly validate `tool_call_id` sequences from failing with malformed history errors.
+**Strict Tool-Call Recovery**: When a provider or middleware interrupts a tool-call loop, UniDeer now strips provider-level raw tool-call metadata on forced-stop assistant messages and injects placeholder tool results for dangling calls before the next model invocation. This keeps OpenAI-compatible reasoning models that strictly validate `tool_call_id` sequences from failing with malformed history errors.
 
-**Visible Tool-Run Completion**: For interactive turns, DeerFlow retries an empty post-tool final response once, then surfaces a visible error instead of reporting a silent successful run.
+**Visible Tool-Run Completion**: For interactive turns, UniDeer retries an empty post-tool final response once, then surfaces a visible error instead of reporting a silent successful run.
 
 ### Long-Term Memory
 
-Most agents forget everything the moment a conversation ends. DeerFlow remembers.
+Most agents forget everything the moment a conversation ends. UniDeer remembers.
 
-DeerFlow also includes an optional `openviking` memory backend. It connects to
+UniDeer also includes an optional `openviking` memory backend. It connects to
 an independent OpenViking server over HTTP, submits completed turns through
 OpenViking Sessions, and recalls remote memories for prompt injection while
 leaving DeerMem as the default. The initial integration supports
@@ -1024,7 +1024,7 @@ connection limits and jittered retries. See
 [OpenViking memory backend](docs/OPENVIKING.md) for configuration and Docker
 startup.
 
-Across sessions, DeerFlow builds a persistent memory of your profile, preferences, and accumulated knowledge. The more you use it, the better it knows you — your writing style, your technical stack, your recurring workflows. Memory is stored locally and stays under your control.
+Across sessions, UniDeer builds a persistent memory of your profile, preferences, and accumulated knowledge. The more you use it, the better it knows you — your writing style, your technical stack, your recurring workflows. Memory is stored locally and stays under your control.
 
 DeerMem remains the default local backend. An opt-in `mem0` backend is also
 available for the hosted mem0 Platform API or API-compatible self-hosted
@@ -1051,13 +1051,13 @@ PYTHONPATH=. python scripts/migrate_memory_markdown.py --all-users
 PYTHONPATH=. python scripts/migrate_memory_markdown.py --storage-path /path/to/deerflow-home --user-id 'test@example.com'
 ```
 
-The v1-to-v2 storage migration is one-way for a running application: pre-PR code does not read Markdown facts. Before upgrading a persistent deployment, stop DeerFlow and take a filesystem snapshot or full backup of the configured memory storage root. The migration also durably retains each destructive JSON source beside the original path as `{manifest_filename}.v1.bak` before writing v2 data; an existing mismatched backup or a backup-write failure stops migration without modifying the v1 source. This local backup preserves pre-migration data but is not a substitute for a full snapshot and does not contain facts created after the upgrade.
+The v1-to-v2 storage migration is one-way for a running application: pre-PR code does not read Markdown facts. Before upgrading a persistent deployment, stop UniDeer and take a filesystem snapshot or full backup of the configured memory storage root. The migration also durably retains each destructive JSON source beside the original path as `{manifest_filename}.v1.bak` before writing v2 data; an existing mismatched backup or a backup-write failure stops migration without modifying the v1 source. This local backup preserves pre-migration data but is not a substitute for a full snapshot and does not contain facts created after the upgrade.
 
 `--user-id` may be repeated. `--all-users` discovers the existing directory-safe buckets below the selected storage root; standalone integrations that passed raw IDs containing characters such as `@` should use the original value with `--user-id`. A failed user's migration is reported without hiding the rest of the audit, and the command exits non-zero when any user fails. The automatic first-read path remains enabled, so running this CLI is not required for startup.
 
 ## Recommended Models
 
-DeerFlow is model-agnostic — it works with any LLM that implements the OpenAI-compatible API. That said, it performs best with models that support:
+UniDeer is model-agnostic — it works with any LLM that implements the OpenAI-compatible API. That said, it performs best with models that support:
 
 - **Long context windows** (100k+ tokens) for deep research and multi-step tasks
 - **Reasoning capabilities** for adaptive planning and complex decomposition
@@ -1066,24 +1066,24 @@ DeerFlow is model-agnostic — it works with any LLM that implements the OpenAI-
 
 ## Embedded Python Client
 
-DeerFlow can be used as an embedded Python library without running the full HTTP services. The `DeerFlowClient` provides direct in-process access to all agent and Gateway capabilities, returning the same response schemas as the HTTP Gateway API. The HTTP Gateway also exposes `DELETE /api/threads/{thread_id}` to remove DeerFlow-managed local thread data after the LangGraph thread itself has been deleted:
+UniDeer can be used as an embedded Python library without running the full HTTP services. The `UniDeerClient` provides direct in-process access to all agent and Gateway capabilities, returning the same response schemas as the HTTP Gateway API. The HTTP Gateway also exposes `DELETE /api/threads/{thread_id}` to remove UniDeer-managed local thread data after the LangGraph thread itself has been deleted:
 
 Thread IDs may be supplied by callers and do not have to be UUIDs. Explicit
 IDs must contain 1–64 ASCII letters, digits, hyphens, or underscores
-(`^[A-Za-z0-9_-]{1,64}$`). DeerFlow generates a UUID only when `thread_id` is
+(`^[A-Za-z0-9_-]{1,64}$`). UniDeer generates a UUID only when `thread_id` is
 omitted or `None`; an explicitly supplied empty string is invalid.
 Existing route-addressable threads created under older, looser rules remain
 readable and deletable, but cannot start new runs or create new filesystem or
 sandbox state. Legacy deletion skips local path cleanup when the ID is not
 safe under the canonical contract. For canonical legacy threads whose
-conversation exists only in LangGraph checkpoints, DeerFlow seeds an empty
+conversation exists only in LangGraph checkpoints, UniDeer seeds an empty
 run-event feed from the checkpoint before the first new run so
 `/messages/page` keeps both the old and new turns.
 
 ```python
-from deerflow.client import DeerFlowClient
+from deerflow.client import UniDeerClient
 
-client = DeerFlowClient()
+client = UniDeerClient()
 
 # Chat
 response = client.chat("Analyze this paper for me", thread_id="my-thread")
@@ -1113,17 +1113,17 @@ All dict-returning methods are validated against Gateway Pydantic response model
 
 ## Scheduled Tasks
 
-DeerFlow now includes a first-class scheduled-task MVP in the workspace.
+UniDeer now includes a first-class scheduled-task MVP in the workspace.
 
 Current MVP capabilities:
 
 - Manage tasks at `/workspace/scheduled-tasks`
 - Choose whether each scheduled task reuses a thread or creates a fresh thread per run
 - Support `once` and `cron` schedules
-- Run background scheduled executions as non-interactive DeerFlow runs (`ask_clarification` is not exposed there)
+- Run background scheduled executions as non-interactive UniDeer runs (`ask_clarification` is not exposed there)
 - Use `skip` overlap behavior for due cron executions that collide with an active run on the same reused thread
 - Pause, resume, trigger, inspect history, and delete tasks
-- Execute scheduled work through the normal DeerFlow run lifecycle
+- Execute scheduled work through the normal UniDeer run lifecycle
 
 Current MVP limits:
 
@@ -1136,9 +1136,9 @@ Enable background polling with `config.yaml -> scheduler.enabled`. Manual trigge
 
 ## Terminal Workbench (TUI)
 
-`deerflow` is a terminal-native workbench for people who live in the shell. It runs **embedded** over `DeerFlowClient` — no Gateway, frontend, nginx, or Docker required — while honoring the same `config.yaml`, checkpointer, skills, memory, MCP, and sandbox settings as the rest of DeerFlow.
+`deerflow` is a terminal-native workbench for people who live in the shell. It runs **embedded** over `UniDeerClient` — no Gateway, frontend, nginx, or Docker required — while honoring the same `config.yaml`, checkpointer, skills, memory, MCP, and sandbox settings as the rest of UniDeer.
 
-![DeerFlow TUI](docs/tui/tui-preview.svg)
+![UniDeer TUI](docs/tui/tui-preview.svg)
 
 ```bash
 uv pip install 'deerflow-harness[tui]'        # optional 'textual' dependency
@@ -1165,7 +1165,7 @@ See [backend/docs/TUI.md](backend/docs/TUI.md) for the full guide.
 
 ### Improper Deployment May Introduce Security Risks
 
-DeerFlow has key high-privilege capabilities including **system command execution, resource operations, and business logic invocation**, and is designed by default to be **deployed in a local trusted environment (accessible only via the 127.0.0.1 loopback interface)**. If you deploy the agent in untrusted environments — such as LAN networks, public cloud servers, or other multi-endpoint accessible environments — without strict security measures, it may introduce security risks, including:
+UniDeer has key high-privilege capabilities including **system command execution, resource operations, and business logic invocation**, and is designed by default to be **deployed in a local trusted environment (accessible only via the 127.0.0.1 loopback interface)**. If you deploy the agent in untrusted environments — such as LAN networks, public cloud servers, or other multi-endpoint accessible environments — without strict security measures, it may introduce security risks, including:
 
 - **Unauthorized illegal invocation**: Agent functionality could be discovered by unauthorized third parties or malicious internet scanners, triggering bulk unauthorized requests that execute high-risk operations such as system commands and file read/write, potentially causing serious security consequences.
 - **Compliance and legal risks**: If the agent is illegally invoked to conduct cyberattacks, data theft, or other illegal activities, it may result in legal liability and compliance risks.
@@ -1174,7 +1174,7 @@ DeerFlow has key high-privilege capabilities including **system command executio
 
 An admin can register stdio MCP servers, which run commands inside the Gateway
 container. The API restricts them to an allowlist (`npx`, `uvx` by default,
-extended via `DEER_FLOW_MCP_STDIO_COMMAND_ALLOWLIST`) and rejects arguments and
+extended via `UNI_DEER_MCP_STDIO_COMMAND_ALLOWLIST`) and rejects arguments and
 environment variables that would evaluate arbitrary code. That is defense in
 depth, not a boundary: these launchers exist to fetch and run remote packages,
 so **treat Gateway admin as equivalent to code execution on the host** and grant
@@ -1193,23 +1193,23 @@ immediately after starting any deployment that is not loopback-only.
 
 ### Security Recommendations
 
-**Note: We strongly recommend deploying DeerFlow in a local trusted network environment.** If you need cross-device or cross-network deployment, you must implement strict security measures, such as:
+**Note: We strongly recommend deploying UniDeer in a local trusted network environment.** If you need cross-device or cross-network deployment, you must implement strict security measures, such as:
 
 - **IP allowlist**: Use `iptables`, or deploy hardware firewalls / switches with Access Control Lists (ACL), to **configure IP allowlist rules** and deny access from all other IP addresses.
 - **Authentication gateway**: Configure a reverse proxy (e.g., nginx) and **enable strong pre-authentication**, blocking any unauthenticated access.
 - **Network isolation**: Where possible, place the agent and trusted devices in the **same dedicated VLAN**, isolated from other network devices.
-- **Stay updated**: Continue to follow DeerFlow's security feature updates.
+- **Stay updated**: Continue to follow UniDeer's security feature updates.
 
 ## Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, workflow, and guidelines.
 
 Backend `make test` is offline by default and excludes live external-API
-coverage. Maintainers can explicitly run the real `DeerFlowClient` integration
+coverage. Maintainers can explicitly run the real `UniDeerClient` integration
 suite with `cd backend && make test-live` after providing a valid root
 `config.yaml` and API credentials; this may incur API costs and create local
 sandboxes, artifacts, or files. Direct pytest runs additionally require
-`DEER_FLOW_RUN_LIVE_TESTS=1`.
+`UNI_DEER_RUN_LIVE_TESTS=1`.
 
 Regression coverage includes Docker sandbox mode detection and provisioner kubeconfig-path handling tests in `backend/tests/`.
 Backend blocking-IO diagnostics are available from the repository root with
@@ -1232,23 +1232,23 @@ This project is open source and available under the [MIT License](./LICENSE).
 
 ## Acknowledgments
 
-DeerFlow is built upon the incredible work of the open-source community. We are deeply grateful to all the projects and contributors whose efforts have made DeerFlow possible. Truly, we stand on the shoulders of giants.
+UniDeer is built upon the incredible work of the open-source community. We are deeply grateful to all the projects and contributors whose efforts have made UniDeer possible. Truly, we stand on the shoulders of giants.
 
 We would like to extend our sincere appreciation to the following projects for their invaluable contributions:
 
 - **[LangChain](https://github.com/langchain-ai/langchain)**: Their exceptional framework powers our LLM interactions and chains, enabling seamless integration and functionality.
-- **[LangGraph](https://github.com/langchain-ai/langgraph)**: Their innovative approach to multi-agent orchestration has been instrumental in enabling DeerFlow's sophisticated workflows.
+- **[LangGraph](https://github.com/langchain-ai/langgraph)**: Their innovative approach to multi-agent orchestration has been instrumental in enabling UniDeer's sophisticated workflows.
 
 These projects exemplify the transformative power of open-source collaboration, and we are proud to build upon their foundations.
 
 ### Key Contributors
 
-A heartfelt thank you goes out to the core authors of `DeerFlow`, whose vision, passion, and dedication have brought this project to life:
+A heartfelt thank you goes out to the core authors of `UniDeer`, whose vision, passion, and dedication have brought this project to life:
 
 - **[Daniel Walnut](https://github.com/hetaoBackend/)**
 - **[Henry Li](https://github.com/magiccube/)**
 
-Your unwavering commitment and expertise have been the driving force behind DeerFlow's success. We are honored to have you at the helm of this journey.
+Your unwavering commitment and expertise have been the driving force behind UniDeer's success. We are honored to have you at the helm of this journey.
 
 ## Star History
 

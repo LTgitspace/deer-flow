@@ -22,7 +22,7 @@ UniDeer Harness 不仅仅是一个独立应用程序——它是一个可以导�
 from unideer.client import UniDeerClient
 from unideer.config import load_config
 
-# 加载配置（读取 config.yaml 或 DEER_FLOW_CONFIG_PATH）
+# 加载配置（读取 config.yaml 或 UNI_DEER_CONFIG_PATH）
 load_config()
 
 client = UniDeerClient()
@@ -144,7 +144,7 @@ async def chat(thread_id: str, body: dict):
 
 ```python
 import os
-os.environ["DEER_FLOW_CONFIG_PATH"] = "/path/to/my-unideer-config.yaml"
+os.environ["UNI_DEER_CONFIG_PATH"] = "/path/to/my-unideer-config.yaml"
 
 from unideer.config import load_config
 load_config()

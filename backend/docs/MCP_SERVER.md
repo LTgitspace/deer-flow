@@ -1,6 +1,6 @@
 # MCP (Model Context Protocol) Configuration
 
-DeerFlow supports configurable MCP servers and skills to extend its capabilities, which are loaded from a dedicated `extensions_config.json` file in the project root directory.
+UniDeer supports configurable MCP servers and skills to extend its capabilities, which are loaded from a dedicated `extensions_config.json` file in the project root directory.
 
 ## Setup
 
@@ -72,7 +72,7 @@ top-level `config.yaml -> tool_search.auto_promote_top_k` setting.
 
 ## Tool Name Prefixes
 
-DeerFlow prefixes discovered MCP tool names with `<server_name>_` by default.
+UniDeer prefixes discovered MCP tool names with `<server_name>_` by default.
 This avoids collisions when two enabled servers expose tools with the same
 name. A server that already namespaces its own tools can opt out:
 
@@ -93,7 +93,7 @@ With this setting, a server tool named `semantic_scholar_search_papers` keeps
 that name instead of becoming
 `semantic-scholar_semantic_scholar_search_papers`. The default is `true` for
 backward compatibility. Disable it only when every resulting tool name remains
-unique across the enabled servers. Stdio tools continue to use DeerFlow's
+unique across the enabled servers. Stdio tools continue to use UniDeer's
 persistent per-thread session pool regardless of this setting.
 
 ## Per-Tool Timeout (Stdio MCP Servers)
@@ -117,24 +117,24 @@ For `stdio` MCP servers, set `tool_call_timeout` to limit each individual MCP to
 }
 ```
 
-`tool_call_timeout` only applies to `stdio` servers. `http` and `sse` servers use transport-level timeouts, and DeerFlow logs a warning if `tool_call_timeout` is configured for those transports.
+`tool_call_timeout` only applies to `stdio` servers. `http` and `sse` servers use transport-level timeouts, and UniDeer logs a warning if `tool_call_timeout` is configured for those transports.
 
 ## Filesystem MCP Servers
 
-DeerFlow already provides built-in file tools for thread-scoped workspace access.
-Do not add an MCP filesystem server for the same DeerFlow workspace. The
+UniDeer already provides built-in file tools for thread-scoped workspace access.
+Do not add an MCP filesystem server for the same UniDeer workspace. The
 overlapping file tools use different path semantics, which can make LLM tool
 selection and file access behavior unstable.
 
-DeerFlow does not currently adapt the MCP Roots mode for filesystem servers. In
-particular, it does not publish per-thread MCP roots or map DeerFlow sandbox
+UniDeer does not currently adapt the MCP Roots mode for filesystem servers. In
+particular, it does not publish per-thread MCP roots or map UniDeer sandbox
 paths such as `/mnt/user-data/...` to paths accepted by
-`@modelcontextprotocol/server-filesystem`. Use DeerFlow's built-in file tools
-for DeerFlow workspace files.
+`@modelcontextprotocol/server-filesystem`. Use UniDeer's built-in file tools
+for UniDeer workspace files.
 
 ## OAuth Support (HTTP/SSE MCP Servers)
 
-For `http` and `sse` MCP servers, DeerFlow supports OAuth token acquisition and automatic token refresh.
+For `http` and `sse` MCP servers, UniDeer supports OAuth token acquisition and automatic token refresh.
 
 - Supported grants: `client_credentials`, `refresh_token`
 - Configure per-server `oauth` block in `extensions_config.json`
@@ -235,13 +235,13 @@ Deployments that previously sent `metadata.auth_token` or `config.metadata.auth_
    logs, snapshots, exports, and backups.
 
 Current history APIs hide legacy `metadata.auth_token` and `config.metadata.auth_token` values, but hiding a response does not erase
-material already retained by those systems. Restarting or upgrading DeerFlow does
+material already retained by those systems. Restarting or upgrading UniDeer does
 not rotate credentials or perform historical cleanup; operators must complete
 both actions explicitly.
 
 ## How It Works
 
-MCP servers expose tools that are automatically discovered and integrated into DeerFlow’s agent system at runtime. Once enabled, these tools become available to agents without additional code changes.
+MCP servers expose tools that are automatically discovered and integrated into UniDeer’s agent system at runtime. Once enabled, these tools become available to agents without additional code changes.
 
 ## Example Capabilities
 

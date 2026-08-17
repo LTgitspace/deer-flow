@@ -1,6 +1,6 @@
 # 更新日志
 
-本文件记录 DeerFlow 的所有重要变更。
+本文件记录 UniDeer 的所有重要变更。
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本规范](https://semver.org/lang/zh-CN/)。
@@ -14,7 +14,7 @@
 ### ⚠ 不兼容变更（Breaking Changes）
 
 - **沙箱：** E2B 现在将 `sandbox.replicas` 作为进程级容量上限来强制执行。默认的
-  `wait` 策略会等待 `acquire_timeout`，随后令当前智能体回合失败。DeerFlow 不会自
+  `wait` 策略会等待 `acquire_timeout`，随后令当前智能体回合失败。UniDeer 不会自
   动重试该回合。可使用 `burst` 配合 `burst_limit` 允许有限地超出额度多开 VM。`reject`
   策略可在返回容量错误前先回收一个预热 VM。([#4391])
 - **技能：** 包含 `SKILL.md` 的目录现在是一个运行时包边界。该包内嵌套的 `SKILL.md`
@@ -144,7 +144,7 @@
 #### 可观测性与工具
 - **可观测性：** trace-id 关联与增强日志，以及通过 Monocle 实现的智能体可观测性
   。([#3902]、[#4024])
-- **工具：** 类 Hermes 的终端工作台（`deerflow` CLI，基于 `DeerFlowClient`），以
+- **工具：** 类 Hermes 的终端工作台（`deerflow` CLI，基于 `UniDeerClient`），以
   及脱敏的社区支持包（support-bundle）生成器。([#3760]、[#3886])
 - **安装向导：** 安装向导现在会询问 OpenAI 兼容的 gateway 模型是否支持 thinking
   ，并新增火山引擎 Coding Plan 快速安装路径。([#3428]、[#4141])
@@ -232,7 +232,7 @@
 - **上传：** 在写入前先占位转换后的 Markdown 配套文件名，使同词干（stem）的两个
   可转换上传（或一个可转换上传加一个同词干 `.md` 上传）不再在同一请求内静默互相
   覆盖。`uploads.auto_convert_documents` 开启时，配套 `.md` 会得到唯一名称（如 `a_1.md`
-  ）；`POST /threads/{id}/uploads` 与 `DeerFlowClient.upload_files` 都会在 `markdown_file`
+  ）；`POST /threads/{id}/uploads` 与 `UniDeerClient.upload_files` 都会在 `markdown_file`
   中返回实际文件名。([#4288])
 - **配置：** 将为 null 的对象型配置节规整为默认值；在 store 与 sync checkpointer
   中遵循统一数据库配置；并让旧版 DB 回填在已存在的表上补建缺失的 `Index` 对象。([#3573]
@@ -385,7 +385,7 @@
 
 ## [2.0.0] — 2026-06-15
 
-DeerFlow 2.0 是围绕"超级智能体"框架的彻底重写，核心包含子智能体、持久化记忆、
+UniDeer 2.0 是围绕"超级智能体"框架的彻底重写，核心包含子智能体、持久化记忆、
 沙箱执行以及可扩展的技能（Skill）/工具系统。本版本与 1.x 系列**没有共享代码**，
 原有的 Deep Research 框架仍在
 [`main-1.x` 分支](https://github.com/bytedance/deer-flow/tree/main-1.x)上维护。

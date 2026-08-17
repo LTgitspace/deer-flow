@@ -1,6 +1,6 @@
-# DeerFlow Memory Profile
+# UniDeer Memory Profile
 
-> Why DeerFlow's RAM consumption is high, where it goes, and what you can do about it.
+> Why UniDeer's RAM consumption is high, where it goes, and what you can do about it.
 
 ---
 
@@ -36,7 +36,7 @@
 
 ## The Stack Baseline
 
-DeerFlow is not a single process. `make dev` or `docker-compose-dev.yaml` starts **4-5 services**:
+UniDeer is not a single process. `make dev` or `docker-compose-dev.yaml` starts **4-5 services**:
 
 | Service | Tech | Idle RAM | Under Load | Notes |
 |---|---|---|---|---|
@@ -47,13 +47,13 @@ DeerFlow is not a single process. `make dev` or `docker-compose-dev.yaml` starts
 | **Nginx** | Nginx Alpine | ~5 MB | ~15 MB | Reverse proxy |
 | **Provisioner** | Python/FastAPI | ~50 MB | ~100 MB | Optional; K8s sandbox only |
 
-**Biggest single culprit**: The Next.js 16 dev server with Turbopack + HMR. This is a Next.js characteristic, not a DeerFlow bug. Switching to `make start` (production mode) alone saves **~1 GB**.
+**Biggest single culprit**: The Next.js 16 dev server with Turbopack + HMR. This is a Next.js characteristic, not a UniDeer bug. Switching to `make start` (production mode) alone saves **~1 GB**.
 
 ---
 
 ## Python Message Object Inflation
 
-Every conversation message in DeerFlow is a LangChain Pydantic v2 model object. A single `AIMessage` after a tool-call response carries:
+Every conversation message in UniDeer is a LangChain Pydantic v2 model object. A single `AIMessage` after a tool-call response carries:
 
 ```
 AIMessage(
@@ -122,7 +122,7 @@ With 30 message objects, each carrying `additional_kwargs`, `response_metadata`,
 
 ## The Copy Problem (Amplifier)
 
-DeerFlow's 39-middleware chain processes messages through multiple stages. Each middleware that modifies a message calls `model_copy()`, which creates a new Pydantic object with a new set of nested dicts:
+UniDeer's 39-middleware chain processes messages through multiple stages. Each middleware that modifies a message calls `model_copy()`, which creates a new Pydantic object with a new set of nested dicts:
 
 ```python
 # SafetyFinishReasonMiddleware
@@ -286,7 +286,7 @@ The Redis stream bridge (in Docker dev) adds cross-worker broadcast overhead: ev
 
 ## Token Counting Overhead
 
-DeerFlow uses `tiktoken` for token counting. The tokenizer model (e.g., `cl100k_base` for GPT-4) is loaded into memory once per process:
+UniDeer uses `tiktoken` for token counting. The tokenizer model (e.g., `cl100k_base` for GPT-4) is loaded into memory once per process:
 
 | Tokenizer | RAM |
 |---|---|
@@ -349,7 +349,7 @@ The `TokenUsageMiddleware` also accumulates usage metadata on every message — 
 
 The same agent workload in Spring AI Alibaba uses less RAM for fundamental reasons:
 
-| Factor | Python (DeerFlow) | JVM (Spring AI Alibaba) |
+| Factor | Python (UniDeer) | JVM (Spring AI Alibaba) |
 |---|---|---|
 | **Object model** | Pydantic v2 with nested dicts (~72 bytes per dict overhead) | Plain Java POJOs with field-level allocation |
 | **Message storage** | `List[BaseMessage]` in memory, all at once | `Flux<Message>` reactive stream, can be lazily loaded |

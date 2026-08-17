@@ -103,7 +103,7 @@ PR [#4127](https://github.com/bytedance/deer-flow/pull/4127) 于 2026-07-15
 - Layer 1 和 Layer 2 必须使用同一个 provider 和同一个 Principal。
 - Layer 1 必须在 `assemble_deferred_tools` 之前过滤；被移除的工具不能进入
   `DeferredToolCatalog`，也不能被 `tool_search` 再次提升。
-- Layer 1 必须覆盖 lead agent、native subagent 和 `DeerFlowClient` 三条装配路径。
+- Layer 1 必须覆盖 lead agent、native subagent 和 `UniDeerClient` 三条装配路径。
 - Layer 2 复用 `GuardrailMiddleware`；不能在 adapter 中重复实现异常处理、审计、
   deny 消息或 fail-closed 逻辑。
 - ownership 检查和现有 `require_admin_user()` 管理端点保护必须保留。细粒度授权只能
@@ -222,7 +222,7 @@ Phase 1 最低验证要求：
   回归测试）。
 - **兼容性：** 无运行时行为变化（`authorization.enabled: false`）。不修改
   `config.example.yaml`，不 bump `config_version`。
-- **延期：** Layer 1 工具过滤、Layer 2 自动接线、DeerFlowClient、RBAC 配置示例
+- **延期：** Layer 1 工具过滤、Layer 2 自动接线、UniDeerClient、RBAC 配置示例
   移至 Phase 1B。
 - **Phase 1B 注意：** 已知角色缺少某个 resource policy 时语义是“不受限”，不是
   fail-closed。配置示例必须明确提醒，并枚举部署方希望限制的每种 resource。
@@ -278,7 +278,7 @@ Phase 1 最低验证要求：
   guardrail 仍会检查它，没有 deferred setup 的普通同名工具也不获得豁免。
 - 内置 RBAC provider 在解析时校验 `authorization.default_role` 属于已配置角色，配置
   错误直接阻止 agent 构建，不再表现为难以诊断的空工具集合。
-- `DeerFlowClient.stream()` 的调用方属于可信进程内边界，可通过关键字参数传入与
+- `UniDeerClient.stream()` 的调用方属于可信进程内边界，可通过关键字参数传入与
   Gateway runtime context 相同的授权身份字段；这些字段同时进入真实执行 context。
   agent cache key 使用完整 Principal（包括 user/channel/oauth/internal/attributes），
   并深拷贝嵌套 attributes，防止调用方原地修改身份数据后复用旧工具集合。
@@ -328,7 +328,7 @@ Phase 1 最低验证要求：
   custom provider 在 `filter_resources`（action-agnostic）里可见但 `use` 被拒的模型被
   静默选中。
 - **决策（embedded/library 路径）：** `_authorize_model_name` 同样接入
-  `DeerFlowClient._ensure_agent`（client.py），与 Gateway runtime 路径 `_make_lead_agent`
+  `UniDeerClient._ensure_agent`（client.py），与 Gateway runtime 路径 `_make_lead_agent`
   对称。否则 library/embedded 消费者启用 `authorization` + role-scoped model policy 时，
   tools 会被过滤但模型仍可绕过 `model:use`。调用前先把 `None` 默认解析为第一个配置模型
   （与 `create_chat_model(name=None)` 的语义一致），确保隐式默认模型也经过授权。
@@ -342,7 +342,7 @@ Phase 1 最低验证要求：
 - **证据：** `tests/test_models_authorization.py`（24 tests）覆盖 disabled/anonymous/
   RBAC allow/deny/wildcard/fail-closed/fail-open 路由场景，disabled/allowed/
   graceful-fallback/all-denied-fail-closed/all-denied-fail-open/custom-provider-list-vs-use/
-  no-usable-fallback 运行时场景，以及 `DeerFlowClient._ensure_agent` 的 model:use 强制 +
+  no-usable-fallback 运行时场景，以及 `UniDeerClient._ensure_agent` 的 model:use 强制 +
   None 默认解析 + disabled no-op 集成场景；
   `test_authorization_*.py` + `test_lead_agent_model_resolution.py` +
   `test_auth_middleware.py` 共 318 tests 全部通过。
