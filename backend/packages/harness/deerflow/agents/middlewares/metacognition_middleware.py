@@ -143,8 +143,6 @@ class MetacognitionMiddleware(AgentMiddleware[AgentState]):
         content = str(getattr(message, "content", "") or "").lower()
         return any(marker in content for marker in _EXPLICIT_REASONING_MARKERS)
 
-    # ── Nudge builders ──
-
     def _nudge(self, text: str) -> HumanMessage:
         return HumanMessage(content=text, additional_kwargs={"hide_from_ui": True})
 
@@ -154,9 +152,13 @@ class MetacognitionMiddleware(AgentMiddleware[AgentState]):
             return []
         nudges: list[HumanMessage] = []
 
-        # Gate B — post-answer correction. Only while an un-reasoned answer to
-        # a complex prompt is still the latest message; a newer user message
-        # ends the obligation so this can never nag across turns.
+        # Gate B — post-answer correction (advisory). Only while an un-reasoned
+        # answer to a complex prompt is still the latest message; a newer user
+        # message ends the obligation so this can never nag across turns.
+        #
+        # Advisory, not a forced second generation: the nudge lands on the next
+        # natural model call (the user's next turn) instead of triggering an
+        # immediate re-answer, avoiding a 2nd full LLM roundtrip per violation.
         if self._last_message_is_ai(messages):
             last_ai = messages[-1]
             if not self._has_thinking_evidence(last_ai):

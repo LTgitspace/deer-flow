@@ -68,14 +68,12 @@ def test_non_design_thread_passes_through() -> None:
     assert list(result.messages) == messages
 
 
-def test_design_shaped_without_active_skill_gets_activation_nudge() -> None:
+def test_design_shaped_without_active_skill_passes_through() -> None:
+    """Casual queries with design-shaped words get NO inactive-skill nudge."""
     messages = [_design_prompt()]
     result = _run(messages, state={})
-    nudges = _injected_nudges(result)
-    assert len(nudges) == 1
-    content = str(nudges[0].content)
-    assert "system-design skill is not active" in content
-    assert "Ask ONE question" not in content
+    assert _injected_nudges(result) == []
+    assert len(result.messages) == len(messages)
 
 
 def test_active_via_skill_context_fires_contract() -> None:
@@ -98,15 +96,14 @@ def test_active_via_slash_reminder_fires_contract() -> None:
     assert "skill is not active" not in content
 
 
-def test_searched_while_inactive_escalates() -> None:
+def test_searched_while_inactive_passes_through() -> None:
+    """Searching without the skill active is no longer escalated — fast exit."""
     messages = [
         _design_prompt(),
         ToolMessage(content="some search results", name="web_search", tool_call_id="call-1"),
     ]
     result = _run(messages, state={})
-    nudges = _injected_nudges(result)
-    assert len(nudges) == 1
-    assert "STOP designing" in str(nudges[0].content)
+    assert _injected_nudges(result) == []
 
 
 def _intake_prompt(greenfield: bool) -> HumanMessage:

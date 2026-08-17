@@ -227,14 +227,6 @@ class StartupSketchMiddleware(AgentMiddleware[AgentState]):
 
         return []
 
-    def _build_inactive_skill_nudge(self) -> HumanMessage:
-        return self._nudge(
-            "[SKETCH REMINDER] This conversation is startup-sketch shaped, but the "
-            "startup-sketch skill is not active. Activate it first: load it via read_file "
-            "(skills/public/startup-sketch/SKILL.md) or ask the user to run /startup-sketch. "
-            "Sketch contract gates are suspended until the skill is active."
-        )
-
     def _patch_messages(self, messages: list, nudges: list[HumanMessage]) -> list:
         patched = list(messages)
         insert_at = 0
@@ -266,9 +258,10 @@ class StartupSketchMiddleware(AgentMiddleware[AgentState]):
 
         state = getattr(request, "state", None) or {}
         if not skill_is_active(messages, state, _SKILL_NAME):
-            nudge = self._build_inactive_skill_nudge()
-            self._log_nudges([nudge])
-            request = request.override(messages=self._patch_messages(messages, [nudge]))
+            # Inactive-skill fast exit: do NOT inject an activation nudge on
+            # casual queries that merely contain sketch-shaped words. The
+            # contract gates only fire once the skill is explicitly active
+            # (slash-activated or loaded into skill_context).
             return handler(request)
 
         nudges = self._build_nudges(messages)
@@ -289,9 +282,7 @@ class StartupSketchMiddleware(AgentMiddleware[AgentState]):
 
         state = getattr(request, "state", None) or {}
         if not skill_is_active(messages, state, _SKILL_NAME):
-            nudge = self._build_inactive_skill_nudge()
-            self._log_nudges([nudge])
-            request = request.override(messages=self._patch_messages(messages, [nudge]))
+            # Inactive-skill fast exit: see wrap_model_call.
             return await handler(request)
 
         nudges = self._build_nudges(messages)

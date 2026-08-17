@@ -1,4 +1,4 @@
-# 🦌 UniDeer - 2.0
+# UniDeer - 2.0
 
 [English](./README.md) | [中文](./README_zh.md) | [日本語](./README_ja.md) | [Français](./README_fr.md) | Русский
 
@@ -6,685 +6,605 @@
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](./Makefile)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-<a href="https://trendshift.io/repositories/14699" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14699" alt="bytedance%2Fdeer-flow | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+UniDeer (**D**eep **E**xploration and **E**fficient **R**esearch **Flow**) — это open-source **super agent harness**, построенный на **LangGraph**. Он оркестрирует **субагентов**, **долговременную память** и **изолированное выполнение** (sandbox) для решения сложных многошаговых задач — на основе **расширяемых скиллов** (skills).
 
-> 28 февраля 2026 года UniDeer занял 🏆 #1 в GitHub Trending после релиза версии 2. Спасибо огромное нашему сообществу — всё благодаря вам! 💪🔥
+UniDeer — это **community-форк [DeerFlow](https://github.com/bytedance/deer-flow), созданного компанией [ByteDance](https://www.bytedance.com/)** (v2.0+), который превратился в самостоятельный проект с собственным инженерным направлением. Он разделяет наследие deep-research и большую часть исходной архитектуры; кодовая база, конвейер middleware и поведение рантайма были переработаны. См. [Чем UniDeer отличается от DeerFlow](#чем-unideer-отличается-от-deerflow) и [Благодарности](#благодарности).
 
-UniDeer (**D**eep **E**xploration and **E**fficient **R**esearch **Flow**) — open-source **Super Agent Harness**, который управляет **Sub-Agents**, **Memory** и **Sandbox** для решения почти любой задачи. Всё на основе расширяемых **Skills**.
-
-https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
-
-> [!NOTE]
-> **UniDeer 2.0 — проект переписан с нуля.** Общего кода с v1 нет. Если нужен оригинальный Deep Research фреймворк — он живёт в ветке [`1.x`](https://github.com/bytedance/deer-flow/tree/main-1.x), туда тоже принимают контрибьюты. Активная разработка идёт в 2.0.
-
-## Официальный сайт
-
-Больше информации и живые демо на [**официальном сайте**](https://deerflow.tech).
-
-## Coding Plan от ByteDance Volcengine
-
-- Рекомендуем Doubao-Seed-2.0-Code, DeepSeek v3.2 и Kimi 2.5 для запуска UniDeer
-- [Подробнее](https://www.byteplus.com/en/activity/codingplan?utm_campaign=uni_deer&utm_content=uni_deer&utm_medium=devrel&utm_source=OWO&utm_term=uni_deer)
-- [Для разработчиков из материкового Китая](https://www.volcengine.com/activity/codingplan?utm_campaign=uni_deer&utm_content=uni_deer&utm_medium=devrel&utm_source=OWO&utm_term=uni_deer)
-
-## InfoQuest
-
-UniDeer интегрирован с инструментарием для умного поиска и краулинга от BytePlus — [InfoQuest (есть бесплатный онлайн-доступ)](https://docs.byteplus.com/en/docs/InfoQuest/What_is_Info_Quest)
-
-<a href="https://docs.byteplus.com/en/docs/InfoQuest/What_is_Info_Quest" target="_blank">
-  <img
-    src="https://sf16-sg.tiktokcdn.com/obj/eden-sg/hubseh7bsbps/20251208-160108.png"
-    alt="InfoQuest_banner"
-  />
-</a>
+> **Примечание о происхождении:** DeerFlow 2.0 был полностью переписан с нуля и не делил код с v1. UniDeer строится на этом фундаменте 2.0 и продолжает развиваться. Оригинальный deep-research фреймворк v1 по-прежнему поддерживается в ветке [1.x](https://github.com/bytedance/deer-flow/tree/main-1.x) в апстриме.
 
 ---
 
 ## Содержание
 
-- [🦌 UniDeer - 2.0](#-deerflow---20)
-  - [Официальный сайт](#официальный-сайт)
-  - [Coding Plan от ByteDance Volcengine](#coding-plan-от-bytedance-volcengine)
-  - [InfoQuest](#infoquest)
-  - [Содержание](#содержание)
-  - [Установка одной фразой для coding agent](#установка-одной-фразой-для-coding-agent)
-  - [Быстрый старт](#быстрый-старт)
-    - [Конфигурация](#конфигурация)
-    - [Запуск](#запуск)
-      - [Вариант 1: Docker (рекомендуется)](#вариант-1-docker-рекомендуется)
-      - [Вариант 2: Локальная разработка](#вариант-2-локальная-разработка)
-    - [Дополнительно](#дополнительно)
-      - [Режим Sandbox](#режим-sandbox)
-      - [MCP-сервер](#mcp-сервер)
-      - [Мессенджеры](#мессенджеры)
-      - [Трассировка LangSmith](#трассировка-langsmith)
-      - [Трассировка Langfuse](#трассировка-langfuse)
-      - [Использование обоих провайдеров](#использование-обоих-провайдеров)
-  - [От Deep Research к Super Agent Harness](#от-deep-research-к-super-agent-harness)
-  - [Core Features](#core-features)
-    - [Skills & Tools](#skills--tools)
-      - [Интеграция с Claude Code](#интеграция-с-claude-code)
-    - [Цели сессии (Session Goals)](#цели-сессии-session-goals)
-    - [Sub-Agents](#sub-agents)
-    - [Sandbox & файловая система](#sandbox--файловая-система)
-    - [Context Engineering](#context-engineering)
-    - [Long-Term Memory](#long-term-memory)
-  - [Рекомендуемые модели](#рекомендуемые-модели)
-  - [Встроенный Python-клиент](#встроенный-python-клиент)
-  - [Запланированные задачи (Scheduled Tasks)](#запланированные-задачи-scheduled-tasks)
-  - [Терминальная панель (TUI)](#терминальная-панель-tui)
-  - [Документация](#документация)
-  - [⚠️ Безопасность](#️-безопасность)
-  - [Участие в разработке](#участие-в-разработке)
-  - [Лицензия](#лицензия)
-  - [Благодарности](#благодарности)
-    - [Ключевые контрибьюторы](#ключевые-контрибьюторы)
-  - [История звёзд](#история-звёзд)
-
-## Установка одной фразой для coding agent
-
-Если вы используете Claude Code, Codex, Cursor, Windsurf или другой coding agent, просто отправьте ему эту фразу:
-
-```text
-Если UniDeer еще не клонирован, сначала клонируй его, а затем подготовь локальное окружение разработки по инструкции https://raw.githubusercontent.com/bytedance/deer-flow/main/Install.md
-```
-
-Этот prompt предназначен для coding agent. Он просит агента при необходимости сначала клонировать репозиторий, предпочесть Docker, если он доступен, и в конце вернуть точную команду запуска и список недостающих настроек.
-
-## Быстрый старт
-
-### Конфигурация
-
-1. **Склонировать репозиторий UniDeer**
-
-   ```bash
-   git clone https://github.com/bytedance/deer-flow.git
-   cd deer-flow
-   ```
-
-2. **Запустить мастер настройки (рекомендуется)**
-
-   Из корня проекта (`deer-flow/`) запустите:
-
-   ```bash
-   make setup
-   ```
-
-   Запустится интерактивный мастер, который поможет выбрать LLM-провайдера, опциональный веб-поиск и настройки выполнения/безопасности (режим sandbox, доступ к bash, инструменты записи файлов). Он сгенерирует минимальный `config.yaml` и запишет ключи в `.env`. Это занимает около 2 минут.
-
-   В любой момент запускайте `make doctor`, чтобы проверить конфигурацию и получить конкретные подсказки по исправлению.
-   Если вы открываете GitHub issue о проблеме с локальной установкой или работой системы, выполните
-   `make support-bundle`. Команда выводит дальнейшие шаги для автора отчёта, создаёт файл
-   `*-issue-summary.md`, который нужно вставить в issue, файл `*-issue-draft.md`
-   для оформления issue с помощью AI и, опционально, zip-архив с диагностикой в
-   `.deer-flow/support-bundles/`. Если issue оформляет AI-ассистент, он должен начать
-   с черновика и заменить каждый плейсхолдер REQUIRED, а не выдумывать недостающие
-   факты. Прикладывайте zip-архив только если его запросит мейнтейнер или если одной
-   сводки недостаточно. Мейнтейнеры и AI-инструменты триажа могут начинать с
-   `triage.json`; архив содержит только очищенную от чувствительных данных диагностику
-   и манифесты файлов и не включает `.env`, исходные сообщения диалогов или содержимое
-   пользовательских файлов.
-
-   > **Продвинутая / ручная настройка**: если вы предпочитаете редактировать `config.yaml` напрямую, выполните вместо этого `make config`, чтобы скопировать полный шаблон. Полный справочник — `config.example.yaml`, включая CLI-провайдеров (Codex CLI, Claude Code OAuth), OpenRouter, Responses API и многое другое.
-
-   <details>
-   <summary>Примеры ручной настройки моделей</summary>
-
-   ```yaml
-   models:
-     - name: gpt-4o
-       display_name: GPT-4o
-       use: langchain_openai:ChatOpenAI
-       model: gpt-4o
-       api_key: $OPENAI_API_KEY
-
-     - name: openrouter-gemini-2.5-flash
-       display_name: Gemini 2.5 Flash (OpenRouter)
-       use: langchain_openai:ChatOpenAI
-       model: google/gemini-2.5-flash-preview
-       api_key: $OPENROUTER_API_KEY
-       base_url: https://openrouter.ai/api/v1
-
-     - name: gpt-5-responses
-       display_name: GPT-5 (Responses API)
-       use: langchain_openai:ChatOpenAI
-       model: gpt-5
-       api_key: $OPENAI_API_KEY
-       use_responses_api: true
-       output_version: responses/v1
-
-     - name: qwen3-32b-vllm
-       display_name: Qwen3 32B (vLLM)
-       use: deerflow.models.vllm_provider:VllmChatModel
-       model: Qwen/Qwen3-32B
-       api_key: $VLLM_API_KEY
-       base_url: http://localhost:8000/v1
-       supports_thinking: true
-       when_thinking_enabled:
-         extra_body:
-           chat_template_kwargs:
-             enable_thinking: true
-   ```
-
-   OpenRouter и аналогичные OpenAI-совместимые шлюзы настраиваются через `langchain_openai:ChatOpenAI` с параметром `base_url`. Если вы предпочитаете имя переменной окружения, специфичное для провайдера, укажите его в `api_key` явно (например, `api_key: $OPENROUTER_API_KEY`).
-
-   Чтобы направить модели OpenAI через `/v1/responses`, продолжайте использовать `langchain_openai:ChatOpenAI` и задайте `use_responses_api: true` вместе с `output_version: responses/v1`.
-
-   Для vLLM 0.19.0 используйте `deerflow.models.vllm_provider:VllmChatModel`. Для reasoning-моделей в стиле Qwen UniDeer переключает режим рассуждений через `extra_body.chat_template_kwargs.enable_thinking` и сохраняет нестандартное поле `reasoning` vLLM в многоходовых диалогах с вызовами инструментов. Устаревшие конфигурации `thinking` автоматически нормализуются для обратной совместимости. Reasoning-моделям также может потребоваться запуск сервера с флагом `--reasoning-parser ...`. Если ваш локальный vLLM принимает любой непустой API-ключ, всё равно задайте `VLLM_API_KEY` со значением-заглушкой.
-
-   Примеры CLI-провайдеров:
-
-   ```yaml
-   models:
-     - name: gpt-5.4
-       display_name: GPT-5.4 (Codex CLI)
-       use: deerflow.models.openai_codex_provider:CodexChatModel
-       model: gpt-5.4
-       supports_thinking: true
-       supports_reasoning_effort: true
-
-     - name: claude-sonnet-4.6
-       display_name: Claude Sonnet 4.6 (Claude Code OAuth)
-       use: deerflow.models.claude_provider:ClaudeChatModel
-       model: claude-sonnet-4-6
-       max_tokens: 4096
-       supports_thinking: true
-   ```
-
-   - Codex CLI читает `~/.codex/auth.json`
-   - Claude Code принимает `CLAUDE_CODE_OAUTH_TOKEN`, `ANTHROPIC_AUTH_TOKEN`, `CLAUDE_CODE_CREDENTIALS_PATH` или `~/.claude/.credentials.json`
-   - Записи ACP-агентов настраиваются отдельно от провайдеров моделей — если вы настраиваете `acp_agents.codex`, укажите в нём Codex ACP-адаптер, например `npx -y @zed-industries/codex-acp`
-   - На macOS при необходимости экспортируйте аутентификацию Claude Code явно:
-
-   ```bash
-   eval "$(python3 scripts/export_claude_code_oauth.py --print-export)"
-   ```
-
-   API-ключи также можно задать вручную в `.env` (рекомендуется) или экспортировать в оболочке:
-
-   ```bash
-   OPENAI_API_KEY=your-openai-api-key
-   TAVILY_API_KEY=your-tavily-api-key
-   ```
-
-   </details>
-
-### Запуск
-
-#### Вариант 1: Docker (рекомендуется)
-
-**Разработка** (hot-reload, монтирование исходников):
-
-```bash
-make docker-init    # Загрузить образ Sandbox (один раз или при обновлении)
-make docker-start   # Запустить сервисы
-```
-
-**Продакшен** (собирает образы локально):
-
-```bash
-make up     # Собрать образы и запустить все сервисы
-make down   # Остановить и удалить контейнеры
-```
-
-> [!TIP]
-> На Linux при ошибке `permission denied` для Docker daemon добавьте пользователя в группу `docker` и перелогиньтесь. Подробнее в [CONTRIBUTING.md](CONTRIBUTING.md#linux-docker-daemon-permission-denied).
-
-Адрес: http://localhost:2026
-
-#### Вариант 2: Локальная разработка
-
-Предварительное условие: сначала выполните шаги раздела «Конфигурация» выше (`make setup`). Для `make dev` нужен корректный `config.yaml` в корне проекта. Задайте `UNI_DEER_PROJECT_ROOT`, чтобы явно указать корень проекта, или `UNI_DEER_CONFIG_PATH`, чтобы указать конкретный файл конфигурации. Состояние времени выполнения по умолчанию записывается в `.deer-flow` в корне проекта и может быть перенесено через `UNI_DEER_HOME`; skills по умолчанию читаются из `skills/` в корне проекта, путь можно переопределить через `UNI_DEER_SKILLS_PATH`. Перед запуском выполните `make doctor`, чтобы проверить настройку.
-В Windows запускайте локальный процесс разработки из Git Bash. Нативные оболочки `cmd.exe` и PowerShell не поддерживаются для сервисных скриптов на bash, а работа в WSL не гарантируется, поскольку некоторые скрипты зависят от утилит Git for Windows, таких как `cygpath`.
-
-1. **Проверить зависимости**:
-   ```bash
-   make check  # Проверяет Node.js 22+, pnpm, uv, nginx
-   ```
-
-2. **Установить зависимости**:
-   ```bash
-   make install
-   ```
-
-3. **(Опционально) Загрузить образ Sandbox заранее**:
-   ```bash
-   make setup-sandbox
-   ```
-
-4. **Запустить сервисы**:
-   ```bash
-   make dev
-   ```
-
-5. **Адрес**: http://localhost:2026
-
-### Дополнительно
-
-#### Режим Sandbox
-
-UniDeer поддерживает несколько режимов выполнения:
-- **Локальное выполнение** — код запускается прямо на хосте
-- **Docker** — код выполняется в изолированных Docker-контейнерах
-- **Docker + Kubernetes** — выполнение в Kubernetes-подах через provisioner
-
-Подробнее в [руководстве по конфигурации Sandbox](backend/docs/CONFIGURATION.md#sandbox).
-
-#### MCP-сервер
-
-UniDeer поддерживает настраиваемые MCP-серверы для расширения возможностей. Для HTTP/SSE MCP-серверов поддерживаются OAuth-токены (`client_credentials`, `refresh_token`). Подробнее в [руководстве по MCP-серверу](backend/docs/MCP_SERVER.md).
-
-#### Мессенджеры
-
-UniDeer принимает задачи прямо из мессенджеров. Каналы запускаются автоматически при настройке, публичный IP не нужен.
-
-UniDeer может также предоставлять в workspace UI пользовательские подключения IM-каналов. Когда включён `channel_connections`, вошедшие в систему пользователи могут привязать Telegram, Slack, Discord, Feishu/Lark, DingTalk, WeChat или WeCom из боковой панели / Settings > Channels. Это переиспользует существующие исходящие транспорты `channels.*`, поэтому публичный IP или URL обратного вызова провайдера не требуются. Входящие IM-сообщения выполняются от имени подключённого пользователя UniDeer. Настройки и вопросы безопасности описаны в [IM Channel Connections](backend/docs/IM_CHANNEL_CONNECTIONS.md).
-
-| Канал | Транспорт | Сложность |
-|-------|-----------|-----------|
-| Telegram | Bot API (long-polling) | Просто |
-| Slack | Socket Mode | Средне |
-| Feishu / Lark | WebSocket | Средне |
-| WeChat | Tencent iLink (long-polling) | Средне |
-| WeCom | WebSocket | Средне |
-| DingTalk | Stream Push (WebSocket) | Средне |
-
-**Конфигурация в `config.yaml`:**
-
-```yaml
-channels:
-  feishu:
-    enabled: true
-    app_id: $FEISHU_APP_ID
-    app_secret: $FEISHU_APP_SECRET
-    # domain: https://open.feishu.cn       # China (default)
-    # domain: https://open.larksuite.com   # International
-
-  wecom:
-    enabled: true
-    bot_id: $WECOM_BOT_ID
-    bot_secret: $WECOM_BOT_SECRET
-
-  slack:
-    enabled: true
-    bot_token: $SLACK_BOT_TOKEN
-    app_token: $SLACK_APP_TOKEN
-    allowed_users: []
-
-  telegram:
-    enabled: true
-    bot_token: $TELEGRAM_BOT_TOKEN
-    allowed_users: []
-
-  wechat:
-    enabled: false
-    bot_token: $WECHAT_BOT_TOKEN
-    ilink_bot_id: $WECHAT_ILINK_BOT_ID
-    qrcode_login_enabled: true      # опционально: разрешить первичную загрузку через QR-код при отсутствии bot_token
-    allowed_users: []               # пусто = разрешить всем
-    polling_timeout: 35
-    state_dir: ./.deer-flow/wechat/state
-    max_inbound_image_bytes: 20971520
-    max_outbound_image_bytes: 20971520
-    max_inbound_file_bytes: 52428800
-    max_outbound_file_bytes: 52428800
-
-  dingtalk:
-    enabled: true
-    client_id: $DINGTALK_CLIENT_ID             # ClientId с DingTalk Open Platform
-    client_secret: $DINGTALK_CLIENT_SECRET     # ClientSecret с DingTalk Open Platform
-    allowed_users: []                          # пусто = разрешить всем
-    card_template_id: ""                       # Опционально: ID шаблона AI Card для потокового эффекта печатной машинки
-```
-
-**Ключи API в `.env`:**
-
-```bash
-# Telegram
-TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
-
-# Slack
-SLACK_BOT_TOKEN=xoxb-...
-SLACK_APP_TOKEN=xapp-...
-
-# Feishu / Lark
-FEISHU_APP_ID=cli_xxxx
-FEISHU_APP_SECRET=your_app_secret
-
-# WeChat iLink
-WECHAT_BOT_TOKEN=your_ilink_bot_token
-WECHAT_ILINK_BOT_ID=your_ilink_bot_id
-
-# WeCom
-WECOM_BOT_ID=your_bot_id
-WECOM_BOT_SECRET=your_bot_secret
-
-# DingTalk
-DINGTALK_CLIENT_ID=your_client_id
-DINGTALK_CLIENT_SECRET=your_client_secret
-```
-
-**Настройка Telegram**
-
-1. Напишите [@BotFather](https://t.me/BotFather), отправьте `/newbot` и скопируйте HTTP API-токен.
-2. Укажите `TELEGRAM_BOT_TOKEN` в `.env` и включите канал в `config.yaml`.
-
-**Настройка WeChat**
-
-1. Включите канал `wechat` в `config.yaml`.
-2. Либо задайте `WECHAT_BOT_TOKEN` в `.env`, либо установите `qrcode_login_enabled: true` для первичной загрузки через QR-код.
-3. Когда `bot_token` отсутствует и загрузка через QR включена, следите за логами бэкенда — там появится QR-контент, возвращённый iLink, — и завершите процесс привязки.
-4. После успешного прохождения QR-процесса UniDeer сохраняет полученный токен в `state_dir` для последующих перезапусков.
-5. Для развёртываний Docker Compose держите `state_dir` на постоянном томе, чтобы курсор `get_updates_buf` и сохранённое состояние аутентификации переживали перезапуски.
-
-**Настройка WeCom**
-
-1. Создайте бота на платформе WeCom AI Bot и получите `bot_id` и `bot_secret`.
-2. Включите `channels.wecom` в `config.yaml` и заполните `bot_id` / `bot_secret`.
-3. Задайте `WECOM_BOT_ID` и `WECOM_BOT_SECRET` в `.env`.
-4. Убедитесь, что зависимости бэкенда включают `wecom-aibot-python-sdk`. Канал использует долговременное WebSocket-соединение и не требует публичного URL обратного вызова.
-5. Текущая интеграция поддерживает входящие текстовые сообщения, изображения и файлы. Итоговые изображения/файлы, сгенерированные агентом, также отправляются обратно в диалог WeCom.
-
-**Настройка DingTalk**
-
-1. Создайте приложение на [DingTalk Open Platform](https://open.dingtalk.com/) и включите возможность **Робот**.
-2. На странице настроек робота установите режим приёма сообщений на **Stream**.
-3. Скопируйте `Client ID` и `Client Secret`. Укажите `DINGTALK_CLIENT_ID` и `DINGTALK_CLIENT_SECRET` в `.env` и включите канал в `config.yaml`.
-4. *(Опционально)* Для включения потоковых ответов AI Card (эффект печатной машинки) создайте шаблон **AI Card** на [платформе карточек DingTalk](https://open.dingtalk.com/document/dingstart/typewriter-effect-streaming-ai-card), затем укажите `card_template_id` в `config.yaml` с ID шаблона. Также необходимо запросить разрешения `Card.Streaming.Write` и `Card.Instance.Write`.
-
-**Доступные команды**
-
-| Команда | Описание |
-|---------|----------|
-| `/new` | Начать новый диалог |
-| `/status` | Показать информацию о текущем треде |
-| `/models` | Список доступных моделей |
-| `/memory` | Просмотреть память |
-| `/help` | Показать справку |
-
-> Сообщения без команды воспринимаются как обычный чат — UniDeer создаёт тред и отвечает.
-
-#### Трассировка LangSmith
-
-UniDeer имеет встроенную интеграцию с [LangSmith](https://smith.langchain.com) для наблюдаемости. При включении все вызовы LLM, запуски агентов и выполнения инструментов отслеживаются и отображаются в дашборде LangSmith.
-
-Добавьте в файл `.env` в корне проекта:
-
-```bash
-LANGSMITH_TRACING=true
-LANGSMITH_API_KEY=lsv2_pt_xxxxxxxxxxxxxxxx
-LANGSMITH_PROJECT=deer-flow
-```
-
-`LANGSMITH_ENDPOINT` по умолчанию `https://api.smith.langchain.com` и может быть переопределён при необходимости. Устаревшие переменные `LANGCHAIN_*` (`LANGCHAIN_TRACING_V2`, `LANGCHAIN_API_KEY` и т.д.) также поддерживаются для обратной совместимости; `LANGSMITH_*` имеет приоритет, когда заданы обе.
-
-#### Трассировка Langfuse
-
-UniDeer также поддерживает наблюдаемость через [Langfuse](https://langfuse.com) для запусков, совместимых с LangChain.
-
-Добавьте в файл `.env`:
-
-```bash
-LANGFUSE_TRACING=true
-LANGFUSE_PUBLIC_KEY=pk-lf-xxxxxxxxxxxxxxxx
-LANGFUSE_SECRET_KEY=sk-lf-xxxxxxxxxxxxxxxx
-LANGFUSE_BASE_URL=https://cloud.langfuse.com
-```
-
-Если вы используете собственный экземпляр Langfuse, укажите `LANGFUSE_BASE_URL` в качестве URL вашего развёртывания.
-
-**Поля корреляции трасс.** Каждый запуск агента аннотируется зарезервированными атрибутами трассировки Langfuse, поэтому страницы Sessions и Users заполняются автоматически:
-
-- `session_id` = `thread_id` LangGraph — группирует все трассы одного диалога
-- `user_id` = эффективный пользователь из `get_effective_user_id()` (возвращается к `default` в режиме без аутентификации)
-- `trace_name` = assistant id (по умолчанию `lead-agent`)
-- `tags` = `[env:<UNI_DEER_ENV>, model:<model_name>]` (опускается, если не заданы)
-- `metadata.deerflow_trace_id` = идентификатор корреляции запросов UniDeer, совпадающий с `X-Trace-Id`, когда корреляция трассировки запросов включена
-
-Эти поля внедряются в `RunnableConfig.metadata` в корне вызова графа как для gateway-пути (`runtime/runs/worker.py::run_agent`), так и для встроенного пути (`client.py::UniDeerClient.stream`), поэтому любой LangChain-совместимый callback может их прочитать. Установите `UNI_DEER_ENV` (или `ENVIRONMENT`) для тегирования трасс по среде развёртывания.
-
-#### Использование обоих провайдеров
-
-Если и LangSmith, и Langfuse включены, UniDeer подключает оба callback'а трассировки и отправляет одну и ту же активность модели в обе системы.
-
-Если провайдер явно включён, но отсутствуют необходимые учётные данные, или если его callback не может инициализироваться, UniDeer завершает работу с ошибкой (fail fast) при инициализации трассировки во время создания модели, а сообщение об ошибке указывает провайдера, вызвавшего сбой.
-
-В Docker-развёртываниях трассировка отключена по умолчанию. Установите `LANGSMITH_TRACING=true` и `LANGSMITH_API_KEY` в `.env` для включения.
-
-## От Deep Research к Super Agent Harness
-
-UniDeer начинался как фреймворк для Deep Research, и сообщество вышло далеко за эти рамки. После запуска разработчики строили пайплайны, генерировали презентации, поднимали дашборды, автоматизировали контент. То, чего мы не ожидали.
-
-Стало понятно: UniDeer не просто research-инструмент. Это **harness**: runtime, который даёт агентам необходимую инфраструктуру.
-
-Поэтому мы переписали всё с нуля.
-
-UniDeer 2.0 — это Super Agent Harness «из коробки». Batteries included, полностью расширяемый. Построен на LangGraph и LangChain. По умолчанию есть всё, что нужно агенту: файловая система, memory, skills, sandbox-выполнение и возможность планировать и запускать sub-agents для сложных многошаговых задач.
-
-Используйте как есть. Или разберите и переделайте под себя.
-
-## Core Features
-
-### Skills & Tools
-
-Skills — это то, что позволяет UniDeer делать почти что угодно.
-
-Agent Skill — это структурированный модуль: Markdown-файл с описанием воркфлоу, лучших практик и ссылок на ресурсы. UniDeer поставляется со встроенными skills для ресёрча, генерации отчётов, слайдов, веб-страниц, изображений и видео. Но главное — расширяемость: добавляйте свои skills, заменяйте встроенные или собирайте из них составные воркфлоу.
-
-Skills загружаются по мере необходимости, только когда задача их требует. Это держит контекстное окно чистым.
-
-```
-# Пути внутри контейнера sandbox
-/mnt/skills/public
-├── research/SKILL.md
-├── report-generation/SKILL.md
-├── slide-creation/SKILL.md
-├── web-page/SKILL.md
-└── image-generation/SKILL.md
-
-/mnt/skills/custom
-└── your-custom-skill/SKILL.md      ← ваш skill
-```
-
-#### Интеграция с Claude Code
-
-Skill `claude-to-deerflow` позволяет работать с UniDeer прямо из [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Отправляйте задачи, проверяйте статус, управляйте тредами, не выходя из терминала.
-
-**Установка скилла**:
-
-```bash
-npx skills add https://github.com/bytedance/deer-flow --skill claude-to-deerflow
-```
-
-**Что можно делать**:
-- Отправлять сообщения в UniDeer и получать потоковые ответы
-- Выбирать режимы выполнения: flash (быстро), standard, pro (planning), ultra (sub-agents)
-- Проверять статус UniDeer, просматривать модели, скиллы, агентов
-- Управлять тредами и историей диалога
-- Загружать файлы для анализа
-
-Полный справочник API в [`skills/public/claude-to-deerflow/SKILL.md`](skills/public/claude-to-deerflow/SKILL.md).
-
-### Цели сессии (Session Goals)
-
-Используйте `/goal <условие завершения>`, чтобы привязать к текущему треду одно активное условие завершения. Цель — это состояние уровня треда, а не активация навыка, поэтому она остаётся активной между ходами, пока UniDeer не сочтёт её выполненной или пока вы её не очистите.
-
-Поддерживаемые команды:
-
-```text
-/goal finish the implementation and make all tests pass
-/goal              # показать активную цель
-/goal clear        # очистить её
-```
-
-После каждого запуска, выполненного через Gateway, UniDeer оценивает видимый диалог относительно активной цели с помощью non-thinking модели-оценщика. Оценщик должен вернуть типизированный блокер (`missing_evidence`, `needs_user_input`, `run_failed`, `external_wait` или `goal_not_met_yet`) с видимыми доказательствами. UniDeer добавляет hidden continuation только тогда, когда последний ход assistant сохранён в чекпоинте, блокер имеет тип `goal_not_met_yet`, тред не изменился во время оценки и счётчик отсутствия прогресса не сработал. Предел безопасности по умолчанию — 8 hidden continuation, а повторяющиеся одинаковые оценки без прогресса останавливаются после 2 попыток. `/goal clear` и любой новый ввод от пользователя имеют приоритет над continuation в очереди. Когда цель выполнена, UniDeer очищает её автоматически и публикует обновлённое состояние треда.
-
-Веб-интерфейс показывает активную цель над полем ввода. Та же команда доступна из TUI и поддерживаемых IM-каналов. В веб-интерфейсе и поддерживаемых IM-каналах установка `/goal <условие завершения>` также запускает выполнение с условием в качестве задачи; команды статуса и очистки только управляют состоянием цели.
-
-### Sub-Agents
-
-Сложные задачи редко решаются за один проход. UniDeer их декомпозирует.
-
-Lead agent запускает sub-agents на лету, каждый со своим изолированным контекстом, инструментами и условиями завершения. Sub-agents работают параллельно, возвращают структурированные результаты, а lead agent собирает всё в единый итог.
-
-Вот как UniDeer справляется с задачами на минуты и часы: research-задача разветвляется в дюжину sub-agents, каждый копает свой угол, потом всё сходится в один отчёт, или сайт, или слайддек со сгенерированными визуалами. Один harness, много рук.
-
-### Sandbox & файловая система
-
-UniDeer не просто *говорит* о том, что умеет что-то делать. У него есть собственный компьютер.
-
-Каждая задача выполняется внутри изолированного Docker-контейнера с полной файловой системой: skills, workspace, uploads, outputs. Агент читает, пишет и редактирует файлы. Выполняет bash-команды и пишет код. Смотрит на изображения. Всё изолировано, всё прозрачно, никакого пересечения между сессиями.
-
-Это разница между чатботом с доступом к инструментам и агентом с реальной средой выполнения.
-
-```
-# Пути внутри контейнера sandbox
-/mnt/user-data/
-├── uploads/          ← ваши файлы
-├── workspace/        ← рабочая директория агентов
-└── outputs/          ← результаты
-```
-
-### Context Engineering
-
-**Изолированный контекст**: каждый sub-agent работает в своём контексте и не видит контекст главного агента или других sub-agents. Агент фокусируется на своей задаче.
-
-**Управление контекстом**: внутри сессии UniDeer агрессивно сжимает контекст и суммирует завершённые подзадачи, выгружает промежуточные результаты в файловую систему, сжимает то, что уже не актуально. На длинных многошаговых задачах контекстное окно не переполняется.
-
-### Long-Term Memory
-
-Большинство агентов забывают всё, когда диалог заканчивается. UniDeer помнит.
-
-UniDeer сохраняет ваш профиль, предпочтения и накопленные знания между сессиями. Чем больше используете, тем лучше он вас знает: стиль, технологический стек, повторяющиеся воркфлоу. Всё хранится локально и остаётся под вашим контролем.
-
-## Рекомендуемые модели
-
-UniDeer работает с любым LLM через OpenAI-совместимый API. Лучше всего — с моделями, которые поддерживают:
-
-- **Большое контекстное окно** (100k+ токенов) — для deep research и многошаговых задач
-- **Reasoning capabilities** — для адаптивного планирования и сложной декомпозиции
-- **Multimodal inputs** — для работы с изображениями и видео
-- **Strong tool-use** — для надёжного вызова функций и структурированных ответов
-
-## Встроенный Python-клиент
-
-UniDeer можно использовать как Python-библиотеку прямо в коде — без запуска HTTP-сервисов. `UniDeerClient` даёт доступ ко всем возможностям агента и Gateway, возвращает те же схемы ответов, что и HTTP Gateway API. HTTP Gateway также предоставляет `DELETE /api/threads/{thread_id}` для удаления локальных данных треда, управляемых UniDeer, после того как сам LangGraph thread был удалён:
-
-```python
-from deerflow.client import UniDeerClient
-
-client = UniDeerClient()
-
-# Chat
-response = client.chat("Analyze this paper for me", thread_id="my-thread")
-
-# Streaming (LangGraph SSE protocol: values, messages-tuple, end)
-for event in client.stream("hello"):
-    if event.type == "messages-tuple" and event.data.get("type") == "ai":
-        print(event.data["content"])
-
-# Configuration & management — returns Gateway-aligned dicts
-models = client.list_models()        # {"models": [...]}
-skills = client.list_skills()        # {"skills": [...]}
-client.update_skill("web-search", enabled=True)
-client.upload_files("thread-1", ["./report.pdf"])  # {"success": True, "files": [...]}
-client.set_goal("thread-1", "finish the implementation and make all tests pass")
-client.get_goal("thread-1")       # {"goal": {...}} or {"goal": None}
-client.clear_goal("thread-1")
-```
-
-## Запланированные задачи (Scheduled Tasks)
-
-Теперь в UniDeer есть первоклассный MVP запланированных задач (scheduled-task) в workspace.
-
-Текущие возможности MVP:
-
-- Управление задачами на `/workspace/scheduled-tasks`
-- Выбор: каждая запланированная задача переиспользует тред или создаёт новый тред для каждого запуска
-- Поддержка расписаний `once` и `cron`
-- Фоновые запланированные запуски выполняются как неинтерактивные запуски UniDeer (`ask_clarification` там не предоставляется)
-- При совпадении наступившего cron-запуска с активным запуском на том же переиспользуемом треде применяется поведение перекрытия `skip`
-- Приостановка, возобновление, ручной запуск, просмотр истории и удаление задач
-- Запланированные задачи выполняются через стандартный жизненный цикл запуска UniDeer
-
-Текущие ограничения MVP:
-
-- Пока нет инструмента `schedule_task`, создающего задачи в диалоге
-- Нет заданий с текстовыми уведомлениями
-- Нет каналов или целей отправки GitHub
-- В этой первой версии нет типа расписания `interval`
-
-Включите фоновый опрос через `config.yaml -> scheduler.enabled`. Ручной запуск использует тот же ресурс и путь выполнения scheduled-task.
-
-## Терминальная панель (TUI)
-
-`deerflow` — это нативная терминальная панель для тех, кто живёт в шелле. Она работает **встроенной** поверх `UniDeerClient` — без Gateway, фронтенда, nginx или Docker — и при этом учитывает те же настройки `config.yaml`, checkpointer, skills, memory, MCP и sandbox, что и остальной UniDeer.
-
-![UniDeer TUI](docs/tui/tui-preview.svg)
-
-```bash
-uv pip install 'deerflow-harness[tui]'        # опциональная зависимость 'textual'
-
-deerflow                                      # запустить терминальный UI (требуется TTY)
-deerflow --continue                           # возобновить последний тред
-deerflow --resume THREAD                      # возобновить тред по id
-deerflow --print "summarize this repo"        # автономный разовый ответ в stdout
-deerflow --json  "hello"                       # автономный режим, StreamEvents с разделением новой строкой
-```
-
-Интерфейс чата с управлением с клавиатуры: потоковый транскрипт (ответы рендерятся в Markdown), компактные карточки активности инструментов, палитра слэш-команд `/`, управление целями `/goal`, селекторы `/model` и `/threads`, история ввода, а также прерывание через `Esc` / `Ctrl+C`. Сессии, открытые в TUI, также появляются в боковой панели веб-интерфейса — TUI пишет в общее хранилище тредов под локальным пользователем по умолчанию, поэтому терминал и веб остаются синхронизированными **без запуска Gateway**.
-
-Полное руководство — в [backend/docs/TUI.md](backend/docs/TUI.md).
-
-## Документация
-
-- [Руководство по участию](CONTRIBUTING.md) — настройка среды разработки, воркфлоу и гайдлайны
-- [Руководство по конфигурации](backend/docs/CONFIGURATION.md) — инструкции по настройке
-- [Обзор архитектуры](backend/CLAUDE.md) — технические детали
-- [Архитектура бэкенда](backend/README.md) — бэкенд и справочник API
-
-## ⚠️ Безопасность
-
-### Неправильное развёртывание может привести к угрозам безопасности
-
-UniDeer обладает ключевыми высокопривилегированными возможностями, включая **выполнение системных команд, операции с ресурсами и вызов бизнес-логики**. По умолчанию он рассчитан на **развёртывание в локальной доверенной среде (доступ только через loopback-адрес 127.0.0.1)**. Если вы разворачиваете агент в недоверенных средах — локальных сетях, публичных облачных серверах или других окружениях, доступных с нескольких устройств — без строгих мер безопасности, это может привести к следующим угрозам:
-
-- **Несанкционированные вызовы**: функциональность агента может быть обнаружена неавторизованными третьими лицами или вредоносными сканерами, что приведёт к массовым несанкционированным запросам с выполнением высокорисковых операций (системные команды, чтение/запись файлов) и серьёзным последствиям для безопасности.
-- **Юридические и compliance-риски**: если агент будет незаконно использован для кибератак, кражи данных или других противоправных действий, это может повлечь юридическую ответственность и compliance-риски.
-
-### Рекомендации по безопасности
-
-**Примечание: настоятельно рекомендуем развёртывать UniDeer только в локальной доверенной сети.** Если вам необходимо развёртывание через несколько устройств или сетей, обязательно реализуйте строгие меры безопасности, например:
-
-- **Белый список IP-адресов**: используйте `iptables` или аппаратные межсетевые экраны / коммутаторы с ACL, чтобы **настроить правила белого списка IP** и заблокировать доступ со всех остальных адресов.
-- **Шлюз аутентификации**: настройте обратный прокси (nginx и др.) и **включите строгую предварительную аутентификацию**, запрещающую любой доступ без авторизации.
-- **Сетевая изоляция**: по возможности разместите агент и доверенные устройства в **одном выделенном VLAN**, изолированном от остальной сети.
-- **Следите за обновлениями**: регулярно отслеживайте обновления безопасности проекта UniDeer.
-
-## Участие в разработке
-
-Приветствуем контрибьюторов! Настройка среды разработки, воркфлоу и гайдлайны — в [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Лицензия
-
-Проект распространяется под [лицензией MIT](./LICENSE).
+- [Почему UniDeer](#почему-unideer)
+  - [Проблема «чат-бот плюс инструменты»](#проблема-чат-бот-плюс-инструменты)
+  - [Принципы проектирования](#принципы-проектирования)
+- [Благодарности](#благодарности)
+- [Чем UniDeer отличается от DeerFlow](#чем-unideer-отличается-от-deerflow)
+- [Обзор архитектуры](#обзор-архитектуры)
+  - [Топология сервисов](#топология-сервисов)
+  - [Файрвол зависимостей harness / app](#файрвол-зависимостей-harness--app)
+  - [Типичный запрос от начала до конца](#типичный-запрос-от-начала-до-конца)
+- [Основные возможности](#основные-возможности)
+  - [Скиллы и инструменты](#скиллы-и-инструменты)
+  - [Конвейер middleware](#конвейер-middleware)
+  - [Субагенты](#субагенты)
+  - [Sandbox и файловая система](#sandbox-и-файловая-система)
+  - [Инженерия контекста](#инженерия-контекста)
+  - [Долговременная память](#долговременная-память)
+  - [MCP и фабрика моделей](#mcp-и-фабрика-моделей)
+  - [Каталог инструментов](#каталог-инструментов)
+- [Рантайм и надёжность](#рантайм-и-надёжность)
+  - [Владение запусками, аренда и восстановление](#владение-запусками-аренда-и-восстановление)
+  - [Чекпоинты](#чекпоинты)
+  - [Инварианты конкурентности на уровне БД](#инварианты-конкурентности-на-уровне-бд)
+- [Быстрый старт](#быстрый-старт)
+  - [Предварительные требования](#предварительные-требования)
+  - [Конфигурация](#конфигурация)
+  - [Запуск приложения](#запуск-приложения)
+  - [Режимы запуска](#режимы-запуска)
+- [Продвинутый уровень](#продвинутый-уровень)
+  - [Провайдеры sandbox](#провайдеры-sandbox)
+  - [IM-каналы](#im-каналы)
+  - [Авторизация и RBAC](#авторизация-и-rbac)
+  - [Трейсинг и наблюдаемость](#трейсинг-и-наблюдаемость)
+  - [Запланированные задачи](#запланированные-задачи)
+  - [Provisioner (Kubernetes)](#provisioner-kubernetes)
+- [Встроенный Python-клиент](#встроенный-python-клиент)
+- [Терминальный Workbench (TUI)](#терминальный-workbench-tui)
+- [Деплой](#деплой)
+  - [Локальная разработка](#локальная-разработка)
+  - [Docker](#docker)
+  - [Kubernetes](#kubernetes)
+- [Безопасность](#безопасность)
+- [Документация](#документация)
+- [Вклад](#вклад)
+- [Лицензия](#лицензия)
+
+---
+
+## Почему UniDeer
+
+Большинство «AI-агентов» — это просто чат-интерфейсы с прикрученным инструментом поиска. UniDeer — это **harness**: структурированный рантайм, который превращает стохастическую генерацию LLM в детерминированный конвейер выполнения, управляемый конечным автоматом.
+
+Один запрос проходит через:
+
+1. **Ведущего агента (lead agent)** — планирует ход, решает, делегировать ли, и синтезирует финальный ответ
+2. **Цепочку middleware** — конвейер из 35+ композируемых перехватчиков, которые применяют скиллы, бюджеты, безопасность и политики инструментов до и после каждого вызова модели
+3. **Субагентов** — параллельные изолированные воркеры для задач, которым выгодна реальная параллельная задержка, специализация или изоляция контекста
+4. **Sandbox** — изолированная файловая система на поток (скиллы, workspace, uploads, outputs) с подключаемой изоляцией выполнения
+5. **Память** — постоянные профили пользователя и факты между сессиями, внедряемые в промпт при необходимости
+6. **Стриминг** — SSE-события, отображаемые в реальном времени в веб-интерфейсе, TUI или IM-каналах
+
+Руководящая философия — одна фраза: **скиллы обучают, middleware принуждают.** Возможности объявляются в файлах `SKILL.md`; инварианты — чтение перед записью, бюджеты токенов, политики инструментов, обнаружение циклов, безопасные завершения — применяются в коде детерминированно, независимо от того, что решит модель.
+
+### Проблема «чат-бот плюс инструменты»
+
+Обычная чат-обёртка вокруг LLM с инструментами имеет три структурные слабости, для исправления которых и создан UniDeer:
+
+- **Нет принуждения.** Модель может игнорировать инструкции. Промпт «всегда ищи перед ответом» — это предложение; middleware, который считает поиски и внедряет исправление, — это гарантия.
+- **Нет изоляции.** Каждый вызов инструмента выполняется в том же контексте, что и чат, поэтому длительная исследовательская задача загрязняет диалог, а подзадача не может безопасно выполняться параллельно.
+- **Нет дисциплины состояния.** Без чекпоинтов, сжатия и межсессионной памяти многоходовая задача теряет связность, а многочасовая — взрывает окно контекста.
+
+UniDeer решает все три проблемы с помощью рантайма на конечном автомате, конвейера принуждения и песочницы в файловой системе.
+
+### Принципы проектирования
+
+- **Детерминированность важнее стохастичности.** Промпты направляют; middleware принуждают. Ворота, счётчики и политики выводятся из истории сообщений и состояния потока, а не из прихотей модели.
+- **Прогрессивная загрузка.** Скиллы загружаются только при необходимости, сохраняя окно контекста компактным. Инструменты обнаруживаются через `tool_search` и продвигаются только когда это уместно.
+- **Изоляция по умолчанию.** Субагенты не видят историю родителя; пути sandbox — на поток; память — на пользователя и агента; запуски принадлежат и арендуются.
+- **Fail closed.** Конфликтующие обновления состояния вызывают ошибку, авторизация инструментов фильтрует до выполнения, а инварианты чекпоинтов применяются на уровне БД частичными уникальными индексами.
+- **Эксплуатируемость.** Аренда запусков, восстановление сирот, корреляция трассировок запросов и подключаемый трейсинг (Langfuse, LangSmith, Monocle) — граждане первого класса, а не запоздалые дополнения.
 
 ## Благодарности
 
-UniDeer стоит на плечах open-source сообщества. Спасибо всем проектам и разработчикам, чья работа сделала его возможным.
+UniDeer не существовал бы без работы команд и сообществ, которые были до него.
 
-Отдельная благодарность:
+- **[ByteDance](https://www.bytedance.com/)** — создатель оригинального проекта DeerFlow и deep-research фреймворка, от которого ответвлён UniDeer. Этот проект строится на их open-source фундаменте.
+- **[DeerFlow](https://github.com/bytedance/deer-flow)** — вышестоящий open-source проект (лицензия MIT), community-форком которого является UniDeer. Мы благодарны за архитектуру, экосистему скиллов и инженерию, которые сделали это возможным.
+- **Мейнтейнеры и контрибьюторы DeerFlow v1** — оригинальный Deep Research фреймворк (поддерживается в ветке [1.x](https://github.com/bytedance/deer-flow/tree/main-1.x)) заложил основу для переписывания 2.0, на котором строится UniDeer.
+- **Сообщество DeerFlow** — контрибьюторы, тестировщики и пользователи, сформировавшие вышестоящий проект.
 
-- **[LangChain](https://github.com/langchain-ai/langchain)** — фреймворк для взаимодействия с LLM и построения цепочек.
-- **[LangGraph](https://github.com/langchain-ai/langgraph)** — многоагентная оркестрация, на которой держатся сложные воркфлоу UniDeer.
+Собственные отличия, оптимизации и дополнения UniDeer описаны в разделе [Чем UniDeer отличается от DeerFlow](#чем-unideer-отличается-от-deerflow).
 
-### Ключевые контрибьюторы
+## Чем UniDeer отличается от DeerFlow
 
-Авторы UniDeer, без которых проекта бы не было:
+UniDeer сохраняет видение супер-агентного harness, но расходится в инженерном и продуктовом направлении. Различия, которые важны сегодня:
 
-- **[Daniel Walnut](https://github.com/hetaoBackend/)**
-- **[Henry Li](https://github.com/magiccube/)**
+| Область | DeerFlow (апстрим) | UniDeer (этот проект) |
+| --- | --- | --- |
+| **Репозиторий** | `bytedance/deer-flow` | Независимый форк со своей дорожной картой и ритмом релизов |
+| **Конвейер middleware** | Широкие ключевые триггеры скиллов, внедряющие активационные подсказки в «похожие, но неактивные» диалоги | **Быстрый выход для неактивных скиллов**: ворота скиллов (deep-research, system-design, startup-sketch и др.) срабатывают только при явной активации через слэш или загрузке в `skill_context`. Обычные запросы проходят без изменений — без загрязнения промпта, меньше задержка до первого токена |
+| **Исправление после ответа** | Metacognition и подобные ворота могут запускать второй полный LLM-проход для «исправления» ответа | **Совещательные исправления**: пост-ответные подсказки применяются на следующем естественном ходе вместо немедленной регенерации, устраняя всплеск задержки второго LLM-раунда |
+| **Наблюдаемость субагентов** | Свёрнутые карточки субагентов показывают только статус | **Живые метаданные рантайма**: свёрнутые карточки показывают эффективное имя модели и суммарное потребление токенов, обновляясь после каждого LLM-вызова субагента и сохраняясь после перезагрузки |
+| **Персистентность сессии** | Только сессионный cookie | **Политика «запомнить меня»**: единый жизненный цикл сессионных cookie, обработка `remember_me` и стратегия Secure/Max-Age в зависимости от деплоя (HTTPS, loopback, публичный HTTP) |
+| **Бэкенды памяти** | DeerMem по умолчанию | DeerMem по умолчанию **плюс HTTP-бэкенд OpenViking** для удалённого межэкземплярного вызова памяти |
+| **Авторизация** | Отключена по умолчанию | **Подключаемая авторизация + встроенный RBAC**-провайдер с политиками разрешения/запрета инструментов и маршрутов по ролям |
+| **Корреляция трассировок** | Базовая | Распространение X-Trace-ID плюс трейсинг Langfuse/LangSmith/Monocle с корреляцией `metadata.deerflow_trace_id` |
+| **Кодовая база** | — | Пакет harness (`backend/packages/harness/deerflow/`) поддерживается здесь, со своими тестами, инвариантами (файрвол импортов harness/app) и документацией |
 
-## История звёзд
+Общая ДНК остаётся: скиллы, субагенты, sandbox, память, MCP и мосты к IM-каналам. Фокус UniDeer — **предсказуемая задержка** (никаких потраченных токенов, никаких неожиданных регенераций) и **операционная глубина** (владение, аренда, конкурентность на уровне БД, наблюдаемость).
 
-[![Star History Chart](https://api.star-history.com/svg?repos=bytedance/deer-flow&type=Date)](https://star-history.com/#bytedance/deer-flow&Date)
+## Обзор архитектуры
+
+### Топология сервисов
+
+Стандартный деплой запускает четыре взаимодействующих сервиса, оркестрируемых одной командой или стеком Docker Compose:
+
+| Сервис | Порт | Роль |
+| --- | --- | --- |
+| **Nginx** | `2026` | Единая точка входа обратного прокси. Маршрутизирует `/api/langgraph/*` во встроенный LangGraph-рантайм Gateway, остальное проксирует во Frontend. |
+| **Gateway API** | `8001` | FastAPI REST API плюс встроенный LangGraph-рантайм (`RunManager`, `run_agent()`, `StreamBridge`). Отдельного LangGraph-сервиса нет — рантайм живёт внутри процесса Gateway. |
+| **Frontend** | `3000` | Веб-интерфейс Next.js 16 (React 19, TypeScript, Tailwind CSS 4, pnpm). |
+| **Provisioner** | `8002` | Опционально — запускается только когда sandbox настроен в режиме provisioner/Kubernetes. Управляет жизненным циклом подов/VM sandbox. |
+
+```
+                    Browser / IM Client (Feishu, Slack, Telegram, WeChat, WeCom, DingTalk, GitHub, Discord)
+                                       |
+                                       v
+                            Nginx (port 2026)
+                     /api/langgraph/*          /, /workspace/*, /blog/*
+                     |                        |
+                     v                        v
+            Gateway API (FastAPI :8001)   Frontend (Next.js :3000)
+            + embedded LangGraph runtime
+                     |
+        +------------+------------+-----------+
+        |            |            |           |
+        v            v            v           v
+   Sandbox      IM Channels  Provisioner   Persistence
+   (E2B/Aio/    (8 bridges)   (:8002, K8s)  (SQLAlchemy +
+    Local)                                  Alembic)
+```
+
+### Файрвол зависимостей harness / app
+
+Бэкенд разделён на два слоя с жёстким правилом зависимостей, применяемым CI:
+
+- `app.*` (хост FastAPI: роутеры gateway, мосты каналов, планировщик) **может** импортировать `deerflow.*`
+- `packages/harness/deerflow/` (пакет harness, импортируемый как `deerflow.*`) **никогда не должен** импортировать `app.*`
+
+Это обеспечивается `backend/tests/test_harness_boundary.py`, который выполняется в CI. Harness остаётся публикуемым, независимым от приложения и тестируемым изолированно. Второй инвариант обеспечивается `make test-blocking-io`: ноль синхронных файловых/БД/сетевых операций ввода-вывода на асинхронном цикле событий — блокирующая работа должна выноситься через `asyncio.to_thread`.
+
+### Типичный запрос от начала до конца
+
+1. Пользователь вводит сообщение в композер Frontend (опционально с голосовой транскрипцией или AI-полировкой).
+2. `POST /api/threads/{id}/runs/stream` открывает стриминговый SSE-запрос.
+3. Gateway проверяет аутентификацию (cookie-сессии Better Auth, CSRF, RBAC), разрешает конфигурацию агента и создаёт LangGraph-запуск.
+4. `RunManager.run_agent()` загружает `ThreadState` из чекпоинтера, разрешает модель и строит цепочку middleware.
+5. Выполняется узел ведущего агента: middleware памяти внедряет контекст пользователя, активация скилла загружает `SKILL.md` при слэш-активации, собирается системный промпт (цель, скиллы, инструменты, память), модель вызывается с определениями инструментов.
+6. Если модель вызывает инструменты, они маршрутизируются к встроенным / sandbox / community / MCP обработчикам, результаты санируются, выполняется обнаружение циклов.
+7. Если вызван инструмент `task`, исполнитель субагентов порождает параллельных субагентов с изолированными контекстами и ограниченными наборами инструментов; каждый сообщает структурированный `TaskResult`; ведущий синтезирует.
+8. После запуска: извлечение памяти сохраняет новые факты, генерируется заголовок (первый ход), вычисляются изменения workspace, оценивается цель, создаются предложения.
+9. `StreamBridge` преобразует внутренние события в SSE-события (`values`, `messages-tuple`, `custom`, `tasks`), которые Frontend отображает в реальном времени: анимированный Markdown, карточки субагентов с таймлайнами шагов и потреблением токенов, диффы изменений workspace, todo, статус цели и follow-up предложения.
+
+## Основные возможности
+
+### Скиллы и инструменты
+
+Скиллы — это структурированные модули возможностей — файл `SKILL.md`, определяющий workflow, лучшие практики и ссылки на вспомогательные ресурсы. UniDeer поставляется с 30+ встроенными скиллами и позволяет добавлять свои, заменять встроенные или комбинировать их в составные workflows.
+
+**Как работают скиллы:**
+
+1. Каждый скилл живёт в собственном каталоге в `skills/public/` (в репозитории) или `skills/custom/` (в gitignore).
+2. Файл `SKILL.md` — точка входа — инструкции, которым следует агент, когда скилл активен.
+3. Скиллы загружаются **прогрессивно** — только когда задача требует, сохраняя окно контекста компактным.
+4. Скиллы могут объявлять `allowed-tools`, ограничивая инструменты агента, пока скилл активен (поведенческое ограничение best-effort).
+5. **Слэш-активация**: `/skill-name` в начале запроса активирует скилл на этот ход.
+6. **SkillScan**: детерминированный сканер безопасности запускается на установленных скиллах, отмечая высоковероятные проблемы (приватные ключи, паттерны выполнения shell).
+
+**Ворота активации.** Специфичные для доменов ворота скиллов (deep-research, system-design, startup-sketch и др.) срабатывают только когда скилл явно активен в потоке — слэш-активация через `/skill-name` или захват в `skill_context` после загрузки `read_file`. Разговорный запрос, который просто содержит слова, похожие на скилл (например, «почему...», «объясни...» или «дизайн...»), проходит без изменений: скрытые активационные подсказки не внедряются, поэтому обычные ходы не загрязняют промпт и не замедляют задержку до первого токена.
+
+**Встроенные скиллы включают:**
+
+- Исследование и анализ: `deep-research`, `github-deep-research`, `data-analysis`, `academic-paper-review`, `systematic-literature-review`, `consulting-analysis`
+- Генерация контента: `report-generation`, `ppt-generation`, `image-generation`, `video-generation`, `music-generation`, `podcast-generation`, `newsletter-generation`
+- Инженерия: `frontend-design`, `web-design-guidelines`, `chart-visualization`, `code-documentation`, `system-design`, `bootstrap`
+- Продукт и требования: `business-requirement`, `product-requirements`, `software-requirements`, `startup-sketch`
+- Мета: `skill-creator`, `skill-reviewer`, `find-skills`, `surprise-me`, `vercel-deploy-claimable`, `claude-to-deerflow`
+
+Политика `allowed-tools` скилла применяется только после явной активации скилла. Простое включение, реклама или перечисление скилла в списке разрешений `skills` кастомного агента или субагента не сокращает обычный набор инструментов агента. После активации политика фильтрует и видимые модели схемы инструментов, и выполнение инструментов. Это поведенческое ограничение best-effort, а не жёсткая граница безопасности.
+
+### Конвейер middleware
+
+Граф ведущего агента (`make_lead_agent`) собирает конвейер из 35+ стадий middleware (60+ модулей в дереве исходников), оборачивающих каждый вызов модели и выполнение инструмента. Это главная точка расширения harness.
+
+Избранные стадии, в приблизительном порядке:
+
+| Middleware | Назначение |
+| --- | --- |
+| `InputSanitization` | Нейтрализует вредоносные системные теги в сыром вводе |
+| `ToolOutputBudget` | Ограничивает слишком большие выводы инструментов, предотвращая переполнение контекста |
+| `ToolResultSanitization` | Санирует удалённые HTML/веб-результаты |
+| `ThreadData` / `Uploads` | Монтирует области изоляции потока и внедряет метаданные загруженных файлов |
+| `Sandbox` | Получает контейнер sandbox или локальный контекст |
+| `DanglingToolCall` | Чинит незавершённые вызовы инструментов после восстановления прерывания |
+| `LLMErrorHandling` | Нормализует ошибки провайдера в восстанавливаемые ходы |
+| `SandboxAudit` | AST-инспекция bash-команд на опасные паттерны |
+| `ReadBeforeWrite` | Применяет ворота криптографической SHA-метки перед записью файлов |
+| `ToolProgress` | Конечный автомат обнаружения застоя инструментов (ACTIVE к WARNED к BLOCKED) |
+| `SkillActivation` / `SkillToolPolicy` | Связывает контекст `SKILL.md` и применяет `allowed-tools` |
+| `Metacognition` | Принуждение «сначала подумай» для сложных промптов (до ответа; после ответа — совещательно) |
+| `Planner` | Правило «нет плана — нет правок» для многошаговых мутаций |
+| `EmojiGate` | Unicode-сканер, сохраняющий генерируемый код/конфиг без эмодзи |
+| `Summarization` / `TokenBudget` | Сжатие контекста при высоких уровнях токенов |
+| `TodoList` / `Title` | Отслеживание задач в режиме плана и автоматические заголовки после первого хода |
+| `Memory` | Внедряет долговременную память до запусков, извлекает новые факты после |
+| `LoopDetection` | Жёстко останавливает повторяющиеся одинаковые циклы вызовов инструментов |
+| `TerminalResponse` | Повторяет пустые ответы ассистента; предотвращает тихие сбои |
+| `Safety / ModelLengthFinishReason` | Обрабатывает фильтры контента провайдера и лимиты токенов |
+| `Clarification` (последний) | Перехватывает `ask_clarification` и выдаёт `Command(goto=END)` |
+
+Та же цепочка (минус стадии, специфичные для ведущего агента) применяется к субагентам, поэтому делегированная задача управляется теми же инвариантами, что и родительская.
+
+### Субагенты
+
+Субагенты — это оптимизация, а не ответ по умолчанию на сложный запрос.
+
+Ведущий агент порождает субагентов на лету — каждого со своим ограниченным контекстом, инструментами и условиями завершения — когда делегирование даёт явную чистую выгоду от реальной параллельной задержки, специализированной возможности или изоляции контекста. Он держит взаимозависимые области и пересекающиеся побочные эффекты вне параллельной диспетчеризации. Субагенты сообщают структурированные результаты; ведущий проверяет и синтезирует.
+
+**Модель выполнения.** Исполнитель субагентов — гибрид пула потоков + asyncio: контекстные переменные корректно распространяются от родителя, каждый субагент выполняет собственный изолированный цикл событий, а состояние жизненного цикла следует строгому конечному автомату: `PENDING` к `RUNNING` к `COMPLETED` / `FAILED` / `CANCELLED` / `TIMED_OUT`. Ограничители (`token_capped`, `turn_capped`, `loop_capped`) завершают запуск раньше, сохраняя частичный вывод, и ведущий может отличить «завершено» от «ограничено».
+
+**Лимиты конкурентности.** `SubagentLimitMiddleware` ограничивает параллельные делегирования (по умолчанию 3, настраивается 1-4) и общее число делегирований на запуск (по умолчанию 6, максимум 50).
+
+**Структурированные контракты.** Результаты субагентов переносятся в `ToolMessage.additional_kwargs` как закреплённый контракт: статус, причина остановки, ошибка, SHA-256-дайджест полного результата, эффективное имя модели и суммарное потребление токенов. Значения перечислений разделяются между Python и TypeScript через `contracts/subagent_status_contract.json`, а контрактный тест закрепляет их друг против друга, чтобы фронтенд и бэкенд никогда не расходились.
+
+**Живые метаданные рантайма.** Свёрнутые карточки субагентов показывают эффективную модель и, когда провайдер возвращает метаданные использования, суммарное число токенов, обновляющееся после каждого LLM-вызова субагента и сохраняющееся после перезагрузки. Конкурентные субагенты сохраняют независимые итоги по ключу `task_id`. Провайдеры, опускающие использование, показывают явное состояние «недоступно», никогда не выдуманный ноль.
+
+Независимое чтение-только исследование может выполняться параллельно, когда выигрыш во времени превышает стоимость дублированного поиска и синтеза. Рефакторинг репозитория с общими файлами и последовательной обратной связью тестов остаётся у ведущего агента. Когда `max_concurrent_subagents` равен 1, руководство по параллельной и многопакетной маршрутизации отключается; делегирование доступно только для существенной специализации или изоляции контекста.
+
+### Sandbox и файловая система
+
+Каждая задача получает собственное окружение выполнения с полным видом файловой системы — скиллы, workspace, uploads, outputs.
+
+```
+/mnt/user-data/
+├── uploads/          # your files
+├── workspace/        # agents' working directory
+└── outputs/          # final deliverables
+```
+
+**Провайдеры:**
+
+| Провайдер | Описание |
+| --- | --- |
+| `E2BSandboxProvider` | Удалённый E2B sandbox с VM-изоляцией, тёплым пулом, burst и Redis-владением для мультиворкерных деплоев |
+| `AioSandboxProvider` | Изоляция на основе контейнеров (Docker) |
+| `LocalSandboxProvider` | Файловая система хоста с каталогами на поток; bash хоста отключён по умолчанию |
+
+**Ключевые возможности:**
+
+- Изоляция каталогов на поток с политиками безопасности путей и политиками переменных окружения
+- Блокировки операций с файлами для сериализации конкурентных чтений/записей по одному пути
+- **Принуждение чтения перед записью**: `read_file` ставит SHA-256-хэш текущего содержимого файла в метку сообщения; `write_file` / `str_replace` для существующего файла детерминированно блокируется, если хэш на диске не совпадает с меткой. Любая запись инвалидирует предыдущие чтения, заставляя перечитывать между последовательными изменениями.
+- **Отслеживание изменений workspace**: после каждого запуска записывается сводка диффов изменённых файлов в `workspace` и `outputs`, отображаемая как бейдж «files changed» с текстовыми диффами в UI. Uploads исключаются (это пользовательский ввод).
+- Обработка изображений: base64-изображения удаляются из чекпоинтов после потребления моделью зрения, чтобы избежать дублирования полезной нагрузки.
+- Поиск по файлам sandbox встроенным инструментом `grep`.
+
+### Инженерия контекста
+
+- **Изолированный контекст субагентов** — субагенты не видят историю родителя или соседей
+- **Суммаризация** — завершённые подзадачи сжимаются, промежуточные результаты выгружаются в файловую систему, контекст сжимается для удержания в лимитах токенов
+- **Строгое восстановление вызовов инструментов** — зависшие вызовы инструментов чинятся плейсхолдер-результатами перед следующим вызовом модели, не давая строгим моделям рассуждений падать на некорректной истории
+- **Видимое завершение выполнения инструментов** — пустой финальный ответ после инструмента повторяется один раз, затем показывается как видимая ошибка вместо тихого успеха
+- **Ручное сжатие** — `/compact` в композере суммаризирует старый контекст, сохраняя чат полностью видимым
+- **Цели сессии** — `/goal <условие>` прикрепляет цель завершения в рамках потока; рантайм оценивает диалог относительно цели после каждого запуска и внедряет скрытые продолжения (безопасный предел 8) до достижения или очистки
+
+### Долговременная память
+
+Постоянная межсессионная память профиля пользователя, предпочтений и накопленных знаний.
+
+**Архитектура хранения:**
+
+```
+{deerflow_home}/memory/
+├── users/{user_id}/
+│   ├── memory.json              # user profile + history summaries (JSON)
+│   └── agents/{agent_name}/
+│       └── facts/
+│           ├── ab/cdef123...md  # individual fact (Markdown, sharded by SHA-256)
+│           └── ...
+```
+
+- Факты — канонические Markdown-файлы, шардированные по первым двум шестнадцатеричным символам `SHA-256(fact_id)`
+- Журналируемые записи предотвращают тихую потерю обновлений; общий пользовательский замок и оптимистичные ревизии защищают конкурентный доступ
+- Поиск использует адаптер SQLite FTS5/BM25 с областью действия по умолчанию, с локальным fallback по подстроке; производный индекс перестраиваем, повреждённые индексы пересоздаются автоматически
+- Унаследованные факты `memory.json` автоматически мигрируют при первом чтении
+
+**Бэкенды:**
+
+- **DeerMem** (по умолчанию) — файловый, с учётом области действия, с воротами записи извлечения, классифицирующими каждый предлагаемый факт по области, долговечности и авторитетности перед хранением. Сохраняются только долговечные описательные факты пользовательского уровня; ограничения текущего потока и разовые разрешения остаются в состоянии диалога.
+- **OpenViking** (опционально) — подключается к независимому серверу OpenViking по HTTP для удалённого межэкземплярного вызова. Ограниченные уровни отправки и ретраи с джиттером предотвращают дублирование коммитов при повторе.
+
+Внедрение памяти настраивается по режиму операции (`middleware` против `tool`), а `memory.injection_enabled: false` полностью отключает блок.
+
+### MCP и фабрика моделей
+
+UniDeer поддерживает **Model Context Protocol** для подключения внешних серверов инструментов через stdio или HTTP, с кэшированием схем инструментов, middleware маршрутизации MCP и аннотациями инструментов для MCP-инструментов.
+
+Фабрика моделей не зависит от провайдера:
+
+- OpenAI и OpenAI-совместимые API (`langchain_openai:ChatOpenAI`)
+- vLLM (self-hosted, с поддержкой мышления через `chat_template_kwargs.enable_thinking`)
+- OpenAI Codex CLI (класс `gpt-5.4`) и Anthropic Claude (OAuth или API-ключ)
+- Huawei MindIE, плюс патченные провайдеры (DeepSeek, MiniMax, StepFun, MiMo) для рассуждений
+
+Поддержка мышления/рассуждений (`supports_thinking`, `supports_reasoning_effort`), модели зрения и API Responses (`output_version: responses/v1`) — всё первого класса. Учётные данные загружаются из переменных окружения через загрузчик учётных данных.
+
+### Каталог инструментов
+
+**Встроенные инструменты** — `task` (порождение субагента), `tool_search` (поиск инструментов по описанию), `ask_clarification` (пауза для ввода пользователя), `view_image`, `present_file`, `list_uploaded_files`, `review_skill_package`, `setup_agent` / `update_agent`, `invoke_acp_agent`.
+
+**Community-инструменты** — `web_search`, `web_fetch`, `web_capture`, `image_search` (настраиваемый провайдер).
+
+**Инструменты sandbox** — `bash`, `ls`, `read_file` (с диапазонами строк), `write_file`, `str_replace`.
+
+**Браузерные инструменты** (опциональное дополнение) — `browser_navigate`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_get_text`, `browser_back`, `browser_screenshot`, `browser_close`. На базе Playwright со SSRF-скринингом; отключены по умолчанию.
+
+**Авторизация.** С `authorization.enabled` подключаемый `AuthorizationProvider` фильтрует запрещённые инструменты до того, как они достигнут модели или отложенного каталога инструментов, и проверяет снова перед каждым выполнением бизнес-инструмента. Встроенный RBAC-провайдер поддерживает политики разрешения/запрета `tools` и `routes` по ролям.
+
+## Рантайм и надёжность
+
+### Владение запусками, аренда и восстановление
+
+Каждый запуск имеет владельца. Менеджер запусков назначает уникальный ID воркера (`hostname:hex_uuid`), ставит на каждый запуск аренду и персистит владение в таблицу runs. Если Gateway перезапускается или воркер становится недоступен до достижения запуском долговечного финального состояния, запуск восстанавливается как сирота с понятной причиной остановки:
+
+- `"Gateway restarted before this run reached a durable final state."`
+- `"Run lease expired - owning worker is unreachable."`
+
+Обнаружение истечения аренды, восстановление сирот при старте и мультиворкерное владение запусками поддерживаются на SQLite (локально) и Postgres (в деплое). Временные конфликты блокировок SQLite при финализации статуса повторяются с ограниченным backoff, а нативные сигналы ограничений уникальности драйвера (Postgres `23505`, коды ограничений SQLite) обнаруживаются без опоры на зависящий от локали текст ошибок.
+
+### Чекпоинты
+
+Состояние потока чекпоинтится после каждого шага, чтобы запуски могли возобновляться или ветвиться. Рантайм включает патчи совместимости для вышестоящих механизмов чекпоинтов LangGraph (например, исправление `InMemorySaver`, теряющего записи на потоках с миграцией full-to-delta), закреплённые за проверенной версией LangGraph и автоматически отключающиеся, если апстрим исправит проблему. Режимы каналов чекпоинтов и частота снапшотов настраиваются на деплой.
+
+### Инварианты конкурентности на уровне БД
+
+Конкурентностью управляет база данных, а не флаги в памяти. Частичные уникальные индексы применяют ключевые инварианты:
+
+| Индекс | Инвариант |
+| --- | --- |
+| `uq_runs_thread_active` | Максимум один pending/running запуск на поток (`WHERE status IN ('pending','running')`) |
+| `uq_scheduled_task_run_active` | Максимум один активный запуск на запланированную задачу (`WHERE status IN ('queued','running')`) |
+| `uq_channel_connection_active_identity` | Единый активный владелец для внешних IM-идентичностей (`WHERE status != 'revoked'`) |
+
+Миграции включают шаги дедупликации, чтобы индексы можно было построить даже на базах, уже нарушающих инвариант (полевые базы, мультиворкерные деплои до фикса). Проигравший писатель в гонке проявляется как типизированный конфликт (например, `ActiveScheduledRunConflict`), а запланированные диспетчеризации, пересекающиеся с активным запуском, записывают терминальный tombstone `skipped`, который никогда не занимает активный слот.
+
+## Быстрый старт
+
+### Предварительные требования
+
+- Python 3.12+ и `uv`
+- Node.js 22+ и pnpm 10
+- `nginx` (требуется для единой локальной точки входа `make dev`)
+- Docker (опционально, для контейнерного деплоя)
+
+Выполните `make check` для проверки инструментария.
+
+### Конфигурация
+
+```bash
+git clone https://github.com/bytedance/deer-flow.git
+cd deer-flow
+```
+
+> URL клонирования выше указывает на вышестоящий репозиторий. Для UniDeer клонируйте с полученного URL форка.
+
+1. Установите зависимости: `make install` (сначала бэкенд, затем фронтенд, как реализовано в target)
+2. Запустите мастер настройки:
+
+```bash
+make setup
+```
+
+Мастер проведёт вас через выбор LLM-провайдера, опциональный веб-поиск и предпочтения выполнения/безопасности, такие как режим sandbox, доступ к bash и инструменты записи файлов. Он генерирует минимальный `config.yaml` и записывает ключи в `.env`. Около 2 минут.
+
+Запускайте `make doctor` в любое время для проверки настройки и получения действенных советов по исправлению. Если вы открываете GitHub issue о локальной настройке или проблеме рантайма, выполните `make support-bundle` — он записывает отредактированную сводку issue, черновик issue с помощью ИИ и опциональный zip с доказательствами в `.deer-flow/support-bundles/`.
+
+**Файлы конфигурации:**
+
+- `config.yaml` (в gitignore) — основная конфигурация приложения: модели, sandbox, инструменты, каналы, планировщик, логирование, трейсинг
+- `extensions_config.json` (в gitignore) — MCP-серверы и определения скиллов
+- `config.example.yaml` / `extensions_config.example.json` — шаблоны для копирования
+
+Используйте `make config-upgrade` для слияния новых полей из `config.example.yaml` в существующий `config.yaml` без потери локальных настроек.
+
+**Модели** настраиваются в `config.yaml` в разделе `models:`. Каждая запись указывает класс провайдера, ID модели и учётные данные через переменные окружения:
+
+```yaml
+models:
+  - name: gpt-4o
+    display_name: GPT-4o
+    use: langchain_openai:ChatOpenAI
+    model: gpt-4o
+    api_key: $OPENAI_API_KEY
+  - name: qwen3-32b-vllm
+    display_name: Qwen3 32B (vLLM)
+    use: deerflow.models.vllm_provider:VllmChatModel
+    model: Qwen/Qwen3-32B
+    api_key: $VLLM_API_KEY
+    base_url: http://localhost:8000/v1
+    supports_thinking: true
+```
+
+**Переменные окружения** (пути и состояние рантайма):
+
+- `UNI_DEER_PROJECT_ROOT` — явный корень проекта
+- `UNI_DEER_CONFIG_PATH` — указать конкретный файл конфигурации
+- `UNI_DEER_HOME` — расположение состояния рантайма (по умолчанию `.deer-flow` в корне проекта)
+- `UNI_DEER_SKILLS_PATH` — каталог скиллов (по умолчанию `skills/` в корне проекта)
+
+### Запуск приложения
+
+**Вариант 1: Docker (рекомендуется)**
+
+```bash
+make docker-start
+```
+
+Запуск с учётом режима из `config.yaml`, единая точка входа `http://localhost:2026`. Другие target: `make docker-stop`, `make docker-logs`, `make docker-logs-gateway`, `make docker-logs-frontend`, `make docker-logs-redis`.
+
+**Вариант 2: Локальная разработка**
+
+```bash
+make dev
+```
+
+Запускает три сервиса с горячей перезагрузкой:
+
+- Gateway API (FastAPI, порт 8001, со встроенным LangGraph-рантаймом)
+- Frontend (Next.js, порт 3000)
+- Nginx (порт 2026 — единая точка входа)
+
+Остановите всё с помощью `make stop`. Логи в `logs/gateway.log`, `logs/frontend.log` и `logs/nginx.log`. В Windows запускайте локальный процесс из Git Bash (нативные `cmd.exe`/PowerShell не поддерживаются для bash-скриптов сервисов).
+
+**Команды разработки бэкенда** (из `backend/`):
+
+```bash
+make dev                # FastAPI Gateway with reload (port 8001)
+make test               # offline unit tests
+make test-blocking-io   # strict blocking-IO runtime gate
+make lint               # ruff check
+make format             # ruff format
+make migrate-rev MSG="" # autogenerate an Alembic migration
+```
+
+**Команды разработки фронтенда** (из `frontend/`):
+
+```bash
+pnpm dev                # Next.js Turbopack dev server (port 3000)
+pnpm lint               # ESLint
+pnpm typecheck          # TypeScript check
+pnpm test               # unit tests
+pnpm test:e2e           # Playwright E2E tests
+```
+
+### Режимы запуска
+
+`config.yaml` поддерживает запуск с учётом режима:
+
+| Режим | Описание |
+| --- | --- |
+| `flash` | Быстрые ответы, минимальные рассуждения |
+| `standard` | Баланс скорости и глубины |
+| `pro` | Режим планирования с явными рассуждениями |
+| `ultra` | Полная оркестрация субагентов |
+
+## Продвинутый уровень
+
+### Провайдеры sandbox
+
+**E2B** использует `wait` как политику переполнения по умолчанию: ждёт `acquire_timeout`, затем завершает ход агента ошибкой (UniDeer не повторяет автоматически; клиенты могут использовать структурированную ошибку для планирования повтора). `burst` с `burst_limit` разрешает ограниченные дополнительные VM; `reject` может удалить одну тёплую VM перед возвратом ошибки. С Redis-владением `replicas` — жёсткий лимит на весь деплой, разделяемый воркерами через один хэш ёмкости; несовпадающие воркеры fail closed.
+
+**Aio** выполняет shell в изолированных Docker-контейнерах, определяя монтирования данных потока из своего бэкенда (локальные контейнеры используют смонтированные каталоги gateway; удалённые/provisioner sandbox получают загрузки через явную синхронизацию).
+
+**Local** сопоставляет файловые инструменты с каталогами на поток на хосте, но bash хоста отключён по умолчанию, поскольку это не безопасная граница изоляции. Включайте только для полностью доверенных локальных workflows. Команды bash хоста имеют таймаут по стене.
+
+### IM-каналы
+
+UniDeer мостит внешние платформы обмена сообщениями: **Feishu, Slack, Telegram, Discord, DingTalk, WeChat, WeCom и GitHub**. Все каналы разделяют общий путь выполнения через жизненный цикл запусков Gateway:
+
+- Каждый канал получает сообщения пользователя, преобразует их в запуски потоков и стримит ответы обратно
+- Управление сессией (ID ассистента, лимиты рекурсии, режим мышления) настраивается на канал
+- Шина сообщений, политики выполнения на канал и связывание идентичности соединений унифицируют 8 мостов
+- **Единый активный владелец**: внешняя идентичность ключуется по `(provider, external_account_id, workspace_id)`; побеждает последняя успешная привязка, применяемая без гонок частичным уникальным индексом `uq_channel_connection_active_identity`
+- Дедупликация входящих повторных доставок, подготовка вложений в sandbox и доставка артефактов (только outputs — другие пути отклоняются для предотвращения эксфильтрации)
+
+### Авторизация и RBAC
+
+Продвинутые деплои могут включить подключаемую авторизацию с `authorization.enabled` в `config.yaml`. Настроенный `AuthorizationProvider` фильтрует запрещённые инструменты до того, как они достигнут модели или отложенного каталога инструментов, затем тот же провайдер проверяется снова перед каждым выполнением бизнес-инструмента. Разрешения маршрутов Gateway `threads:*` и `runs:*` выводятся из того же провайдера, а существующие проверки владельца и админские ворота остаются в силе. Встроенный RBAC-провайдер поддерживает политики `tools` и `routes` по ролям и проверяет, что `default_role` именует настроенную роль. Отключено по умолчанию.
+
+### Трейсинг и наблюдаемость
+
+- **Корреляция трассировок запросов**: каждый HTTP-ответ Gateway включает `X-Trace-Id`; логи включают `trace_id`
+- **Langfuse**: трассы включают `metadata.deerflow_trace_id`, соответствующий `X-Trace-Id`; установите `UNI_DEER_ENV` (или `ENVIRONMENT`) для тегирования трасс по окружению деплоя
+- **LangSmith и Monocle**: подключаемые провайдеры трейсинга
+- Callback'и трейсинга прикрепляются к корню вызова графа, поэтому спаны не дублируются; этот инвариант явно задокументирован в кодовой базе
+
+### Запланированные задачи
+
+Настраивайте повторяющиеся запуски агентов из веб-интерфейса или Gateway API. Фоновый планировщик диспетчеризует каждую задачу по cron-расписанию, с:
+
+- Применяемой БД семантикой «максимум один активный запуск на задачу» (`uq_scheduled_task_run_active`)
+- Tombstone `skipped` при пересечении диспетчеризации с активным запуском (никогда не занимает активный слот)
+- Ручные триггеры, гонящиеся с поллером, сходятся к тому же результату, что и быстрый путь (ручной: конфликт 409; запланированный: `skipped`)
+
+### Provisioner (Kubernetes)
+
+Опциональный сервис Provisioner (порт 8002) управляет инфраструктурой sandbox для деплоев на Kubernetes: выделяет поды/VM sandbox по требованию, поддерживает тёплые пулы для быстрого получения и обрабатывает полный жизненный цикл (создание, проверка здоровья, уничтожение). Запускается только когда sandbox настроен в режиме provisioner/K8s; локальные и Docker Compose деплои с провайдерами E2B/Aio в нём не нуждаются.
+
+## Встроенный Python-клиент
+
+Взаимодействуйте с экземпляром UniDeer программно — веб-интерфейс не нужен:
+
+```python
+from deerflow.client import DeerFlowClient
+
+client = DeerFlowClient(base_url="http://localhost:8001")
+
+# Stream a turn
+for event in client.stream("thread-id", "your prompt"):
+    print(event)
+
+# Create a thread
+thread = client.create_thread(agent="lead_agent")
+```
+
+Клиент поддерживает создание потоков, стриминг сообщений (те же SSE-режимы, что в UI), управление памятью, загрузку файлов и настройку агентов. Выполните `make test-live` в `backend/` для живых API-тестов.
+
+## Терминальный Workbench (TUI)
+
+Терминальный интерфейс для взаимодействия с UniDeer без веб-интерфейса — новые потоки, стриминговые ответы, цели и команды скиллов из CLI. Запустите командой CLI `deerflow`; на не-TTY он деградирует в headless `--print` / `--json` вывод для скриптов.
+
+## Деплой
+
+### Локальная разработка
+
+```bash
+make dev       # Gateway (8001) + Frontend (3000) + Nginx (2026)
+make stop      # stop everything
+```
+
+### Docker
+
+```bash
+make docker-start   # mode-aware development stack from config.yaml (localhost:2026)
+make up             # production compose (localhost:2026)
+make down           # stop and remove production containers
+```
+
+### Kubernetes
+
+Helm-чарт живёт в `deploy/helm/deer-flow/` для деплоев на Kubernetes, а Provisioner управляет инфраструктурой sandbox.
+
+## Безопасность
+
+UniDeer по дизайну даёт агентам реальную власть над файловой системой и выполнением. Деплой должен рассматриваться как привилегированная инфраструктура:
+
+- **Неправильный деплой может привести к рискам безопасности.** Администратор gateway фактически эквивалентен выполнению кода на хосте.
+- Локальный sandbox отключает bash хоста по умолчанию; включайте только для полностью доверенных локальных workflows.
+- Держите `headless: true` и `allow_private_addresses: false` для управления браузером вне доверенной отладки. Подключение к существующему Chrome через `cdp_url` не может применять SSRF-защиту и fail closed, если `allow_unguarded_cdp: true` явно не признаёт риск.
+- Относитесь к `config.yaml` и `extensions_config.json` как к доверенным файлам, управляемым оператором: объявления middleware, инструментов, моделей, sandbox, guardrail и MCP — это выполнение кода.
+- Аутентификация использует HttpOnly-куки, CSRF-защиту и подключаемый RBAC; политика «запомнить меня» понижается до сессионных куки на публичном HTTP и использует Secure + Max-Age только на HTTPS или loopback.
+
+## Документация
+
+- [Архитектура](docs/ARCHITECTURE.md) — топология сервисов, все 8 слоёв, поток данных, карта репозитория, глоссарий
+- [Гид по контексту](context.md) — системная архитектура и контекст агента для кодинг-агентов
+- [Планы и RFC](docs/plans/) — авторизация, трейсинг, память и другое
+- [Вклад](CONTRIBUTING.md) — окружение разработки и workflow
+- [Установка](Install.md) — однострочные инструкции настройки агента
+
+## Вклад
+
+См. [CONTRIBUTING.md](CONTRIBUTING.md) для настройки окружения разработки, требуемого порядка команд и ожиданий по валидации. Перед отправкой изменений:
+
+- Бэкенд: `cd backend && make lint && make test` (паритет CI: `uv sync --group dev`, затем lint, затем test)
+- Фронтенд (если затронут): `cd frontend && pnpm lint && pnpm typecheck`; установите `BETTER_AUTH_SECRET` для продакшен-сборок
+- Никогда не ломайте файрвол импортов harness/app (`tests/test_harness_boundary.py`)
+- Держите асинхронный цикл событий без блокирующего ввода-вывода (`make test-blocking-io`)
+- Обновляйте документацию при изменении функций (`README.md`) или архитектуры/middleware (`AGENTS.md`)
+
+## Лицензия
+
+UniDeer распространяется под **лицензией MIT** — см. [LICENSE](LICENSE). Как форк DeerFlow (также MIT), оригинальные авторские права и атрибуция для частей, производных от вышестоящего проекта, остаются за ByteDance и контрибьюторами DeerFlow.

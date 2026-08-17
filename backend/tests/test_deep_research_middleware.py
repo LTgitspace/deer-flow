@@ -73,14 +73,14 @@ def test_non_research_thread_passes_through() -> None:
     assert list(result.messages) == messages
 
 
-def test_research_shaped_without_active_skill_gets_activation_nudge() -> None:
+def test_research_shaped_without_active_skill_passes_through() -> None:
+    """Casual queries with research-shaped words get NO inactive-skill nudge."""
     messages = [_research_prompt()]
     result = _run(messages, state={})
     nudges = _injected_nudges(result)
-    assert len(nudges) == 1
-    content = str(nudges[0].content)
-    assert "deep-research skill is not active" in content
-    assert "clarification questions" not in content
+    assert nudges == []
+    # Messages pass through unchanged (no activation nudge injected).
+    assert len(result.messages) == len(messages)
 
 
 def test_active_via_skill_context_fires_contract() -> None:
@@ -101,15 +101,14 @@ def test_active_via_slash_reminder_fires_contract() -> None:
     assert f"{MIN_CLARIFY_QUESTIONS} clarification questions" in content
 
 
-def test_searched_while_inactive_escalates() -> None:
+def test_searched_while_inactive_passes_through() -> None:
+    """Searching without the skill active is no longer escalated — fast exit."""
     messages = [
         _research_prompt(),
         ToolMessage(content="some search results", name="web_search", tool_call_id="call-1"),
     ]
     result = _run(messages, state={})
-    nudges = _injected_nudges(result)
-    assert len(nudges) == 1
-    assert "STOP researching" in str(nudges[0].content)
+    assert _injected_nudges(result) == []
 
 
 def test_build_nudges_keyword_only_regression() -> None:

@@ -116,11 +116,10 @@ def test_non_sketch_thread_passes_through() -> None:
     assert list(result.messages) == messages
 
 
-def test_sketch_shaped_without_active_skill_gets_activation_nudge() -> None:
+def test_sketch_shaped_without_active_skill_passes_through() -> None:
+    """Casual queries with sketch-shaped words get NO inactive-skill nudge."""
     result = _run([_sketch_prompt()], state={})
-    nudges = _injected_nudges(result)
-    assert len(nudges) == 1
-    assert "startup-sketch skill is not active" in str(nudges[0].content)
+    assert _injected_nudges(result) == []
 
 
 def test_active_via_slash_fires_contract() -> None:

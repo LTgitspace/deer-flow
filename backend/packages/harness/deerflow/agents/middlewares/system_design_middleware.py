@@ -638,27 +638,6 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
 
         return nudges[:MAX_NUDGES_PER_CALL]
 
-    def _build_inactive_skill_nudge(self, search_count: int) -> HumanMessage:
-        """Force skill activation before any design work continues.
-
-        Escalates when the model already searched without the skill active.
-        """
-        if search_count > 0:
-            text = (
-                "[SYSTEM REMINDER] The system-design skill is not active in this thread, but you "
-                "have already started searching. STOP designing. Activate the skill first: load it "
-                "via read_file (skills/public/system-design/SKILL.md) or ask the user to run "
-                "/system-design. Design contract gates are suspended until the skill is active."
-            )
-        else:
-            text = (
-                "[SYSTEM REMINDER] This thread is design-shaped, but the system-design skill is "
-                "not active. Before any design work, activate the skill: load it via read_file "
-                "(skills/public/system-design/SKILL.md) or ask the user to run /system-design. "
-                "Design contract gates are suspended until the skill is active."
-            )
-        return self._nudge(text)
-
     def _patch_messages(self, messages: list, nudges: list[HumanMessage]) -> list:
         patched = list(messages)
         insert_at = 0
@@ -690,10 +669,10 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
 
         state = getattr(request, "state", None) or {}
         if not skill_is_active(messages, state, _SKILL_NAME):
-            search_count, _, _ = self._tool_counts(messages)
-            nudge = self._build_inactive_skill_nudge(search_count)
-            self._log_nudges([nudge])
-            request = request.override(messages=self._patch_messages(messages, [nudge]))
+            # Inactive-skill fast exit: do NOT inject an activation nudge on
+            # casual queries that merely contain design-shaped words. The
+            # contract gates only fire once the skill is explicitly active
+            # (slash-activated or loaded into skill_context).
             return handler(request)
 
         nudges = self._build_nudges(messages)
@@ -714,10 +693,7 @@ class SystemDesignMiddleware(AgentMiddleware[AgentState]):
 
         state = getattr(request, "state", None) or {}
         if not skill_is_active(messages, state, _SKILL_NAME):
-            search_count, _, _ = self._tool_counts(messages)
-            nudge = self._build_inactive_skill_nudge(search_count)
-            self._log_nudges([nudge])
-            request = request.override(messages=self._patch_messages(messages, [nudge]))
+            # Inactive-skill fast exit: see wrap_model_call.
             return await handler(request)
 
         nudges = self._build_nudges(messages)

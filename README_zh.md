@@ -1,4 +1,4 @@
-# 🦌 UniDeer - 2.0
+# UniDeer - 2.0
 
 [English](./README.md) | 中文 | [日本語](./README_ja.md) | [Français](./README_fr.md) | [Русский](./README_ru.md)
 
@@ -6,787 +6,605 @@
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](./Makefile)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-<a href="https://trendshift.io/repositories/14699" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14699" alt="bytedance%2Fdeer-flow | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-> 2026 年 2 月 28 日，UniDeer 2 发布后登上 GitHub Trending 第 1 名。非常感谢社区的支持，这是大家一起做到的。
+UniDeer（**D**eep **E**xploration and **E**fficient **R**esearch **Flow**）是一个开源的 **super agent harness**，构建在 **LangGraph** 之上。它通过 **sub-agents**（子代理）、**长期记忆**和**沙箱执行**来编排复杂的多步骤任务——并由**可扩展的 skills**（技能）驱动。
 
-UniDeer（**D**eep **E**xploration and **E**fficient **R**esearch **Flow**）是一个开源的 **super agent harness**。它把 **sub-agents**、**memory** 和 **sandbox** 组织在一起，再配合可扩展的 **skills**，让 agent 可以完成几乎任何事情。
+UniDeer 是 **[DeerFlow](https://github.com/bytedance/deer-flow)（由 [ByteDance](https://www.bytedance.com/) 创建）** 的**社区 fork**（基于 v2.0+），并已发展为一个具有自身工程方向的项目。它继承了 deep-research 的血统和大部分原始架构；代码库、中间件流水线和运行时行为都已重新改造。参见[UniDeer 与 DeerFlow 的区别](#unideer-与-deerflow-的区别)和[致谢](#致谢)。
 
-https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
+> **关于血统的说明：** DeerFlow 2.0 是一次彻底的从头重写，与 v1 没有任何共享代码。UniDeer 建立在这一 2.0 基础之上并继续演进。最初的 v1 deep-research 框架仍在上游的 [1.x 分支](https://github.com/bytedance/deer-flow/tree/main-1.x) 维护。
 
-> [!NOTE]
-> **UniDeer 2.0 是一次彻底重写。** 它和 v1 没有共用代码。如果你要找的是最初的 Deep Research 框架，可以前往 [`1.x` 分支](https://github.com/bytedance/deer-flow/tree/main-1.x)。那里仍然欢迎贡献；当前的主要开发已经转向 2.0。
-
-## 官网
-
-想了解更多，或者直接看**真实演示**，可以访问[**官网**](https://deerflow.tech)。
-
-## 字节跳动火山引擎方舟 Coding Plan
-
-- 我们推荐使用 Doubao-Seed-2.0-Code、DeepSeek v3.2 和 Kimi 2.5 运行 UniDeer
-- [现在就加入 Coding Plan](https://www.volcengine.com/activity/codingplan?utm_campaign=uni_deer&utm_content=uni_deer&utm_medium=devrel&utm_source=OWO&utm_term=uni_deer)
-- [海外地区的开发者请点击这里](https://www.byteplus.com/en/activity/codingplan?utm_campaign=uni_deer&utm_content=uni_deer&utm_medium=devrel&utm_source=OWO&utm_term=uni_deer)
-
-## InfoQuest
-
-UniDeer 新近集成了 BytePlus 自研的智能搜索与抓取工具集——[InfoQuest（支持免费在线体验）](https://docs.byteplus.com/en/docs/InfoQuest/What_is_Info_Quest)
-
-<a href="https://docs.byteplus.com/en/docs/InfoQuest/What_is_Info_Quest" target="_blank">
-  <img
-    src="https://sf16-sg.tiktokcdn.com/obj/eden-sg/hubseh7bsbps/20251208-160108.png"   alt="InfoQuest_banner"
-  />
-</a>
+---
 
 ## 目录
 
-- [🦌 UniDeer - 2.0](#-deerflow---20)
-  - [官网](#官网)
-  - [字节跳动火山引擎方舟 Coding Plan](#字节跳动火山引擎方舟-coding-plan)
-  - [InfoQuest](#infoquest)
-  - [目录](#目录)
-  - [一句话交给 Coding Agent 安装](#一句话交给-coding-agent-安装)
-  - [快速开始](#快速开始)
-    - [配置](#配置)
-    - [运行应用](#运行应用)
-      - [部署建议与资源规划](#部署建议与资源规划)
-      - [方式一：Docker（推荐）](#方式一docker推荐)
-      - [方式二：本地开发](#方式二本地开发)
-    - [进阶配置](#进阶配置)
-      - [Sandbox 模式](#sandbox-模式)
-      - [MCP Server](#mcp-server)
-      - [IM 渠道](#im-渠道)
-      - [LangSmith 链路追踪](#langsmith-链路追踪)
-      - [Langfuse 链路追踪](#langfuse-链路追踪)
-      - [同时使用两种追踪服务](#同时使用两种追踪服务)
-  - [从 Deep Research 到 Super Agent Harness](#从-deep-research-到-super-agent-harness)
-  - [核心特性](#核心特性)
-    - [Skills 与 Tools](#skills-与-tools)
-      - [Claude Code 集成](#claude-code-集成)
-    - [Session Goals](#session-goals)
-    - [手动上下文压缩](#手动上下文压缩)
-    - [Sub-Agents](#sub-agents)
-    - [Sandbox 与文件系统](#sandbox-与文件系统)
-    - [Context Engineering](#context-engineering)
-    - [长期记忆](#长期记忆)
-  - [推荐模型](#推荐模型)
-  - [内嵌 Python Client](#内嵌-python-client)
-  - [定时任务 (Scheduled Tasks)](#定时任务-scheduled-tasks)
-  - [终端工作台 (TUI)](#终端工作台-tui)
-  - [文档](#文档)
-  - [⚠️ 安全使用](#️-安全使用)
-  - [参与贡献](#参与贡献)
-  - [许可证](#许可证)
-  - [致谢](#致谢)
-    - [核心贡献者](#核心贡献者)
-  - [Star History](#star-history)
-
-## 一句话交给 Coding Agent 安装
-
-如果你在用 Claude Code、Codex、Cursor、Windsurf 或其他 coding agent，可以直接把下面这句话发给它：
-
-```text
-如果还没 clone UniDeer，就先 clone，然后按照 https://raw.githubusercontent.com/bytedance/deer-flow/main/Install.md 把它的本地开发环境初始化好
-```
-
-这条提示词是给 coding agent 用的。它会在需要时先 clone 仓库，优先选择 Docker，完成初始化，并在结束时告诉你下一条启动命令，以及还缺哪些配置需要你补充。
-
-## 快速开始
-
-### 配置
-
-1. **克隆 UniDeer 仓库**
-
-   ```bash
-   git clone https://github.com/bytedance/deer-flow.git
-   cd deer-flow
-   ```
-
-2. **运行安装向导（推荐）**
-
-   在项目根目录（`deer-flow/`）执行：
-
-   ```bash
-   make setup
-   ```
-
-   这会启动一个交互式向导，引导你选择 LLM provider、可选的 web 搜索工具，以及 sandbox 模式、bash 权限、文件写入等执行/安全偏好。它会生成一份最小化的 `config.yaml`，并把 API key 写入 `.env`，大约 2 分钟完成。
-
-   随时可以运行 `make doctor` 检查配置和系统环境，并获得可执行的修复建议。
-   如果你要提交本地安装、配置或运行问题，可以执行 `make support-bundle`。
-   命令会直接打印 reporter 下一步建议，并在 `.deer-flow/support-bundles/` 下生成
-   `*-issue-summary.md`、面向 AI 辅助提 issue 的 `*-issue-draft.md`，以及可选证据
-   zip。提交 GitHub issue 时，先把 `*-issue-summary.md` 粘贴到 issue 正文；如果由
-   AI 助手代填 issue，就从 `*-issue-draft.md` 开始，并先替换所有 REQUIRED 占位符，
-   不要编造未知事实。只有维护者要求证据包，或摘要不足以诊断时，再附上 zip。维护者
-   或 AI 辅助 triage 可以优先读取 `triage.json`；bundle 只包含脱敏后的诊断信息和
-   文件 manifest，不包含 `.env`、原始对话消息或用户文件内容；提交前仍建议自己快速
-   检查一遍。
-
-   > **进阶 / 手动配置**：如果你更想直接编辑 `config.yaml`，可以改用 `make config` 复制完整的示例模板。完整参考见 `config.example.yaml`，其中包含 CLI-backed provider（Codex CLI、Claude Code OAuth）、OpenRouter、Responses API 等更多配置。
-
-   <details>
-   <summary>手动模型配置示例</summary>
-
-   ```yaml
-   models:
-     - name: gpt-4o
-       display_name: GPT-4o
-       use: langchain_openai:ChatOpenAI
-       model: gpt-4o
-       api_key: $OPENAI_API_KEY
-
-     - name: openrouter-gemini-2.5-flash
-       display_name: Gemini 2.5 Flash (OpenRouter)
-       use: langchain_openai:ChatOpenAI
-       model: google/gemini-2.5-flash-preview
-       api_key: $OPENROUTER_API_KEY
-       base_url: https://openrouter.ai/api/v1
-
-     - name: gpt-5-responses
-       display_name: GPT-5 (Responses API)
-       use: langchain_openai:ChatOpenAI
-       model: gpt-5
-       api_key: $OPENAI_API_KEY
-       use_responses_api: true
-       output_version: responses/v1
-
-     - name: qwen3-32b-vllm
-       display_name: Qwen3 32B (vLLM)
-       use: deerflow.models.vllm_provider:VllmChatModel
-       model: Qwen/Qwen3-32B
-       api_key: $VLLM_API_KEY
-       base_url: http://localhost:8000/v1
-       supports_thinking: true
-       when_thinking_enabled:
-         extra_body:
-           chat_template_kwargs:
-             enable_thinking: true
-   ```
-
-   OpenRouter 以及类似的 OpenAI 兼容网关，建议通过 `langchain_openai:ChatOpenAI` 配合 `base_url` 来配置。如果你更想用 provider 自己的环境变量名，也可以直接把 `api_key` 指向对应变量，例如 `api_key: $OPENROUTER_API_KEY`。
-
-   如果要让 OpenAI 模型走 `/v1/responses`，继续使用 `langchain_openai:ChatOpenAI`，并设置 `use_responses_api: true` 和 `output_version: responses/v1`。
-
-   对于 vLLM 0.19.0，请使用 `deerflow.models.vllm_provider:VllmChatModel`。对于 Qwen 风格的推理模型，UniDeer 通过 `extra_body.chat_template_kwargs.enable_thinking` 开关推理，并在多轮 tool-call 对话中保留 vLLM 非标准的 `reasoning` 字段。旧版 `thinking` 配置会自动规范化以保持向后兼容。推理模型可能还需要在启动 vLLM 服务时加上 `--reasoning-parser ...` 参数。如果你的本地 vLLM 部署接受任意非空 API key，可以把 `VLLM_API_KEY` 设为一个占位值。
-
-   CLI-backed provider 配置示例：
-
-   ```yaml
-   models:
-     - name: gpt-5.4
-       display_name: GPT-5.4 (Codex CLI)
-       use: deerflow.models.openai_codex_provider:CodexChatModel
-       model: gpt-5.4
-       supports_thinking: true
-       supports_reasoning_effort: true
-
-     - name: claude-sonnet-4.6
-       display_name: Claude Sonnet 4.6 (Claude Code OAuth)
-       use: deerflow.models.claude_provider:ClaudeChatModel
-       model: claude-sonnet-4-6
-       max_tokens: 4096
-       supports_thinking: true
-   ```
-
-   - Codex CLI 会读取 `~/.codex/auth.json`
-   - Claude Code 支持 `CLAUDE_CODE_OAUTH_TOKEN`、`ANTHROPIC_AUTH_TOKEN`、`CLAUDE_CODE_CREDENTIALS_PATH`，或 `~/.claude/.credentials.json`
-   - ACP agent 条目与 model provider 是分开配置的——如果你配置了 `acp_agents.codex`，请把它指向一个 Codex ACP 适配器，例如 `npx -y @zed-industries/codex-acp`
-   - 在 macOS 上，如有需要可显式导出 Claude Code 的认证信息：
-
-   ```bash
-   eval "$(python3 scripts/export_claude_code_oauth.py --print-export)"
-   ```
-
-   API key 也可以手动写入 `.env` 文件（推荐）或在 shell 中导出：
-
-   ```bash
-   OPENAI_API_KEY=your-openai-api-key
-   TAVILY_API_KEY=your-tavily-api-key
-   ```
-
-   </details>
-
-### 运行应用
-
-#### 部署建议与资源规划
-
-可以先按下面的资源档位来选择 UniDeer 的运行方式：
-
-| 部署场景 | 起步配置 | 推荐配置 | 说明 |
-|---------|-----------|------------|-------|
-| 本地体验 / `make dev` | 4 vCPU、8 GB 内存、20 GB SSD 可用空间 | 8 vCPU、16 GB 内存 | 适合单个开发者或单个轻量会话，且模型走外部 API。`2 核 / 4 GB` 通常跑不稳。 |
-| Docker 开发 / `make docker-start` | 4 vCPU、8 GB 内存、25 GB SSD 可用空间 | 8 vCPU、16 GB 内存 | 镜像构建、源码挂载和 sandbox 容器都会比纯本地模式更吃资源。 |
-| 长期运行服务 / `make up` | 8 vCPU、16 GB 内存、40 GB SSD 可用空间 | 16 vCPU、32 GB 内存 | 更适合共享环境、多 agent 任务、报告生成或更重的 sandbox 负载。 |
-
-- 上面的配置只覆盖 UniDeer 本身；如果你还要本机部署本地大模型，请单独为模型服务预留资源。
-- 持续运行的服务更推荐使用 Linux + Docker。macOS 和 Windows 更适合作为开发机或体验环境。
-- 如果 CPU 或内存长期打满，先降低并发会话或重任务数量，再考虑升级到更高一档配置。
-
-#### 方式一：Docker（推荐）
-
-**开发模式**（支持热更新，挂载源码）：
-
-```bash
-make docker-init    # 拉取 sandbox 镜像（首次运行或镜像更新时执行）
-make docker-start   # 启动服务（会根据 config.yaml 自动判断 sandbox 模式）
-```
-
-如果 `config.yaml` 使用的是 provisioner 模式（`sandbox.use: deerflow.community.aio_sandbox:AioSandboxProvider` 且配置了 `provisioner_url`），`make docker-start` 才会启动 `provisioner`。
-
-**生产模式**（本地构建镜像，并挂载运行期配置与数据）：
-
-```bash
-make up     # 构建镜像并启动全部生产服务
-make down   # 停止并移除容器
-```
-
-> [!NOTE]
-> 当前 Agent 运行时嵌入在 Gateway 中运行，`/api/langgraph/*` 会由 nginx 重写到 Gateway 的 LangGraph-compatible API。
-
-访问地址：http://localhost:2026
-
-更完整的 Docker 开发说明见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-#### 方式二：本地开发
-
-如果你更希望直接在本地启动各个服务：
-
-前提：先完成上面的“配置”步骤（`make setup`）。`make dev` 需要有效配置文件，默认读取项目根目录下的 `config.yaml`。可以用 `UNI_DEER_PROJECT_ROOT` 显式指定项目根目录，也可以用 `UNI_DEER_CONFIG_PATH` 指向某个具体配置文件。运行期状态默认写到项目根目录下的 `.deer-flow`，可用 `UNI_DEER_HOME` 覆盖；skills 默认读取项目根目录下的 `skills/`，可用 `UNI_DEER_SKILLS_PATH` 覆盖。启动前先运行 `make doctor` 校验配置。
-在 Windows 上，请使用 Git Bash 运行本地开发流程。基于 bash 的服务脚本不支持直接在原生 `cmd.exe` 或 PowerShell 中执行，且 WSL 也不保证可用，因为部分脚本依赖 Git for Windows 的 `cygpath` 等工具。
-
-1. **检查依赖环境**：
-   ```bash
-   make check  # 校验 Node.js 22+、pnpm、uv、nginx
-   ```
-
-2. **安装依赖**：
-   ```bash
-   make install  # 安装 backend + frontend 依赖
-   ```
-
-3. **（可选）预拉取 sandbox 镜像**：
-   ```bash
-   # 如果使用 Docker / Container sandbox，建议先执行
-   make setup-sandbox
-   ```
-
-4. **启动服务**：
-   ```bash
-   make dev
-   ```
-
-5. **访问地址**：http://localhost:2026
-
-### 进阶配置
-#### Sandbox 模式
-
-UniDeer 支持多种 sandbox 执行方式：
-- **本地执行**（直接在宿主机上运行 sandbox 代码）
-- **Docker 执行**（在隔离的 Docker 容器里运行 sandbox 代码）
-- **Docker + Kubernetes 执行**（通过 provisioner 服务在 Kubernetes Pod 中运行 sandbox 代码）
-
-Docker 开发时，服务启动行为会遵循 `config.yaml` 里的 sandbox 模式。在 Local / Docker 模式下，不会启动 `provisioner`。
-
-如果要配置你自己的模式，参见 [Sandbox 配置指南](backend/docs/CONFIGURATION.md#sandbox)。
-
-#### MCP Server
-
-UniDeer 支持可配置的 MCP Server 和 skills，用来扩展能力。
-对于 HTTP/SSE MCP Server，还支持 OAuth token 流程（`client_credentials`、`refresh_token`）。
-详细说明见 [MCP Server 指南](backend/docs/MCP_SERVER.md)。
-
-#### IM 渠道
-
-UniDeer 支持从即时通讯应用接收任务。只要配置完成，对应渠道会自动启动，而且都不需要公网 IP。
-
-UniDeer 还可以在 workspace UI 里暴露用户自有的 IM 渠道连接。启用 `channel_connections` 后，已登录用户可以从侧边栏 / Settings > Channels 绑定 Telegram、Slack、Discord、Feishu/Lark、DingTalk、WeChat 或 WeCom。它复用现有的 `channels.*` 出站传输，因此不需要公网 IP 或 provider 回调地址。入站 IM 消息会以所连接的 UniDeer 用户身份运行。设置和安全注意事项参见 [IM Channel Connections](backend/docs/IM_CHANNEL_CONNECTIONS.md)。
-
-| 渠道 | 传输方式 | 上手难度 |
-|---------|-----------|------------|
-| Telegram | Bot API（long-polling） | 简单 |
-| Slack | Socket Mode | 中等 |
-| Feishu / Lark | WebSocket | 中等 |
-| WeChat | Tencent iLink（long-polling） | 中等 |
-| 企业微信智能机器人 | WebSocket | 中等 |
-| 钉钉 | Stream Push（WebSocket） | 中等 |
-
-**`config.yaml` 中的配置示例：**
-
-```yaml
-channels:
-  # LangGraph-compatible Gateway API base URL（默认：http://localhost:8001/api）
-  langgraph_url: http://localhost:8001/api
-  # Gateway API URL（默认：http://localhost:8001）
-  gateway_url: http://localhost:8001
-
-  # 可选：所有移动端渠道共用的全局 session 默认值
-  session:
-    assistant_id: lead_agent  # 也可以填自定义 agent 名；渠道层会自动转换为 lead_agent + agent_name
-    config:
-      recursion_limit: 100
-    context:
-      thinking_enabled: true
-      is_plan_mode: false
-      subagent_enabled: false
-
-  feishu:
-    enabled: true
-    app_id: $FEISHU_APP_ID
-    app_secret: $FEISHU_APP_SECRET
-    # domain: https://open.feishu.cn       # 国内版（默认）
-    # domain: https://open.larksuite.com   # 国际版
-
-  wecom:
-    enabled: true
-    bot_id: $WECOM_BOT_ID
-    bot_secret: $WECOM_BOT_SECRET
-
-  slack:
-    enabled: true
-    bot_token: $SLACK_BOT_TOKEN     # xoxb-...
-    app_token: $SLACK_APP_TOKEN     # xapp-...（Socket Mode）
-    allowed_users: []               # 留空表示允许所有人
-
-  telegram:
-    enabled: true
-    bot_token: $TELEGRAM_BOT_TOKEN
-    allowed_users: []               # 留空表示允许所有人
-
-    # 可选：按渠道 / 按用户单独覆盖 session 配置
-    session:
-      assistant_id: mobile-agent  # 这里同样支持自定义 agent 名
-      context:
-        thinking_enabled: false
-      users:
-        "123456789":
-          assistant_id: vip-agent
-          config:
-            recursion_limit: 150
-          context:
-            thinking_enabled: true
-            subagent_enabled: true
-
-  wechat:
-    enabled: false
-    bot_token: $WECHAT_BOT_TOKEN
-    ilink_bot_id: $WECHAT_ILINK_BOT_ID
-    qrcode_login_enabled: true      # 可选：bot_token 缺失时允许首次扫码登录引导
-    allowed_users: []               # 留空表示允许所有人
-    polling_timeout: 35
-    state_dir: ./.deer-flow/wechat/state
-    max_inbound_image_bytes: 20971520
-    max_outbound_image_bytes: 20971520
-    max_inbound_file_bytes: 52428800
-    max_outbound_file_bytes: 52428800
-
-  dingtalk:
-    enabled: true
-    client_id: $DINGTALK_CLIENT_ID             # 钉钉开放平台 ClientId
-    client_secret: $DINGTALK_CLIENT_SECRET     # 钉钉开放平台 ClientSecret
-    allowed_users: []                          # 留空表示允许所有人
-    card_template_id: ""                       # 可选：AI 卡片模板 ID，用于流式打字机效果
-```
-
-说明：
-- `assistant_id: lead_agent` 会直接调用默认的 LangGraph assistant。
-- 如果 `assistant_id` 填的是自定义 agent 名，UniDeer 仍然会走 `lead_agent`，同时把该值注入为 `agent_name`，这样 IM 渠道也会生效对应 agent 的 SOUL 和配置。
-
-在 `.env` 里设置对应的 API key：
-
-```bash
-# Telegram
-TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
-
-# Slack
-SLACK_BOT_TOKEN=xoxb-...
-SLACK_APP_TOKEN=xapp-...
-
-# Feishu / Lark
-FEISHU_APP_ID=cli_xxxx
-FEISHU_APP_SECRET=your_app_secret
-
-# WeChat iLink
-WECHAT_BOT_TOKEN=your_ilink_bot_token
-WECHAT_ILINK_BOT_ID=your_ilink_bot_id
-
-# 企业微信智能机器人
-WECOM_BOT_ID=your_bot_id
-WECOM_BOT_SECRET=your_bot_secret
-
-# 钉钉
-DINGTALK_CLIENT_ID=your_client_id
-DINGTALK_CLIENT_SECRET=your_client_secret
-```
-
-**Telegram 配置**
-
-1. 打开 [@BotFather](https://t.me/BotFather)，发送 `/newbot`，复制生成的 HTTP API token。
-2. 在 `.env` 中设置 `TELEGRAM_BOT_TOKEN`，并在 `config.yaml` 里启用该渠道。
-3. 机器人支持接收入站文本、图片和文档（可带说明文字，也可不带）；托管版 Bot API 的单个附件下载上限为 20 MB。
-
-**Slack 配置**
-
-1. 前往 [api.slack.com/apps](https://api.slack.com/apps) 创建 Slack App：Create New App → From scratch。
-2. 在 **OAuth & Permissions** 中添加 Bot Token Scopes：`app_mentions:read`、`chat:write`、`im:history`、`im:read`、`im:write`、`files:write`。
-3. 启用 **Socket Mode**，生成带 `connections:write` 权限的 App-Level Token（`xapp-...`）。
-4. 在 **Event Subscriptions** 中订阅 bot events：`app_mention`、`message.im`。
-5. 在 `.env` 中设置 `SLACK_BOT_TOKEN` 和 `SLACK_APP_TOKEN`，并在 `config.yaml` 中启用该渠道。
-
-**Feishu / Lark 配置**
-
-1. 在 [飞书开放平台](https://open.feishu.cn/) 创建应用，并启用 **Bot** 能力。
-2. 添加权限：`im:message`、`im:message.p2p_msg:readonly`、`im:resource`。
-3. 在 **事件订阅** 中订阅 `im.message.receive_v1`，连接方式选择 **长连接**。
-4. 复制 App ID 和 App Secret，在 `.env` 中设置 `FEISHU_APP_ID` 和 `FEISHU_APP_SECRET`，并在 `config.yaml` 中启用该渠道。
-
-**WeChat 配置**
-
-1. 在 `config.yaml` 中启用 `wechat` 渠道。
-2. 在 `.env` 中设置 `WECHAT_BOT_TOKEN`，或者把 `qrcode_login_enabled` 设为 `true` 以便首次扫码登录引导。
-3. 当 `bot_token` 缺失且启用了扫码引导时，留意后端日志里 iLink 返回的二维码内容，并完成绑定流程。
-4. 扫码流程成功后，UniDeer 会把获取到的 token 持久化到 `state_dir`，便于后续重启复用。
-5. Docker Compose 部署时，请把 `state_dir` 放在持久化卷上，这样 `get_updates_buf` 游标和已保存的登录状态才能在重启后保留。
-
-**企业微信智能机器人配置**
-
-1. 在企业微信智能机器人平台创建机器人，获取 `bot_id` 和 `bot_secret`。
-2. 在 `config.yaml` 中启用 `channels.wecom`，并填入 `bot_id` / `bot_secret`。
-3. 在 `.env` 中设置 `WECOM_BOT_ID` 和 `WECOM_BOT_SECRET`。
-4. 安装后端依赖时确保包含 `wecom-aibot-python-sdk`，渠道会通过 WebSocket 长连接接收消息，无需公网回调地址。
-5. 当前支持文本、图片和文件入站消息；agent 生成的最终图片/文件也会回传到企业微信会话中。
-
-**钉钉配置**
-
-1. 在 [钉钉开放平台](https://open.dingtalk.com/) 创建应用，并启用 **机器人** 能力。
-2. 在机器人配置页面设置消息接收模式为 **Stream模式**。
-3. 复制 `Client ID` 和 `Client Secret`，在 `.env` 中设置 `DINGTALK_CLIENT_ID` 和 `DINGTALK_CLIENT_SECRET`，并在 `config.yaml` 中启用该渠道。
-4. *（可选）* 如需开启流式 AI 卡片回复（打字机效果），请在[钉钉卡片平台](https://open.dingtalk.com/document/dingstart/typewriter-effect-streaming-ai-card)创建 **AI 卡片**模板，然后在 `config.yaml` 中将 `card_template_id` 设为该模板 ID。同时需要申请 `Card.Streaming.Write` 和 `Card.Instance.Write` 权限。
-
-**命令**
-
-渠道连接完成后，你可以直接在聊天窗口里和 UniDeer 交互：
-
-| 命令 | 说明 |
-|---------|-------------|
-| `/new` | 开启新对话 |
-| `/status` | 查看当前 thread 信息 |
-| `/models` | 列出可用模型 |
-| `/memory` | 查看 memory |
-| `/help` | 查看帮助 |
-
-> 没有命令前缀的消息会被当作普通聊天处理。UniDeer 会自动创建 thread，并以对话方式回复。
-
-#### LangSmith 链路追踪
-
-UniDeer 内置了 [LangSmith](https://smith.langchain.com) 集成，用于可观测性。启用后，所有 LLM 调用、agent 运行和工具执行都会被追踪，并在 LangSmith 仪表盘中展示。
-
-在 `.env` 文件中添加以下配置：
-
-```bash
-LANGSMITH_TRACING=true
-LANGSMITH_ENDPOINT=https://api.smith.langchain.com
-LANGSMITH_API_KEY=lsv2_pt_xxxxxxxxxxxxxxxx
-LANGSMITH_PROJECT=xxx
-```
-
-#### Langfuse 链路追踪
-
-UniDeer 同样支持 [Langfuse](https://langfuse.com) 可观测性，适用于兼容 LangChain 的运行。
-
-在 `.env` 文件中添加以下配置：
-
-```bash
-LANGFUSE_TRACING=true
-LANGFUSE_PUBLIC_KEY=pk-lf-xxxxxxxxxxxxxxxx
-LANGFUSE_SECRET_KEY=sk-lf-xxxxxxxxxxxxxxxx
-LANGFUSE_BASE_URL=https://cloud.langfuse.com
-```
-
-如果你使用自托管的 Langfuse 实例，请将 `LANGFUSE_BASE_URL` 设置为你的部署地址。
-
-**链路关联字段。** 每次 agent 运行都会标注 Langfuse 的保留追踪属性，这样 Sessions 和 Users 页面就能自动填充数据：
-
-- `session_id` = LangGraph 的 `thread_id`——将同一会话的所有 trace 归为一组
-- `user_id` = 来自 `get_effective_user_id()` 的有效用户（在无鉴权模式下回退为 `default`）
-- `trace_name` = assistant id（默认为 `lead-agent`）
-- `tags` = `[env:<UNI_DEER_ENV>, model:<model_name>]`（未设置时省略）
-- `metadata.deerflow_trace_id` = UniDeer 的请求关联 id，当启用请求链路关联（request trace correlation）时与 `X-Trace-Id` 一致
-
-这些字段会在图（graph）调用的根部注入到 `RunnableConfig.metadata`，同时覆盖 gateway 路径（`runtime/runs/worker.py::run_agent`）和内嵌路径（`client.py::UniDeerClient.stream`），因此任何兼容 LangChain 的 callback 都能读取到它们。设置 `UNI_DEER_ENV`（或 `ENVIRONMENT`）可按部署环境为 trace 打标签。
-
-#### 同时使用两种追踪服务
-
-如果同时启用 LangSmith 和 Langfuse，UniDeer 会挂载两个追踪 callback，并将相同的模型活动上报到两个系统。
-
-如果某个 provider 被显式启用但缺少必要的凭据，或其 callback 初始化失败，UniDeer 会在创建模型、初始化追踪时快速失败（fail fast），错误信息会指明导致失败的 provider。
-
-Docker 部署时，追踪默认关闭。在 `.env` 中设置 `LANGSMITH_TRACING=true` 和 `LANGSMITH_API_KEY` 即可启用。
-
-## 从 Deep Research 到 Super Agent Harness
-
-UniDeer 最初是一个 Deep Research 框架，后来社区把它一路推到了更远的地方。上线之后，开发者拿它去做的事情早就不止研究：搭数据流水线、生成演示文稿、快速起 dashboard、自动化内容流程，很多方向一开始连我们自己都没想到。
-
-这让我们意识到一件事：UniDeer 不只是一个研究工具。它更像一个 **harness**，一个真正让 agents 把事情做完的运行时基础设施。
-
-所以我们把它从头重做了一遍。
-
-UniDeer 2.0 不再是一个需要你自己拼装的 framework。它是一个开箱即用、同时又足够可扩展的 super agent harness。基于 LangGraph 和 LangChain 构建，默认就带上了 agent 真正会用到的关键能力：文件系统、memory、skills、sandbox 执行环境，以及为复杂多步骤任务做规划、拉起 sub-agents 的能力。
-
-你可以直接拿来用，也可以拆开重组，改成你自己的样子。
-
-## 核心特性
-
-### Skills 与 Tools
-
-Skills 是 UniDeer 能做“几乎任何事”的关键。
-
-标准的 Agent Skill 是一种结构化能力模块，通常就是一个 Markdown 文件，里面定义了工作流、最佳实践，以及相关的参考资源。UniDeer 自带一批内置 skills，覆盖研究、报告生成、演示文稿制作、网页生成、图像和视频生成等场景。真正有意思的地方在于它的扩展性：你可以加自己的 skills，替换内置 skills，或者把多个 skills 组合成复合工作流。
-
-Skills 采用按需渐进加载，不会一次性把所有内容都塞进上下文。只有任务确实需要时才加载，这样能把上下文窗口控制得更干净，也更适合对 token 比较敏感的模型。
-
-通过 Gateway 安装 `.skill` 压缩包时，UniDeer 会接受标准的可选 frontmatter 元数据，比如 `version`、`author`、`compatibility`，不会把本来合法的外部 skill 拒之门外。
-
-Tools 也是同样的思路。UniDeer 自带一组核心工具：网页搜索、网页抓取、网页渲染截图、文件操作、bash 执行；同时也支持通过 MCP Server 和 Python 函数扩展自定义工具。你可以替换任何一项，也可以继续往里加。
-
-Gateway 生成后续建议时，现在会先把普通字符串输出和 block/list 风格的富文本内容统一归一化，再去解析 JSON 数组响应，因此不同 provider 的内容包装方式不会再悄悄把建议吞掉。
-
-Web UI 支持从已完成的 assistant 回复分叉出一个新的主对话。新 thread 会保留该轮回复的 checkpoint 以及用户消息之前的重放 checkpoint，因此分叉后可以立即重新生成该回复。对于缺少 checkpoint 父链接的旧历史或导入历史，Gateway 会进行有界的时间顺序查找；如果不存在更早的重放 checkpoint，分叉仍会按旧版单-checkpoint 形态成功创建，但无法重新生成继承的回复。已有的单-checkpoint 分叉会保持不变，不会通过不安全的 checkpoint 复制尝试修复。只有从最新回合分叉时才会尽力复制当前 thread 的工作区文件；从历史回合分叉不会带入后续时间线创建的文件。
-
-```text
-# sandbox 容器内的路径
-/mnt/skills/public
-├── research/SKILL.md
-├── report-generation/SKILL.md
-├── slide-creation/SKILL.md
-├── web-page/SKILL.md
-└── image-generation/SKILL.md
-
-/mnt/skills/custom
-└── your-custom-skill/SKILL.md      ← 你的 skill
-```
-
-#### Claude Code 集成
-
-借助 `claude-to-deerflow` skill，你可以直接在 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 里和正在运行的 UniDeer 实例交互。不用离开终端，就能下发研究任务、查看状态、管理 threads。
-
-**安装这个 skill：**
-
-```bash
-npx skills add https://github.com/bytedance/deer-flow --skill claude-to-deerflow
-```
-
-然后确认 UniDeer 已经启动（默认地址是 `http://localhost:2026`），在 Claude Code 里使用 `/claude-to-deerflow` 命令即可。
-
-**你可以做的事情包括：**
-- 给 UniDeer 发送消息，并接收流式响应
-- 选择执行模式：flash（更快）、standard、pro（规划模式）、ultra（sub-agents 模式）
-- 检查 UniDeer 健康状态，列出 models / skills / agents
-- 管理 threads 和会话历史
-- 上传文件做分析
-
-**环境变量**（可选，用于自定义端点）：
-
-```bash
-DEERFLOW_URL=http://localhost:2026            # 统一代理基地址
-DEERFLOW_GATEWAY_URL=http://localhost:2026    # Gateway API
-DEERFLOW_LANGGRAPH_URL=http://localhost:2026/api/langgraph  # LangGraph API
-```
-
-完整 API 说明见 [`skills/public/claude-to-deerflow/SKILL.md`](skills/public/claude-to-deerflow/SKILL.md)。
-
-Web UI 输入框支持浏览器侧语音听写。浏览器提供 Web Speech API 时，麦克风按钮会把语音转写为本地草稿；UniDeer 只接收转写后的文本，音频处理交由浏览器或操作系统语音识别服务按其环境策略完成。用户可以在发送前继续检查和编辑文本。
-
-### Session Goals
-
-用 `/goal <完成条件>` 为当前 thread 绑定一个激活态的完成条件。这个 goal 是 thread 维度的状态，而不是技能激活，所以它会跨轮次持续生效，直到 UniDeer 判定它已被满足、或者你手动清除它。
-
-支持的命令：
-
-```text
-/goal finish the implementation and make all tests pass
-/goal              # 查看当前激活的 goal
-/goal clear        # 清除它
-```
-
-每次 Gateway 驱动的 run 结束后，UniDeer 会用一个 non-thinking 的评估模型，把可见的对话内容拿去和激活的 goal 比对。评估模型必须返回一个带类型的 blocker（`missing_evidence`、`needs_user_input`、`run_failed`、`external_wait` 或 `goal_not_met_yet`），并附上可见证据。只有在最近一轮 assistant 回复已被持久化 checkpoint、blocker 是 `goal_not_met_yet`、评估期间 thread 没有变化、且无进展熔断器没有触发时，UniDeer 才会注入一次 hidden continuation。安全上限默认是 8 次 hidden continuation；连续两次相同的无进展评估后就会停止。`/goal clear` 以及任何用户手动输入的新内容，优先级都高于排队中的 continuation。当 goal 被满足时，UniDeer 会自动清除它，并发布更新后的 thread 状态。
-
-Web UI 会在输入框上方展示当前激活的 goal。同样的命令在 TUI 和受支持的 IM 渠道里也可用。在 Web UI 和受支持的 IM 渠道里，设置 `/goal <完成条件>` 还会以该条件作为任务启动一次 run；状态查询和清除命令则只管理 goal 状态本身。
-
-### 手动上下文压缩
-
-在 Web UI 输入框中使用 `/compact`，可以把当前 thread 的早期上下文压缩成摘要。完整聊天记录仍会保留在界面上，但后续模型调用会基于压缩摘要和最近消息继续。当前历史不足时不会压缩；thread 正在运行任务时会阻止压缩。
-
-### Sub-Agents
-
-Sub-agent 是一种执行优化，而不是遇到复杂任务时的默认选择。
-
-lead agent 只会在委派具有明确净收益时动态拉起 sub-agents，例如真正缩短耗时的并行工作、专业能力收益或上下文隔离收益。存在跨 Agent 依赖或重叠副作用的工作不会并行分派；当专业能力或上下文隔离收益明显占优时，一条有界的顺序任务链仍可交给一个 sub-agent 完成。lead agent 会使用能取得收益的最少 sub-agents，并在每一批完成后重新评估，而不会仅仅因为任务规模大或步骤多就继续拆分。每个 sub-agent 都有自己独立的上下文、工具和终止条件，返回结构化结果后由 lead agent 验证并汇总成完整输出。
-
-例如，彼此独立的只读研究可以在并行节省的时间明显高于重复检索和结果合并成本时并发执行；而会修改相同文件、依赖连续测试反馈的仓库重构则由 lead agent 直接完成。当 `max_concurrent_subagents` 为 `1` 时，提示词会关闭并行和多批次路由指导，仅在专业能力或上下文隔离具有明确收益时保留委派。
-
-### Sandbox 与文件系统
-
-UniDeer 不只是“会说它能做”，它是真的有一台自己的“电脑”。
-
-每个任务都运行在隔离的 Docker 容器里，里面有完整的文件系统，包括 skills、workspace、uploads、outputs。agent 可以读写和编辑文件，可以执行 bash 命令和代码，也可以查看图片。整个过程都在 sandbox 内完成，可审计、会隔离，不会在不同 session 之间互相污染。
-
-这就是“带工具的聊天机器人”和“真正有执行环境的 agent”之间的差别。
-
-```text
-# sandbox 容器内的路径
-/mnt/user-data/
-├── uploads/          ← 你的文件
-├── workspace/        ← agents 的工作目录
-└── outputs/          ← 最终交付物
-```
-
-### Context Engineering
-
-**隔离的 Sub-Agent Context**：每个 sub-agent 都在自己独立的上下文里运行。它看不到主 agent 的上下文，也看不到其他 sub-agents 的上下文。这样做的目的很直接，就是让它只聚焦当前任务，不被无关信息干扰。
-
-**摘要压缩**：在单个 session 内，UniDeer 会比较积极地管理上下文，包括总结已完成的子任务、把中间结果转存到文件系统、压缩暂时不重要的信息。这样在长链路、多步骤任务里，它也能保持聚焦，而不会轻易把上下文窗口打爆。
-
-### 长期记忆
-
-大多数 agents 会在对话结束后把一切都忘掉，UniDeer 不一样。
-
-跨 session 使用时，UniDeer 会逐步积累关于你的持久 memory，包括你的个人偏好、知识背景，以及长期沉淀下来的工作习惯。你用得越多，它越了解你的写作风格、技术栈和重复出现的工作流。memory 保存在本地，控制权也始终在你手里。
-
-默认 DeerMem `middleware` 模式会先判断候选信息的作用域、持久性和授权属性，再由确定性写入门决定是否保存。只有稳定、描述性的用户级事实能进入长期 memory；当前对话或项目的约束、一次性操作授权仍留在对话状态中。用户全局 summary 必须同时具有用户级作用域和描述性授权属性，基于矛盾的删除也会经过作用域保护；如果删除依赖一条替代事实，只有替代事实真正通过校验并保留下来后才执行删除。这些分类字段只用于本次抽取，不写入 fact 文件，也不增加 LLM 调用次数。`memory.mode: tool` 的显式 CRUD 仍是独立的模型直写路径。如果通过 `memory.backend_config.prompts_dir` 覆盖了内置抽取模板，必须同步在自定义模板中加入新的分类字段（`memory_update` 的 fact/summary/removal 格式与 `consolidation` 的合并 fact 结构）：写入门是 fail closed 的，未迁移的旧模板会导致所有抽取驱动的 fact、summary 与删除写入停止，只能通过 `rejected_by_scope_gate` 指标和高拒绝率告警发现。
-
-## 推荐模型
-
-UniDeer 对模型没有强绑定，只要实现了 OpenAI 兼容 API 的 LLM，理论上都可以接入。不过在下面这些能力上表现更强的模型，通常会更适合 UniDeer：
-
-- **长上下文窗口**（100k+ tokens），适合深度研究和多步骤任务
-- **推理能力**，适合自适应规划和复杂拆解
-- **多模态输入**，适合理解图片和视频
-- **稳定的 tool use 能力**，适合可靠的函数调用和结构化输出
-
-## 内嵌 Python Client
-
-UniDeer 也可以作为内嵌的 Python 库使用，不必启动完整的 HTTP 服务。`UniDeerClient` 提供了进程内的直接访问方式，覆盖所有 agent 和 Gateway 能力，返回的数据结构与 HTTP Gateway API 保持一致。HTTP Gateway 还提供 `DELETE /api/threads/{thread_id}`，用于在 LangGraph thread 本身被删除之后，清理 UniDeer 托管的本地 thread 数据：
-
-```python
-from deerflow.client import UniDeerClient
-
-client = UniDeerClient()
-
-# Chat
-response = client.chat("Analyze this paper for me", thread_id="my-thread")
-
-# Streaming（LangGraph SSE 协议：values、messages-tuple、end）
-for event in client.stream("hello"):
-    if event.type == "messages-tuple" and event.data.get("type") == "ai":
-        print(event.data["content"])
-
-# 配置与管理：返回值与 Gateway 对齐的 dict
-models = client.list_models()        # {"models": [...]}
-skills = client.list_skills()        # {"skills": [...]}
-client.update_skill("web-search", enabled=True)
-client.upload_files("thread-1", ["./report.pdf"])  # {"success": True, "files": [...]}
-client.set_goal("thread-1", "finish the implementation and make all tests pass")
-client.get_goal("thread-1")       # {"goal": {...}} or {"goal": None}
-client.clear_goal("thread-1")
-```
-
-所有返回 dict 的方法都会在 CI 中通过 Gateway 的 Pydantic 响应模型校验（`TestGatewayConformance`），以确保内嵌 client 始终和 HTTP API schema 保持同步。完整 API 说明见 `backend/packages/harness/deerflow/client.py`。
-
-## 定时任务 (Scheduled Tasks)
-
-UniDeer 现在在 workspace 里内置了一个一等的定时任务（scheduled-task）MVP。
-
-当前 MVP 能力：
-
-- 在 `/workspace/scheduled-tasks` 管理任务
-- 每个定时任务可以选择复用同一个 thread，也可以选择每次运行新建一个 thread
-- 支持 `once` 和 `cron` 两种调度方式
-- 后台定时执行以非交互式 UniDeer run 运行（那里不会暴露 `ask_clarification`）
-- 当到期的 cron 执行与同一复用 thread 上的活跃 run 冲突时，采用 `skip` 的重叠处理策略
-- 支持暂停、恢复、手动触发、查看历史和删除任务
-- 定时任务通过正常的 UniDeer run 生命周期执行
-
-当前 MVP 限制：
-
-- 暂时还没有可在对话中创建任务的 `schedule_task` 工具
-- 没有纯文本通知任务
-- 没有渠道或 GitHub 分发目标
-- 第一版没有 `interval` 调度类型
-
-通过 `config.yaml -> scheduler.enabled` 开启后台轮询。手动触发使用同样的 scheduled-task 资源和执行路径。
-
-## 终端工作台 (TUI)
-
-`deerflow` 是一个面向终端用户的工作台，**内嵌**运行在 `UniDeerClient` 之上——无需启动 Gateway、前端、nginx 或 Docker，同时沿用与 UniDeer 其它部分相同的 `config.yaml`、checkpointer、技能、记忆、MCP 和沙箱配置。
-
-![UniDeer TUI](docs/tui/tui-preview.svg)
-
-```bash
-uv pip install 'deerflow-harness[tui]'        # 可选的 'textual' 依赖
-
-deerflow                                      # 启动终端 UI（需要 TTY）
-deerflow --continue                           # 恢复最近一次会话
-deerflow --resume THREAD                      # 按 id 恢复指定会话
-deerflow --print "总结一下这个仓库"             # 无头模式，结果打印到 stdout
-deerflow --json  "hello"                       # 无头模式，输出按行分隔的 StreamEvent
-```
-
-键盘驱动的对话界面：流式渲染的对话区（回答按 Markdown 渲染）、紧凑的工具活动卡片、`/` 斜杠命令面板、`/model` 与 `/threads` 选择器、输入历史，以及 `Esc` / `Ctrl+C` 打断。在 TUI 里开启的会话也会出现在 Web UI 侧边栏——它会以本地默认用户身份写入共享的会话存储，因此终端与网页保持同步，**无需运行 Gateway**。
-
-完整说明见 [backend/docs/TUI.md](backend/docs/TUI.md)。
-
-## 文档
-
-- [贡献指南](CONTRIBUTING.md) - 开发环境搭建与协作流程
-- [配置指南](backend/docs/CONFIGURATION.md) - 安装与配置说明
-- [架构概览](backend/CLAUDE.md) - 技术架构说明
-- [后端架构](backend/README.md) - 后端架构与 API 参考
-
-## ⚠️ 安全使用
-
-### 不恰当的部署可能导致安全风险
-
-UniDeer 具备**系统指令执行、资源操作、业务逻辑调用**等关键高权限能力，默认设计为**部署在本地可信环境（仅本机 127.0.0.1 回环访问）**。若您将 agent 部署至不可信局域网、公网云服务器等可被多终端访问的网络环境，且未采取严格的安全防护措施，可能导致安全风险，例如：
-
-- **未授权的非法调用**：agent 功能被未授权的第三方、公网恶意扫描程序探测到，进而发起批量非法调用请求，执行系统命令、文件读写等高危操作，可能导致安全后果。
-- **合规与法律风险**：若 agent 被非法调用用于实施网络攻击、信息窃取等违法违规行为，可能产生法律责任与合规风险。
-
-### 安全使用建议
-
-**注意：建议您将 UniDeer 部署在本地可信的网络环境下。** 若您有跨设备、跨网络的部署需求，必须加入严格的安全措施。例如，采取如下手段：
-
-- **设置访问 IP 白名单**：使用 `iptables`，或部署硬件防火墙 / 带访问控制（ACL）功能的交换机等，**配置规则设置 IP 白名单**，拒绝其他所有 IP 进行访问。
-- **前置身份验证**：配置反向代理（nginx 等），并**开启高强度的前置身份验证功能**，禁止无任何身份验证的访问。
-- **网络隔离**：若有可能，建议将 agent 和可信设备划分到**同一个专用 VLAN**，与其他网络设备做隔离。
-- **持续关注项目更新**：请持续关注 UniDeer 项目的安全功能更新。
-
-## 参与贡献
-
-欢迎参与贡献。开发环境、工作流和相关规范见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-目前回归测试已经覆盖 Docker sandbox 模式识别，以及 `backend/tests/` 中 provisioner kubeconfig-path 处理相关测试。
-
-## 许可证
-
-本项目采用 [MIT License](./LICENSE) 开源发布。
+- [为什么选择 UniDeer](#为什么选择-unideer)
+  - [“聊天机器人加工具”的问题](#聊天机器人加工具的问题)
+  - [设计原则](#设计原则)
+- [致谢](#致谢)
+- [UniDeer 与 DeerFlow 的区别](#unideer-与-deerflow-的区别)
+- [架构概览](#架构概览)
+  - [服务拓扑](#服务拓扑)
+  - [harness 与 app 的依赖防火墙](#harness-与-app-的依赖防火墙)
+  - [一次典型的请求，端到端](#一次典型的请求端到端)
+- [核心特性](#核心特性)
+  - [Skills 与工具](#skills-与工具)
+  - [中间件流水线](#中间件流水线)
+  - [子代理](#子代理)
+  - [沙箱与文件系统](#沙箱与文件系统)
+  - [上下文工程](#上下文工程)
+  - [长期记忆](#长期记忆)
+  - [MCP 与模型工厂](#mcp-与模型工厂)
+  - [工具目录](#工具目录)
+- [运行时与可靠性](#运行时与可靠性)
+  - [运行所有权、租约与恢复](#运行所有权租约与恢复)
+  - [检查点](#检查点)
+  - [数据库级并发不变量](#数据库级并发不变量)
+- [快速开始](#快速开始)
+  - [前置要求](#前置要求)
+  - [配置](#配置)
+  - [运行应用](#运行应用)
+  - [启动模式](#启动模式)
+- [进阶](#进阶)
+  - [沙箱提供方](#沙箱提供方)
+  - [IM 渠道](#im-渠道)
+  - [授权与 RBAC](#授权与-rbac)
+  - [追踪与可观测性](#追踪与可观测性)
+  - [定时任务](#定时任务)
+  - [Provisioner（Kubernetes）](#provisionerkubernetes)
+- [嵌入式 Python 客户端](#嵌入式-python-客户端)
+- [终端工作台（TUI）](#终端工作台tui)
+- [部署](#部署)
+  - [本地开发](#本地开发)
+  - [Docker](#docker)
+  - [Kubernetes](#kubernetes)
+- [安全](#安全)
+- [文档](#文档)
+- [贡献](#贡献)
+- [许可证](#许可证)
+
+---
+
+## 为什么选择 UniDeer
+
+大多数“AI 代理”工具只是接了一个搜索工具的聊天界面。UniDeer 是一个 **harness**：一个结构化的运行时，把随机的 LLM 生成转变为确定性的、由状态机管理的执行流水线。
+
+一次请求会流经：
+
+1. **主导代理（lead agent）** — 规划本轮，决定是否委派，并综合最终答案
+2. **中间件链** — 由 35 个以上可组合的拦截器组成的流水线，在每次模型调用和工具执行前后强制执行技能、预算、安全和工具策略
+3. **子代理** — 并行、隔离的工作单元，用于那些能从真实并行延迟、专业能力或上下文隔离中受益的任务
+4. **沙箱** — 每个线程独立的文件系统（skills、workspace、uploads、outputs），并带有可插拔的执行隔离
+5. **记忆** — 跨会话持久化的用户画像和事实，在相关时注入提示词
+6. **流式输出** — SSE 事件，实时渲染到 Web UI、TUI 或 IM 渠道
+
+核心理念只有一句话：**skills 负责教学，middlewares 负责执行。** 能力在 `SKILL.md` 文件中声明；不变量——写前先读、token 预算、工具策略、循环检测、安全终止——在代码中确定性地执行，无论模型决定做什么。
+
+### “聊天机器人加工具”的问题
+
+单纯的 LLM 加工具的聊天封装有三个结构性弱点，UniDeer 正是为此而设计：
+
+- **没有强制力。** 模型可以无视指令。“先搜索再回答”的提示只是一个建议；而统计搜索次数并注入纠正的中间件则是一种保证。
+- **没有隔离。** 每次工具调用都运行在与聊天相同的上下文中，因此冗长的研究任务会污染对话，子任务也无法安全地并行运行。
+- **没有状态纪律。** 没有检查点、压缩和跨会话记忆，多轮任务会失去连贯性，多小时的任任务则会撑爆上下文窗口。
+
+UniDeer 用状态机运行时、强制流水线和沙箱文件系统解决了这三个问题。
+
+### 设计原则
+
+- **确定性优于随机性。** 提示词负责引导；中间件负责执行。门控、计数和策略都从消息历史和线程状态推导，不依赖模型的临时决定。
+- **渐进加载。** 技能只在需要时加载，保持上下文窗口精简。工具通过 `tool_search` 发现，仅在相关时提升。
+- **默认隔离。** 子代理无法看到父代理的历史；沙箱路径按线程隔离；记忆按用户和代理隔离；运行有所有权和租约。
+- **失败关闭。** 冲突的状态更新会抛错，工具授权在执行前过滤，检查点不变量在数据库层用部分唯一索引强制执行。
+- **可运维。** 运行租约、孤儿恢复、请求追踪关联，以及可插拔的追踪（Langfuse、LangSmith、Monocle）都是一等公民，而不是事后补充。
 
 ## 致谢
 
-UniDeer 建立在开源社区大量优秀工作的基础上。所有让 UniDeer 成为可能的项目和贡献者，我们都心怀感谢。毫不夸张地说，我们是站在巨人的肩膀上继续往前走。
+UniDeer 的存在离不开前人的工作。
 
-特别感谢以下项目带来的关键支持：
+- **[ByteDance](https://www.bytedance.com/)** — 原始 DeerFlow 项目和 deep-research 框架的创造者，UniDeer 正是从其 fork 而来。本项目建立在他们开源的基础之上。
+- **[DeerFlow](https://github.com/bytedance/deer-flow)** — 上游开源项目（MIT 许可），UniDeer 是其社区 fork。我们感谢其架构、skills 生态和工程成果。
+- **DeerFlow v1 维护者与贡献者** — 最初的 Deep Research 框架（在 [1.x 分支](https://github.com/bytedance/deer-flow/tree/main-1.x) 维护）为 UniDeer 所基于的 2.0 重写奠定了基础。
+- **DeerFlow 社区** — 塑造了上游项目的贡献者、测试者和用户。
 
-- **[LangChain](https://github.com/langchain-ai/langchain)**：它们提供的优秀框架支撑了我们的 LLM 交互与 chains，让整体集成和能力编排顺畅可用。
-- **[LangGraph](https://github.com/langchain-ai/langgraph)**：它们在多 agent 编排上的创新方式，是 UniDeer 复杂工作流得以成立的重要基础。
+UniDeer 自身的差异、优化和新增内容见[UniDeer 与 DeerFlow 的区别](#unideer-与-deerflow-的区别)。
 
-这些项目体现了开源协作真正的力量，我们也很高兴能继续建立在这些基础之上。
+## UniDeer 与 DeerFlow 的区别
 
-### 核心贡献者
+UniDeer 保留了 super agent harness 的愿景，但在工程和产品方向上有所分歧。今天重要的区别：
 
-感谢 `UniDeer` 的核心作者，是他们的判断、投入和持续推进，才让这个项目真正落地：
+| 领域 | DeerFlow（上游） | UniDeer（本项目） |
+| --- | --- | --- |
+| **仓库** | `bytedance/deer-flow` | 独立 fork，拥有自己的路线图和发布节奏 |
+| **中间件流水线** | 基于宽泛关键词触发的技能门控，会在“形似但未激活”的对话中注入激活提示 | **未激活技能的快速退出**：技能门控（deep-research、system-design、startup-sketch 等）只在技能被显式斜杠激活或已载入 `skill_context` 时触发。闲聊查询直接通过——不污染提示词，降低首 token 延迟 |
+| **回答后纠正** | Metacognition 等门控可能触发第二次完整 LLM 生成来“修正”回答 | **建议式纠正**：回答后的提示在下一个自然轮次生效，而不是强制立即重新生成，消除第二次 LLM 往返的延迟尖峰 |
+| **子代理可观测性** | 折叠的子代理卡片只显示状态 | **实时运行时元数据**：折叠卡片显示生效的模型名和累计 token 用量，每次子代理 LLM 调用后更新，并在重载后保持 |
+| **会话持久化** | 仅会话 cookie | **“保持登录”** 策略：统一的会话 cookie 生命周期、`remember_me` 处理，以及按部署形态（HTTPS、回环、公网 HTTP）的 Secure/Max-Age 策略 |
+| **记忆后端** | 默认 DeerMem | 默认 DeerMem，**另加 OpenViking HTTP 后端**，支持远程、跨实例的记忆召回 |
+| **授权** | 默认关闭 | **可插拔授权 + 内置 RBAC** 提供方，支持按角色的工具/路由允许-拒绝策略 |
+| **追踪关联** | 基础 | X-Trace-ID 传播，外加 Langfuse/LangSmith/Monocle 追踪，带 `metadata.deerflow_trace_id` 关联 |
+| **代码库** | — | harness 包（`backend/packages/harness/deerflow/`）在此维护，带有自己的测试、不变量（harness/app 导入防火墙）和文档 |
 
-- **[Daniel Walnut](https://github.com/hetaoBackend/)**
-- **[Henry Li](https://github.com/magiccube/)**
+共享的 DNA 仍然存在：skills、子代理、沙箱、记忆、MCP 和 IM 渠道桥接。UniDeer 的关注点是**可预测的延迟**（不浪费 token、不意外重新生成）和**运维深度**（所有权、租约、数据库级并发、可观测性）。
 
-## Star History
+## 架构概览
 
-[![Star History Chart](https://api.star-history.com/svg?repos=bytedance/deer-flow&type=Date)](https://star-history.com/#bytedance/deer-flow&Date)
+### 服务拓扑
+
+一个标准部署运行四个协作服务，由一条命令或一个 Docker Compose 栈编排：
+
+| 服务 | 端口 | 角色 |
+| --- | --- | --- |
+| **Nginx** | `2026` | 统一反向代理入口。将 `/api/langgraph/*` 路由到 Gateway 的内嵌 LangGraph 运行时，其余代理到 Frontend。 |
+| **Gateway API** | `8001` | FastAPI REST API，外加内嵌的 LangGraph 运行时（`RunManager`、`run_agent()`、`StreamBridge`）。没有独立的 LangGraph 服务——运行时就在 Gateway 进程内部。 |
+| **Frontend** | `3000` | Next.js 16 Web 界面（React 19、TypeScript、Tailwind CSS 4、pnpm）。 |
+| **Provisioner** | `8002` | 可选——仅在沙箱配置为 provisioner/Kubernetes 模式时启动。负责沙箱 pod/VM 的生命周期管理。 |
+
+```
+                    Browser / IM Client (Feishu, Slack, Telegram, WeChat, WeCom, DingTalk, GitHub, Discord)
+                                       |
+                                       v
+                            Nginx (port 2026)
+                     /api/langgraph/*          /, /workspace/*, /blog/*
+                     |                        |
+                     v                        v
+            Gateway API (FastAPI :8001)   Frontend (Next.js :3000)
+            + embedded LangGraph runtime
+                     |
+        +------------+------------+-----------+
+        |            |            |           |
+        v            v            v           v
+   Sandbox      IM Channels  Provisioner   Persistence
+   (E2B/Aio/    (8 bridges)   (:8002, K8s)  (SQLAlchemy +
+    Local)                                  Alembic)
+```
+
+### harness 与 app 的依赖防火墙
+
+后端分为两层，并有一条由 CI 强制执行的硬性依赖规则：
+
+- `app.*`（FastAPI 宿主：gateway 路由、渠道桥接、调度器）**可以**导入 `deerflow.*`
+- `packages/harness/deerflow/`（harness 包，以 `deerflow.*` 导入）**绝不能**导入 `app.*`
+
+这由 `backend/tests/test_harness_boundary.py` 强制执行，并在 CI 中运行。harness 保持可发布、与 app 无关、可独立测试。第二个不变量由 `make test-blocking-io` 强制：异步事件循环上零同步文件/数据库/网络 I/O——阻塞工作必须通过 `asyncio.to_thread` 卸载。
+
+### 一次典型的请求，端到端
+
+1. 用户在 Frontend 输入框中输入消息（可选语音转录或 AI 润色）。
+2. `POST /api/threads/{id}/runs/stream` 开启一个 SSE 流式请求。
+3. Gateway 验证认证（Better Auth cookie 会话、CSRF、RBAC），解析代理配置，创建 LangGraph 运行。
+4. `RunManager.run_agent()` 从检查点加载 `ThreadState`，解析模型，构建中间件链。
+5. 主导代理节点执行：记忆中间件注入用户上下文，技能激活在斜杠激活时加载 `SKILL.md`，组装系统提示词（目标、技能、工具、记忆），并以工具定义调用模型。
+6. 如果模型调用工具，则路由到内置 / 沙箱 / 社区 / MCP 处理器，结果被净化，并运行循环检测。
+7. 如果调用 `task` 工具，子代理执行器会以隔离上下文和受限工具集生成并行子代理；每个返回结构化的 `TaskResult`；主导代理综合结果。
+8. 运行结束后：记忆提取保存新事实，生成标题（首轮），计算 workspace 变更，评估目标，生成建议。
+9. `StreamBridge` 将内部事件转换为 SSE 事件（`values`、`messages-tuple`、`custom`、`tasks`），Frontend 实时渲染：动画 Markdown、带步骤时间线和 token 用量的子代理卡片、workspace 变更 diff、待办、目标状态和后续建议。
+
+## 核心特性
+
+### Skills 与工具
+
+Skills 是结构化的能力模块——一个定义工作流、最佳实践和参考资源的 `SKILL.md` 文件。UniDeer 内置 30+ 技能，并允许你添加自己的技能、替换内置技能，或组合成复合工作流。
+
+**技能如何工作：**
+
+1. 每个技能位于 `skills/public/`（已提交）或 `skills/custom/`（gitignore）下的独立目录。
+2. `SKILL.md` 文件是入口——技能激活时代理遵循的指令。
+3. 技能**渐进加载**——只在任务需要时加载，保持上下文窗口精简。
+4. 技能可以声明 `allowed-tools`，在激活时限制代理可用的工具（尽力而为的行为范围）。
+5. **斜杠激活**：请求开头使用 `/skill-name` 可在本轮激活技能。
+6. **SkillScan**：对已安装技能运行确定性安全检查器，标记高置信度问题（私钥、shell 执行模式）。
+
+**激活门控。** 领域特定技能门控（deep-research、system-design、startup-sketch 等）只在技能于线程中显式激活时触发——通过 `/skill-name` 斜杠激活，或通过 `read_file` 加载捕获到 `skill_context`。仅包含技能相关词汇的闲聊查询（例如“为什么……”、“解释……”或“设计……”）直接通过：不注入隐藏的激活提示，因此闲聊轮次不会污染提示词或拖慢首 token 延迟。
+
+**内置技能包括：**
+
+- 研究与分析：`deep-research`、`github-deep-research`、`data-analysis`、`academic-paper-review`、`systematic-literature-review`、`consulting-analysis`
+- 内容生成：`report-generation`、`ppt-generation`、`image-generation`、`video-generation`、`music-generation`、`podcast-generation`、`newsletter-generation`
+- 工程：`frontend-design`、`web-design-guidelines`、`chart-visualization`、`code-documentation`、`system-design`、`bootstrap`
+- 产品与需求：`business-requirement`、`product-requirements`、`software-requirements`、`startup-sketch`
+- 元技能：`skill-creator`、`skill-reviewer`、`find-skills`、`surprise-me`、`vercel-deploy-claimable`、`claude-to-deerflow`
+
+技能的 `allowed-tools` 策略只在技能被显式激活后生效。仅仅启用、宣传或在自定义代理或子代理 `skills` 允许列表中列出技能，并不会缩减代理的正常工具集。一旦激活，策略会同时过滤模型可见的工具 schema 和工具执行。这是尽力而为的行为范围，不是硬性安全边界。
+
+### 中间件流水线
+
+主导代理图（`make_lead_agent`）组装了一条由 35 个以上中间件阶段（源码树中 60+ 模块）组成的流水线，包裹每一次模型调用和工具执行。这是 harness 的主要扩展点。
+
+按大致顺序选择的部分阶段：
+
+| 中间件 | 用途 |
+| --- | --- |
+| `InputSanitization` | 中和原始输入中的恶意系统标签 |
+| `ToolOutputBudget` | 限制过大的工具输出，防止上下文溢出 |
+| `ToolResultSanitization` | 净化远程抓取的 HTML/网页结果 |
+| `ThreadData` / `Uploads` | 挂载线程隔离范围并注入上传文件元数据 |
+| `Sandbox` | 获取沙箱容器或本地上下文 |
+| `DanglingToolCall` | 中断恢复后修补未完成的工具调用 |
+| `LLMErrorHandling` | 将提供方错误规范化为可恢复的轮次 |
+| `SandboxAudit` | AST 检查 bash 命令中的不安全模式 |
+| `ReadBeforeWrite` | 文件写入前强制执行加密 SHA 哈希戳门控 |
+| `ToolProgress` | 检测工具停滞的状态机（ACTIVE 到 WARNED 到 BLOCKED） |
+| `SkillActivation` / `SkillToolPolicy` | 绑定 `SKILL.md` 上下文并执行 `allowed-tools` |
+| `Metacognition` | 复杂提示词的先思考执行（回答前；回答后为建议式） |
+| `Planner` | 多步骤变更的“没有计划，不做修改”规则 |
+| `EmojiGate` | Unicode 扫描器，保证生成的代码/配置无 emoji |
+| `Summarization` / `TokenBudget` | 高 token 水位时压缩上下文 |
+| `TodoList` / `Title` | 计划模式的任务跟踪和首轮后自动标题 |
+| `Memory` | 运行前注入长期记忆，运行后提取新事实 |
+| `LoopDetection` | 硬性停止重复的相同工具调用循环 |
+| `TerminalResponse` | 重试空白的助手响应；防止静默失败 |
+| `Safety / ModelLengthFinishReason` | 处理提供方内容过滤器和最大 token 限制 |
+| `Clarification`（最后） | 拦截 `ask_clarification` 并发出 `Command(goto=END)` |
+
+同一链条（减去主导代理特有的阶段）也应用于子代理，因此委派任务受与父任务相同的不变量约束。
+
+### 子代理
+
+子代理是一种优化，而不是复杂请求的默认响应。
+
+主导代理会即时生成子代理——每个都有自己的作用域上下文、工具和终止条件——当委派能带来真实的并行延迟、专业能力或上下文隔离的净收益时。它会让相互依赖的作用域和重叠副作用远离并行调度。子代理返回结构化结果；主导代理验证并综合。
+
+**执行模型。** 子代理执行器是线程池 + asyncio 的混合体：上下文变量从父代理正确传播，每个子代理运行自己的隔离事件循环，生命周期状态遵循严格状态机：`PENDING` 到 `RUNNING` 到 `COMPLETED` / `FAILED` / `CANCELLED` / `TIMED_OUT`。护栏上限（`token_capped`、`turn_capped`、`loop_capped`）提前结束运行，同时保留部分输出，主导代理可以区分“完成”和“被封顶”。
+
+**并发限制。** `SubagentLimitMiddleware` 限制并发委派（默认 3，可配置 1-4）和每次运行的委派总数（默认 6，最大 50）。
+
+**结构化契约。** 子代理结果以固定契约承载在 `ToolMessage.additional_kwargs` 中：状态、停止原因、错误、完整结果的 SHA-256 摘要、生效模型名和累计 token 用量。枚举值通过 `contracts/subagent_status_contract.json` 在 Python 和 TypeScript 之间共享，契约测试将两者钉在一起，确保前后端永不漂移。
+
+**实时运行时元数据。** 折叠的子代理卡片显示生效模型，并在提供方返回用量元数据时显示累计 token 总数，每次子代理 LLM 调用完成后更新，重载后保持。并发子代理以 `task_id` 为键保持独立总数。不提供用量的提供方显示明确的不可用状态，绝不显示伪造的零。
+
+独立的只读研究可以在墙钟节省超过重复发现与综合成本时并发运行。共享文件且有顺序测试反馈的仓库重构则留在主导代理。当 `max_concurrent_subagents` 为 1 时，并行和多批路由指导被禁用；委派仅保留给有实质专业或上下文隔离收益的场景。
+
+### 沙箱与文件系统
+
+每个任务都有自己的执行环境，拥有完整的文件系统视图——skills、workspace、uploads、outputs。
+
+```
+/mnt/user-data/
+├── uploads/          # your files
+├── workspace/        # agents' working directory
+└── outputs/          # final deliverables
+```
+
+**提供方：**
+
+| 提供方 | 描述 |
+| --- | --- |
+| `E2BSandboxProvider` | 远程 E2B 沙箱，带 VM 隔离、预热池、突发，以及多 worker 部署的 Redis 所有权 |
+| `AioSandboxProvider` | 基于容器的隔离（Docker） |
+| `LocalSandboxProvider` | 宿主机文件系统，带每线程目录；默认禁用宿主机 bash |
+
+**关键特性：**
+
+- 每线程目录隔离，带路径安全策略和环境变量策略
+- 文件操作锁，序列化同一路径上的并发读写
+- **写前先读强制**：`read_file` 将文件当前内容的 SHA-256 哈希戳到消息上；对已存在文件的 `write_file` / `str_replace` 在磁盘哈希与戳不匹配时被确定性地阻止。任何写入都会使先前的读取失效，强制连续修改之间重新读取。
+- **Workspace 变更跟踪**：每次运行后，记录 `workspace` 和 `outputs` 中变更文件的 diff 摘要，并在 UI 中以“files changed”徽章和文本 diff 显示。上传被排除（它们是用户输入）。
+- 图像处理：base64 图像在视觉模型消费后从检查点移除，避免负载重复。
+- 用内置 `grep` 工具搜索沙箱文件。
+
+### 上下文工程
+
+- **隔离的子代理上下文** — 子代理无法看到父代理或兄弟的历史
+- **摘要** — 完成的子任务被压缩，中间结果卸载到文件系统，上下文被压缩以保持在 token 限制内
+- **严格的工具调用恢复** — 悬空的工具调用在下次模型调用前用占位结果修补，防止严格的推理模型因畸形历史而失败
+- **可见的工具运行完成** — 空的后工具最终响应重试一次，然后以可见错误呈现，而不是静默成功
+- **手动压缩** — 编辑器中的 `/compact` 在保持完整聊天可见的同时总结旧上下文
+- **会话目标** — `/goal <条件>` 附加线程作用域的完成条件；运行时在每次运行后对照目标评估对话，并注入隐藏的继续（安全上限 8 次），直到满足或清除
+
+### 长期记忆
+
+用户画像、偏好和积累知识的跨会话持久记忆。
+
+**存储架构：**
+
+```
+{deerflow_home}/memory/
+├── users/{user_id}/
+│   ├── memory.json              # user profile + history summaries (JSON)
+│   └── agents/{agent_name}/
+│       └── facts/
+│           ├── ab/cdef123...md  # individual fact (Markdown, sharded by SHA-256)
+│           └── ...
+```
+
+- 事实是规范的 Markdown 文件，按 `SHA-256(fact_id)` 的前两个十六进制字符分片
+- 日志式写入防止静默丢失更新；共享用户锁和乐观修订保护并发访问
+- 检索默认使用作用域 SQLite FTS5/BM25 适配器，带本地子串回退；派生索引可重建，损坏索引自动重建
+- 旧版 `memory.json` 事实在首次读取时自动迁移
+
+**后端：**
+
+- **DeerMem**（默认）— 文件后端、作用域感知，带提取写入门控，在存储前按作用域、持久性和权威性对每条候选事实分类。只存储持久的、描述性的用户级事实；当前线程约束和一次性权限留在对话状态中。
+- **OpenViking**（可选）— 通过 HTTP 连接独立 OpenViking 服务器，支持远程、跨实例召回。有界提交水位和抖动重试防止重试时重复提交。
+
+记忆注入按操作模式配置（`middleware` 与 `tool`），`memory.injection_enabled: false` 完全禁用该块。
+
+### MCP 与模型工厂
+
+UniDeer 支持 **Model Context Protocol**，通过 stdio 或 HTTP 连接外部工具服务器，带工具 schema 缓存、MCP 路由中间件和 MCP 来源工具的工具注解。
+
+模型工厂与提供方无关：
+
+- OpenAI 和 OpenAI 兼容 API（`langchain_openai:ChatOpenAI`）
+- vLLM（自托管，支持思考/推理，通过 `chat_template_kwargs.enable_thinking`）
+- OpenAI Codex CLI（`gpt-5.4` 类）和 Anthropic Claude（OAuth 或 API 密钥）
+- 华为 MindIE，外加打补丁的提供方（DeepSeek、MiniMax、StepFun、MiMo）以支持推理
+
+思考/推理支持（`supports_thinking`、`supports_reasoning_effort`）、视觉模型和 Responses API（`output_version: responses/v1`）都是一等公民。凭据通过凭据加载器从环境变量加载。
+
+### 工具目录
+
+**内置工具** — `task`（生成子代理）、`tool_search`（按描述发现工具）、`ask_clarification`（暂停等待用户输入）、`view_image`、`present_file`、`list_uploaded_files`、`review_skill_package`、`setup_agent` / `update_agent`、`invoke_acp_agent`。
+
+**社区工具** — `web_search`、`web_fetch`、`web_capture`、`image_search`（提供方可配置）。
+
+**沙箱工具** — `bash`、`ls`、`read_file`（支持行范围）、`write_file`、`str_replace`。
+
+**浏览器工具**（可选附加）— `browser_navigate`、`browser_snapshot`、`browser_click`、`browser_type`、`browser_get_text`、`browser_back`、`browser_screenshot`、`browser_close`。由 Playwright 驱动，带 SSRF 筛查；默认禁用。
+
+**授权。** 启用 `authorization.enabled` 后，可插拔的 `AuthorizationProvider` 在工具到达模型或延迟工具目录之前过滤被拒绝的工具，并在每次业务工具执行前再次检查。内置 RBAC 提供方支持按角色的 `tools` 和 `routes` 允许/拒绝策略。
+
+## 运行时与可靠性
+
+### 运行所有权、租约与恢复
+
+每次运行都有所有权。运行管理器分配唯一 worker id（`hostname:hex_uuid`），为每次运行打上租约，并将所有权持久化到 runs 表。如果 Gateway 重启或 worker 在运行达到持久最终状态前变得不可达，该运行会以清晰的停止原因作为孤儿恢复：
+
+- `"Gateway restarted before this run reached a durable final state."`
+- `"Run lease expired - owning worker is unreachable."`
+
+租约过期检测、启动孤儿恢复和多 worker 运行所有权在 SQLite（本地）和 Postgres（部署）上都受支持。状态最终化时的瞬态 SQLite 锁竞争以有界退避重试，驱动原生唯一约束信号（Postgres `23505`、SQLite 约束码）被检测，而不依赖随语言变化的错误文本。
+
+### 检查点
+
+线程状态在每一步后检查点化，因此运行可以恢复或分支。运行时为上游 LangGraph 检查点机制附带兼容性补丁（例如，修复 `InMemorySaver` 在 full-to-delta 迁移线程上丢失写入），钉在已验证的 LangGraph 版本上，如果上游修复则自动退出。检查点通道模式和快照频率可按部署配置。
+
+### 数据库级并发不变量
+
+并发由数据库管理，而不是内存标志。部分唯一索引强制关键不变量：
+
+| 索引 | 不变量 |
+| --- | --- |
+| `uq_runs_thread_active` | 每线程最多一个 pending/running 运行（`WHERE status IN ('pending','running')`） |
+| `uq_scheduled_task_run_active` | 每个定时任务最多一个活动运行（`WHERE status IN ('queued','running')`） |
+| `uq_channel_connection_active_identity` | 外部 IM 身份的单活动所有者转移（`WHERE status != 'revoked'`） |
+
+迁移包含去重预步骤，因此即使在已经违反不变量的数据库上（现场数据库、修复前的多 worker 部署）也能构建索引。竞争中的失败写入方以类型化冲突呈现（例如 `ActiveScheduledRunConflict`），与活动运行重叠的定时调度会记录终态 `skipped` 墓碑，永远不会占用活动槽位。
+
+## 快速开始
+
+### 前置要求
+
+- Python 3.12+ 和 `uv`
+- Node.js 22+ 和 pnpm 10
+- `nginx`（`make dev` 统一本地端点所需）
+- Docker（可选，用于容器化部署）
+
+运行 `make check` 验证工具链。
+
+### 配置
+
+```bash
+git clone https://github.com/bytedance/deer-flow.git
+cd deer-flow
+```
+
+> 上面的克隆 URL 指向上游仓库。对于 UniDeer，请改为克隆你收到的 fork URL。
+
+1. 安装依赖：`make install`（先后端后前端，按 target 实现）
+2. 运行设置向导：
+
+```bash
+make setup
+```
+
+向导引导你选择 LLM 提供方、可选网页搜索，以及执行/安全偏好，如沙箱模式、bash 访问和文件写入工具。它生成一个最小化的 `config.yaml` 并将你的密钥写入 `.env`。大约需要 2 分钟。
+
+随时运行 `make doctor` 验证设置并获得可操作的修复提示。如果你要针对本地设置或运行时问题提交 GitHub issue，运行 `make support-bundle`——它会写出脱敏的 issue 摘要、AI 辅助的 issue 草稿，以及 `.deer-flow/support-bundles/` 下的可选证据压缩包。
+
+**配置文件：**
+
+- `config.yaml`（gitignore）— 主应用配置：模型、沙箱、工具、渠道、调度器、日志、追踪
+- `extensions_config.json`（gitignore）— MCP 服务器和技能定义
+- `config.example.yaml` / `extensions_config.example.json` — 复制用模板
+
+使用 `make config-upgrade` 将 `config.example.yaml` 中的新字段合并到现有 `config.yaml`，不丢失本地设置。
+
+**模型**在 `config.yaml` 的 `models:` 下配置。每个条目指定提供方类、模型 id 和通过环境变量的凭据：
+
+```yaml
+models:
+  - name: gpt-4o
+    display_name: GPT-4o
+    use: langchain_openai:ChatOpenAI
+    model: gpt-4o
+    api_key: $OPENAI_API_KEY
+  - name: qwen3-32b-vllm
+    display_name: Qwen3 32B (vLLM)
+    use: deerflow.models.vllm_provider:VllmChatModel
+    model: Qwen/Qwen3-32B
+    api_key: $VLLM_API_KEY
+    base_url: http://localhost:8000/v1
+    supports_thinking: true
+```
+
+**环境变量**（路径和运行时状态）：
+
+- `UNI_DEER_PROJECT_ROOT` — 显式项目根
+- `UNI_DEER_CONFIG_PATH` — 指向特定配置文件
+- `UNI_DEER_HOME` — 运行时状态位置（默认项目根下的 `.deer-flow`）
+- `UNI_DEER_SKILLS_PATH` — 技能目录（默认项目根下的 `skills/`）
+
+### 运行应用
+
+**方案 1：Docker（推荐）**
+
+```bash
+make docker-start
+```
+
+从 `config.yaml` 进行模式感知启动，统一端点为 `http://localhost:2026`。其他 target：`make docker-stop`、`make docker-logs`、`make docker-logs-gateway`、`make docker-logs-frontend`、`make docker-logs-redis`。
+
+**方案 2：本地开发**
+
+```bash
+make dev
+```
+
+启动三个带热重载的服务：
+
+- Gateway API（FastAPI，端口 8001，带内嵌 LangGraph 运行时）
+- Frontend（Next.js，端口 3000）
+- Nginx（端口 2026 — 统一入口）
+
+用 `make stop` 停止一切。日志位于 `logs/gateway.log`、`logs/frontend.log` 和 `logs/nginx.log`。在 Windows 上，请从 Git Bash 运行本地流程（原生 `cmd.exe`/PowerShell 不支持基于 bash 的服务脚本）。
+
+**后端开发命令**（在 `backend/` 下）：
+
+```bash
+make dev                # FastAPI Gateway with reload (port 8001)
+make test               # offline unit tests
+make test-blocking-io   # strict blocking-IO runtime gate
+make lint               # ruff check
+make format             # ruff format
+make migrate-rev MSG="" # autogenerate an Alembic migration
+```
+
+**前端开发命令**（在 `frontend/` 下）：
+
+```bash
+pnpm dev                # Next.js Turbopack dev server (port 3000)
+pnpm lint               # ESLint
+pnpm typecheck          # TypeScript check
+pnpm test               # unit tests
+pnpm test:e2e           # Playwright E2E tests
+```
+
+### 启动模式
+
+`config.yaml` 支持模式感知启动：
+
+| 模式 | 描述 |
+| --- | --- |
+| `flash` | 快速响应，最少推理 |
+| `standard` | 速度与深度均衡 |
+| `pro` | 带显式推理的计划模式 |
+| `ultra` | 完整子代理编排 |
+
+## 进阶
+
+### 沙箱提供方
+
+**E2B** 默认使用 `wait` 溢出策略：等待 `acquire_timeout`，然后使代理轮次失败（UniDeer 不自动重试；客户端可用结构化错误安排重试）。`burst` 加 `burst_limit` 允许有限额外 VM；`reject` 可在返回错误前移除一个预热 VM。使用 Redis 所有权时，`replicas` 是通过一个容量哈希在 worker 间共享的部署级硬限制；不匹配的 worker 失败关闭。
+
+**Aio** 在隔离的 Docker 容器中运行 shell 执行，线程数据挂载从其后端检测（本地容器使用挂载的 gateway 目录；远程/provisioner 沙箱通过显式同步接收上传）。
+
+**Local** 将文件工具映射到宿主机上的每线程目录，但默认禁用宿主机 `bash`，因为它不是安全隔离边界。只对完全可信的本地工作流重新启用。宿主机 bash 命令有墙钟超时。
+
+### IM 渠道
+
+UniDeer 桥接外部消息平台：**Feishu、Slack、Telegram、Discord、DingTalk、WeChat、WeCom 和 GitHub**。所有渠道共享同一条通过 Gateway 运行生命周期的执行路径：
+
+- 每个渠道接收用户消息，转换为线程运行，并流式返回响应
+- 会话管理（assistant id、递归限制、思考模式）按渠道可配置
+- 消息总线、每渠道运行策略和连接身份关联统一了 8 个桥接
+- **单活动所有者转移**：外部身份以 `(provider, external_account_id, workspace_id)` 为键；最新成功的绑定胜出，由 `uq_channel_connection_active_identity` 部分唯一索引无竞争地强制
+- 入站重投递去重、文件附件暂存到沙箱，以及工件投递（仅 outputs——其他路径被拒绝以防止外泄）
+
+### 授权与 RBAC
+
+高级部署可以在 `config.yaml` 中启用 `authorization.enabled` 的可插拔授权。配置的 `AuthorizationProvider` 在工具到达模型或延迟工具目录之前过滤被拒绝的工具，然后在每次业务工具执行前再次检查同一提供方。Gateway `threads:*` 和 `runs:*` 路由权限来自同一提供方，而现有的所有者检查和仅管理员管理门控仍然有效。内置 RBAC 提供方支持按角色的 `tools` 和 `routes` 允许/拒绝策略，并验证 `default_role` 命名了已配置角色。默认关闭。
+
+### 追踪与可观测性
+
+- **请求追踪关联**：每个 Gateway HTTP 响应都包含 `X-Trace-Id`；日志包含 `trace_id`
+- **Langfuse**：追踪包含匹配 `X-Trace-Id` 的 `metadata.deerflow_trace_id`；设置 `UNI_DEER_ENV`（或 `ENVIRONMENT`）按部署环境标记追踪
+- **LangSmith 和 Monocle**：可插拔追踪提供方
+- 追踪回调在图的调用根附加，因此 span 不会重复；代码库明确记录了这一不变量
+
+### 定时任务
+
+从 Web UI 或 Gateway API 配置循环代理运行。后台调度器按 cron 调度分发每个任务，并带：
+
+- 数据库强制“每个任务最多一个活动运行”语义（`uq_scheduled_task_run_active`）
+- 调度与活动运行重叠时的 `skipped` 墓碑（绝不占用活动槽位）
+- 手动触发与轮询器竞争时收敛到与快速路径相同的结果（手动：409 冲突；调度：`skipped`）
+
+### Provisioner（Kubernetes）
+
+可选的 Provisioner 服务（端口 8002）管理 Kubernetes 部署的沙箱基础设施：按需分配沙箱 pod/VM，维护快速获取的预热池，并处理完整生命周期（创建、健康检查、销毁）。仅在沙箱配置为 provisioner/K8s 模式时启动；使用 E2B/Aio 提供方的本地和 Docker Compose 部署不需要它。
+
+## 嵌入式 Python 客户端
+
+以编程方式与 UniDeer 实例交互——无需 Web UI：
+
+```python
+from deerflow.client import DeerFlowClient
+
+client = DeerFlowClient(base_url="http://localhost:8001")
+
+# Stream a turn
+for event in client.stream("thread-id", "your prompt"):
+    print(event)
+
+# Create a thread
+thread = client.create_thread(agent="lead_agent")
+```
+
+客户端支持线程创建、消息流式（与 UI 相同的 SSE 模式）、记忆管理、文件上传和代理配置。在 `backend/` 中运行 `make test-live` 进行实时 API 测试。
+
+## 终端工作台（TUI）
+
+一个无需 Web UI 即可与 UniDeer 交互的终端界面——从 CLI 新建线程、流式响应、目标和技能命令。用 `deerflow` CLI 命令启动；在非 TTY 上退化为无头 `--print` / `--json` 输出以便脚本化。
+
+## 部署
+
+### 本地开发
+
+```bash
+make dev       # Gateway (8001) + Frontend (3000) + Nginx (2026)
+make stop      # stop everything
+```
+
+### Docker
+
+```bash
+make docker-start   # mode-aware development stack from config.yaml (localhost:2026)
+make up             # production compose (localhost:2026)
+make down           # stop and remove production containers
+```
+
+### Kubernetes
+
+Helm chart 位于 `deploy/helm/deer-flow/`，用于 Kubernetes 部署，由 Provisioner 管理沙箱基础设施。
+
+## 安全
+
+UniDeer 在设计上赋予代理真实的文件系统和执行能力。部署必须被视为特权基础设施：
+
+- **不当部署可能引入安全风险。** Gateway 管理员实际上等同于宿主机上的代码执行。
+- 本地沙箱默认禁用宿主机 bash；只对完全可信的本地工作流重新启用。
+- 浏览器控制在可信调试之外保持 `headless: true` 和 `allow_private_addresses: false`。用 `cdp_url` 附加现有 Chrome 无法强制 SSRF 防护，除非 `allow_unguarded_cdp: true` 明确承认风险，否则失败关闭。
+- 将 `config.yaml` 和 `extensions_config.json` 视为可信的操作者控制文件：中间件、工具、模型、沙箱、护栏和 MCP 声明都是代码执行。
+- 认证使用 HttpOnly cookie、CSRF 保护和可插拔 RBAC；“保持登录”策略在公网 HTTP 上降级为会话 cookie，仅在 HTTPS 或回环上使用 Secure + Max-Age。
+
+## 文档
+
+- [架构](docs/ARCHITECTURE.md) — 服务拓扑、全部 8 层、数据流、仓库地图、术语表
+- [上下文指南](context.md) — 面向编码代理的系统架构与代理上下文
+- [计划与 RFC](docs/plans/) — 授权、追踪、记忆等
+- [贡献](CONTRIBUTING.md) — 开发环境与工作流
+- [安装](Install.md) — 一键代理设置说明
+
+## 贡献
+
+参见 [CONTRIBUTING.md](CONTRIBUTING.md) 了解开发环境设置、必需的命令顺序和验证预期。提交变更前：
+
+- 后端：`cd backend && make lint && make test`（CI 对齐：`uv sync --group dev`，然后 lint，然后 test）
+- 前端（如涉及）：`cd frontend && pnpm lint && pnpm typecheck`；生产构建设置 `BETTER_AUTH_SECRET`
+- 绝不破坏 harness/app 导入防火墙（`tests/test_harness_boundary.py`）
+- 保持异步事件循环无阻塞 I/O（`make test-blocking-io`）
+- 修改功能时更新文档（`README.md`）或修改架构/中间件时更新（`AGENTS.md`）
+
+## 许可证
+
+UniDeer 以 **MIT 许可证** 分发——参见 [LICENSE](LICENSE)。作为 DeerFlow（同样是 MIT）的 fork，源自上游项目的部分的原始版权和署名归 ByteDance 和 DeerFlow 贡献者所有。
