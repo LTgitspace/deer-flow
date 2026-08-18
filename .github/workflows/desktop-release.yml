@@ -1,0 +1,143 @@
+name: Desktop Release
+
+# Builds and publishes the UniDeer desktop app (Tauri v2 + Python sidecar)
+# for Windows, macOS, and Linux. Produces signed installers and the
+# `latest.json` manifest consumed by the built-in auto-updater.
+#
+# Required repository secrets:
+#   TAURI_SIGNING_PRIVATE_KEY  — generated via `cargo tauri signer generate`;
+#                                the PRIVATE key (keep secret, never commit).
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD — passphrase for the key above.
+#   GH_TOKEN                   — classic PAT with `repo` scope, used by
+#                                tauri-action to publish the GitHub Release.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  # Validate the sidecar smoke test before spending release minutes on the
+  # full Tauri matrix. Runs on PRs and on the release tag.
+  sidecar-smoke:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: uv sync --group dev
+
+      - name: Desktop sidecar smoke test
+        working-directory: backend
+        run: uv run python -m app.gateway.desktop_entry --smoke-test
+
+  build:
+    needs: sidecar-smoke
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin
+          - platform: macos-latest
+            args: --target x86_64-apple-darwin
+          - platform: ubuntu-22.04
+            args: ''
+          - platform: windows-latest
+            args: ''
+    runs-on: ${{ matrix.platform }}
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install backend dependencies (PyInstaller)
+        working-directory: backend
+        run: uv sync --group dev --extra desktop
+
+      - name: Install desktop npm dependencies
+        working-directory: desktop
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate icons
+        working-directory: desktop
+        run: cargo tauri icon icons/app-icon.png
+
+      - name: Build backend sidecar (PyInstaller)
+        working-directory: backend
+        run: uv run python -m PyInstaller --noconfirm --clean desktop_build.spec
+
+      - name: Build frontend standalone
+        working-directory: frontend
+        env:
+          NEXT_CONFIG_BUILD_OUTPUT: standalone
+        run: pnpm build
+
+      - name: Build and publish desktop app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'UniDeer ${{ github.ref_name }}'
+          releaseBody: 'See the assets to download and install this version of UniDeer.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

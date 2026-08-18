@@ -5,6 +5,12 @@ target-version = "py312"
 select = ["E", "F", "I", "UP"]
 ignore = []
 
+# PyInstaller .spec files execute with injected globals (Analysis, PYZ, EXE,
+# COLLECT, ...); they are not importable modules, so the undefined-name and
+# unused-import checks do not apply.
+[lint.per-file-ignores]
+"*.spec" = ["F821", "F401"]
+
 [lint.isort]
 known-first-party = ["deerflow", "app"]
 
